@@ -16,7 +16,7 @@
     // // if(email != in data) {
     //   return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
     // }
-    if(email.value.includes(!("@"))){
+    if(email.value.includes(("@"))){
       console.log("dupa")
       showModal.value = true;
       return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
