@@ -13,16 +13,20 @@
   }
 
   const log = () => {
-    // // if(email != in data) {
+    // if(email = in data) {
+    //   router.push(`/account`) 
+    // } else {
+    //   showModal.value = true;
     //   return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
     // }
     if(email.value.includes(("@"))){
-      console.log("dupa")
+      router.push(`/account`)
+    } else {
       showModal.value = true;
       return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
     }
     
-    router.push(`/account`)
+    
   }
 </script>
 
@@ -30,7 +34,7 @@
     <Header />
     <body>
       <div v-if="showModal" class="overlay">
-        <p v-if="errorMessage">{{ errorMessage }}</p>>
+        <p v-if="errorMessage">{{ errorMessage }}</p>><br>
         <button class="close" @click="showModal = false">Zamknij</button>
       </div>
       <div>
@@ -40,7 +44,7 @@
           <p>Hasło:</p>
           <input v-model="password" type="text"><br>
           <button class="login" @click="log">Zaloguj</button>
-          <p>Nie masz konta? Kliknij <button @click="navigateToRegister">tutaj!</button></p>
+          <p>Nie masz konta? Kliknij <button class="registerButton" @click="navigateToRegister">tutaj!</button></p>
       </div>
     </body>
 </template>
@@ -69,13 +73,17 @@
 
   .overlay {
     position: absolute;
-    width: 300px;
-    height: 300px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 500px;
     background-color: rgba(0, 0, 0, 0.77);
     z-index: 10;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
   }
 
  .close {
@@ -86,4 +94,13 @@
     cursor: pointer;
     font-size: 20px;
  }
+
+ .registerButton {
+  border: none;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  color: rgb(191, 133, 120);
+  background-color: rgb(193, 206, 217); 
+}
 </style>
