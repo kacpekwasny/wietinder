@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory
+from werkzeug import exceptions
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -21,9 +22,13 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     db.init_app(app)
 
+    @app.route('/', defaults={'path': 'index.html'})
     @app.route('/<path:path>')
-    def send_report(path):
-        return send_from_directory(r'D:\Projects\Python\WietinderVue\wietinder\dist', path)
+    def index(path):
+        try:
+            return send_from_directory('/home/kacper/code/wietinder/dist/', path)
+        except exceptions.NotFound:
+            return send_from_directory('/home/kacper/code/wietinder/dist/', "index.html")
 
     from .views import views
     from .auth import auth
