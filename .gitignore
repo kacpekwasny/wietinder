@@ -1,3 +1,18 @@
+########################################################
+Tutaj wpisujemy rzeczy, które git ma ignorować.
+
+
+.vscode
+*.pyc
+*egg-info
+node_modules
+
+
+########################################################
+
+
+
+
 # Logs
 logs
 *.log
