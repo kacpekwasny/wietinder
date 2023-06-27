@@ -1,7 +1,9 @@
-<script setup>
+<script setup >
   import {ref} from "vue";
   import Header from "../components/Header.vue";
   import {useRouter} from "vue-router";
+ 
+ 
 
   const router = useRouter();
   const showModal = ref(false);
@@ -9,25 +11,9 @@
   const email = ref("");
 
   const navigateToRegister = () => {
-    router.push(`/register`)
+    router.push(`/register`)  
   }
 
-  const log = () => {
-    // if(email = in data) {
-    //   router.push(`/account`) 
-    // } else {
-    //   showModal.value = true;
-    //   return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
-    // }
-    if(email.value.includes(("@"))){
-      router.push(`/account`)
-    } else {
-      showModal.value = true;
-      return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
-    }
-    
-    
-  }
 </script>
 
 <template>
@@ -37,14 +23,15 @@
         <p v-if="errorMessage">{{ errorMessage }}</p>><br>
         <button class="close" @click="showModal = false">Zamknij</button>
       </div>
+      
       <div>
+      <form id="app" @submit="Login" >
         <p>Masz już konto? Zaloguj się!</p>
-          <p>E-mail:</p>
-          <input v-model="email" type="text">
-          <p>Hasło:</p>
-          <input v-model="password" type="text"><br>
-          <button class="login" @click="log">Zaloguj</button>
+          <input type="text" placeholder="email"><br><br>
+          <input type="text" placeholder="hasło"><br><br>
+          <button class="login" @click="login">Zaloguj</button>
           <p>Nie masz konta? Kliknij <button class="registerButton" @click="navigateToRegister">tutaj!</button></p>
+        </form>
       </div>
     </body>
 </template>

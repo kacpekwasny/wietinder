@@ -5,6 +5,7 @@
 <template>
     <Header />
     <body>
+      <form id="app" @submit="Login" >
         <p>Imię:</p>
         <input v-model="name" type="text">
         <p>Nazwisko:</p>
@@ -19,6 +20,7 @@
         <input v-model="password" type="text">
         <p>Swój opis:</p>
         <input class="description" v-model="password" type="text">
+      </form>
     </body>
 </template>
 
