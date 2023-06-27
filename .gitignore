@@ -1,3 +1,14 @@
+########################################################
+Tutaj wpisujemy rzeczy, które git ma ignorować.
+
+.vscode
+*.pyc
+*egg-info
+node_modules
+
+########################################################
+
+
 # Logs
 logs
 *.log
@@ -13,6 +24,8 @@ dist
 dist-ssr
 coverage
 *.local
+__pycache__/
+database.db
 
 /cypress/videos/
 /cypress/screenshots/
