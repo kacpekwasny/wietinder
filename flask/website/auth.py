@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, render_template, send_from_directory
+from flask import Blueprint, request, redirect, url_for, render_template, send_from_directory, jsonify
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,37 +10,39 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods = ['POST'])
 def login():
-    print("dupa:", request.json)
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+    
+    email = request.json.get('email')
+    password = request.json.get('password')
+    print("dupa:", request.json.get('email'))
 
-        user = User.query.filter_by(email = email).first()
-        if user:
-            if check_password_hash(password, user.password):
-                login_user(user, remember=True)
-                pass
-            else:
-                pass
+    user = User.query.filter_by(email = email).first()
+    print(check_password_hash(user.password, password))
+    if check_email_exists(email):
+        if user.password == password:
+            login_user(user, remember=True)
+            return jsonify({'status': 'success'})
         else:
-            pass
+            print("dupa")
+            return jsonify({'status': 'failure'})
+    else:
+        print("dupa")
+        return jsonify({'status': 'failure'})
 
-    return '<p>Sign Up<p>'
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return '<p>Logout<p>'
 
-@auth.route('/sign-up', methods = ['GET', 'POST'])
+
+@auth.route('/register', methods = ['POST'])
 def sign_up():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        first_name = request.form.get('first_name')
-        second_name = request.form.get('second_name')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
+    
+    email = request.form.get('email')
+    first_name = request.form.get('first_name')
+    second_name = request.form.get('second_name')
+    password1 = request.form.get('password1')
+    password2 = request.form.get('password2')
     
     user = User.query.filter_by(email = email).first()
     if user:
@@ -54,11 +56,13 @@ def sign_up():
     elif password2 != password1:
         pass
     else:
-        new_user = User(email=email, first_name=first_name, password = generate_password_hash(password1, method = 'sha256'))
+        new_user = User(email=email, first_name=first_name, password = password1)
         db.session.add(new_user)
         db.session.commit()
         login_user(user, remember=True)
 
         return redirect(url_for('views.home'))
 
-    return '<p>Sign Up<p>'
+def check_email_exists(email):
+    user = User.query.filter_by(email=email).first()
+    return user is not None

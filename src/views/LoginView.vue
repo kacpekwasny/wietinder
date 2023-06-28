@@ -27,8 +27,20 @@ const log = () => {
           "Content-Type": "application/json",
           // 'Content-Type': 'application/x-www-form-urlencoded',
         }, body: JSON.stringify({ email: email.value, password: password.value })
-      }).then(console.log)
-    router.push(`/account`)
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error('Request failed');
+        }
+        return response.json();
+      })
+      .then(login => {
+        if (login.status == "failure"){
+          showModal.value = true;
+          return errorMessage.value = "Błędny login lub hasło"
+        } else{
+          router.push(`/account`)
+        }
+      })
   } else {
     showModal.value = true;
     return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
