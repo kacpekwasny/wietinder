@@ -3,6 +3,7 @@ from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_cors import cross_origin
 
 auth = Blueprint('auth', __name__)
 
@@ -16,7 +17,7 @@ def login():
     print("dupa:", request.json.get('email'))
 
     user = User.query.filter_by(email = email).first()
-    print(check_password_hash(user.password, password))
+    # print(check_password_hash(user.password, password))
     if check_email_exists(email):
         if user.password == password:
             login_user(user, remember=True)
@@ -36,6 +37,7 @@ def logout():
 
 
 @auth.route('/register', methods = ['POST'])
+@cross_origin()
 def sign_up():
     
     email = request.form.get('email')

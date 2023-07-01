@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import useValidate from "@vuelidate/core"
 import { email, required } from "@vuelidate/validators"
 
+
 const router = useRouter();
 const showModal = ref(false);
 const errorMessage = ref("");
@@ -17,7 +18,7 @@ const navigateToRegister = () => {
 
 const log = () => {
   if (email.value.includes(("@"))) {
-    fetch("/login",
+    fetch(import.meta.env.VITE_API_URL+"/login",
       {
         method: "POST", headers: {
           "Content-Type": "application/json",
