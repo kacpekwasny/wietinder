@@ -1,5 +1,5 @@
 <script >
-  import { useRouter } from "vue-router";
+ 
   import useValidate from "@vuelidate/core"
   import { email, required } from "@vuelidate/validators"
 
