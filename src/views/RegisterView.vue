@@ -2,12 +2,15 @@
  
   import useValidate from "@vuelidate/core"
   import { email, required } from "@vuelidate/validators"
+  import axios from'axios'
 
   export default {
     data() {
       return {
         v$: useValidate(),
         email: '',
+        selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png'] 
+        //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
       }
     },
     validations() {
@@ -16,6 +19,17 @@
       }
     },
     methods: {
+      onFileSelected(event) {
+        this.selectedFile = event.target.files[0]
+      },
+      onUpload() {
+        const fd = new FormData();
+        fd.append('image', this.selectedFile, this.selectedFile.name)
+        axios.post('link do bazy?')
+          .then(response =>{
+            console.log('udało się')
+          })
+      },
       submitForm() {
         this.v$.$validate() 
         if (!this.v$.$error) {
@@ -50,7 +64,13 @@
         <input v-model="password" type="text">
         <p>Swój opis:</p>
         <input class="description" v-model="password" type="text"><br>
-        <button type="submit" @click="submitForm">Zarejestruj</button>
+        <button type="submit" @click="submitForm">Zarejestruj</button><br>
+        <p>Dodaj zdjęcia</p><br>
+        <input type="file" @change="onFileSelected"/>
+        <button @click="onUpload">Dodaj</button>
+        <div class="row">
+          <img v-for="img in selectedFile" v-bind:src="img"/>
+        </div>
       </form>
     </body>
 </template>
@@ -88,4 +108,6 @@
     justify-content: center;
     font-size: 7em;
   }
+
+
 </style>
