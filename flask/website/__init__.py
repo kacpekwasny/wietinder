@@ -5,6 +5,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from os import path
 from flask_login import LoginManager
+from flask_cors import CORS
 
  
 db = SQLAlchemy()
@@ -21,6 +22,8 @@ def create_app():
     db_path = path.join(app.root_path, DB_NAME)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     db.init_app(app)
+
+    cors = CORS(app)
 
     @app.route('/', defaults={'path': 'index.html'})
     @app.route('/<path:path>')

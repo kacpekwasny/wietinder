@@ -3,6 +3,7 @@ import { ref } from "vue";
 import Header from "../components/Header.vue";
 import { useRouter } from "vue-router";
 
+
 const router = useRouter();
 const showModal = ref(false);
 const errorMessage = ref("");
@@ -21,7 +22,7 @@ const log = () => {
   //   return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
   // }
   if (email.value.includes(("@"))) {
-    fetch("/login",
+    fetch(import.meta.env.VITE_API_URL+"/login",
       {
         method: "POST", headers: {
           "Content-Type": "application/json",
