@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import Header from "../components/Header.vue";
 import { useRouter } from "vue-router";
+import useValidate from "@vuelidate/core"
+import { email, required } from "@vuelidate/validators"
 
 const router = useRouter();
 const showModal = ref(false);
