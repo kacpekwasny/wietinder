@@ -26,9 +26,9 @@ def create_app():
     @app.route('/<path:path>')
     def index(path):
         try:
-            return send_from_directory('/home/kacper/code/wietinder/dist/', path)
+            return send_from_directory('../../dist/', path)
         except exceptions.NotFound:
-            return send_from_directory('/home/kacper/code/wietinder/dist/', "index.html")
+            return send_from_directory('../../dist/', "index.html")
 
     from .views import views
     from .auth import auth
