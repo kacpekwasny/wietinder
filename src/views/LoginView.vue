@@ -25,32 +25,32 @@ export default {
       },
       submitForm() {
         this.v$.$validate() 
-        fetch(import.meta.env.VITE_API_URL+"/login",
-        {
-          method: "POST", headers: {
-            "Content-Type": "application/json",
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          }, body: JSON.stringify({ email: email.value, password: password.value })
-        }).then(response => {
-          if (!response.ok) {
-            throw new Error('Request failed');
-          }
-          return response.json();
-        })
-        .then(login => {
-          if (login.status == "failure"){
-            showModal.value = true;
-            return errorMessage.value = "Błędny login lub hasło"
-          } else{
-            router.push(`/account`)
-          }
-        })
           if (!this.v$.$error) {
             this.$router.push({ path: "/account" });
           } else {
-            alert("Brakuje mejla")
+            fetch(import.meta.env.VITE_API_URL+"/login",
+          {
+            method: "POST", headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            }, body: JSON.stringify({ email: email.value, password: password.value })
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error('Request failed');
+            }
+            return response.json();
+          })
+          .then(login => {
+            if (login.status == "failure"){
+              showModal.value = true;
+              return errorMessage.value = "Błędny login lub hasło"
+            } else{
+              router.push(`/account`)
+            }
+          })
+             alert('Brakuje mejla')
+            }
           }
-        }
       }
   }
 
