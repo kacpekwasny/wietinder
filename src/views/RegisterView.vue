@@ -1,5 +1,12 @@
 <script setup>
   import Header from "../components/Header.vue"
+  import { useRouter } from "vue-router";
+  
+  const router = useRouter();
+
+  const navigateToAccount = () => {
+  router.push(`/account`)
+}
 </script>
 
 <template>
@@ -19,7 +26,8 @@
         <p>Hasło:</p>
         <input v-model="password" type="text">
         <p>Swój opis:</p>
-        <input class="description" v-model="password" type="text">
+        <input class="description" v-model="password" type="text"><br>
+        <button type="submit" @click="navigateToAccount">Zarejestruj</button>
       </form>
     </body>
 </template>
