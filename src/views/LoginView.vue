@@ -15,12 +15,6 @@ const navigateToRegister = () => {
 }
 
 const log = () => {
-  // if(email = in data) {
-  //   router.push(`/account`) 
-  // } else {
-  //   showModal.value = true;
-  //   return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
-  // }
   if (email.value.includes(("@"))) {
     fetch(import.meta.env.VITE_API_URL+"/login",
       {
