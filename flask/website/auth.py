@@ -21,49 +21,41 @@ def login():
     if check_email_exists(email):
         if user.password == password:
             login_user(user, remember=True)
-            return jsonify({'status': 'success'})
+            return jsonify({'status': 'success'}), 200
         else:
-            print("dupa")
-            return jsonify({'status': 'failure'})
+            return jsonify({'status': 'failure'}), 401
     else:
-        print("dupa")
-        return jsonify({'status': 'failure'})
+        return jsonify({'status': 'failure'}), 404
 
-
-@auth.route('/logout')
-@login_required
-def logout():
-    logout_user()
 
 
 @auth.route('/register', methods = ['POST'])
-@cross_origin()
-def sign_up():
+
+def register():
+    print("dupa")
+    print(request.json.get('email'))
     
-    email = request.form.get('email')
-    first_name = request.form.get('first_name')
-    second_name = request.form.get('second_name')
-    password1 = request.form.get('password1')
-    password2 = request.form.get('password2')
+    email = request.json.get('email')
+    password = request.json.get('password')
+    name = request.json.get("name")
     
     user = User.query.filter_by(email = email).first()
-    if user:
-        pass
-    elif len(email) < 4:
-        pass
-    elif len(first_name) < 2:
-        pass
-    elif len(second_name) < 2:
-        pass
-    elif password2 != password1:
-        pass
+    if check_email_exists(user):
+        return jsonify({'message': 'Jest zarejestrowane konto na ten email już'}), 400
+    elif len(email) < 5 or len(email) > 50 :
+        return jsonify({'message': 'Niepoprawna długość maila'}), 400
+    elif len(name) < 2 or len(name) > 50:
+        return jsonify({'message': 'Niepoprawna długość imienia'}), 400
+    elif password < 8:
+        return jsonify({'message': 'Hasło musi miec conajmniej 8 znaków'}), 400
     else:
-        new_user = User(email=email, first_name=first_name, password = password1)
+        new_user = User(email=email, first_name=name, password = password)
         db.session.add(new_user)
         db.session.commit()
         login_user(user, remember=True)
 
-        return redirect(url_for('views.home'))
+        return jsonify({'message': 'Konto zostało założone'}), 200
+    
 
 def check_email_exists(email):
     user = User.query.filter_by(email=email).first()

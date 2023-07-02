@@ -3,19 +3,40 @@
   import useValidate from "@vuelidate/core"
   import { email, required } from "@vuelidate/validators"
   import axios from'axios'
+  import { postJson } from "../common/requests"
 
   export default {
     data() {
       return {
         v$: useValidate(),
-        email: '',
+        nameField: '',
+        lastnameField: '',
+        emailField: '',
+        numberField: '',
+        passwordField: '',
+        confirmPasswordField: '',
+        descriptionField: '',
+        passwordField: '',
         selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png'] 
         //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
       }
     },
     validations() {
       return {
-        email: {email, required},
+        emailField: {
+          email, 
+          required
+        },
+        passwordField: {
+          required, 
+        },
+        confirmPasswordField: {
+          required, 
+
+        },
+        nameField: {
+          required, 
+        }
       }
     },
     methods: {
@@ -33,12 +54,29 @@
       submitForm() {
         this.v$.$validate() 
         if (!this.v$.$error) {
+          console.log("dupa")
+          alert("dik")
           // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
           // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
           // czy hasło jest git.
           // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
           // użytkownikowi przedstawić.
-          this.$router.push({ path: "/account" });
+          if (this.passwordField == this.confirmPasswordField){
+            alert("git mordo")
+            postJson("/register",
+            { name: this.nameField,  
+              email: this.emailField,   
+              password: this.passwordField, 
+            }).then(response => {
+              if (response.status == 400){
+                alert()
+              }
+            })
+            
+          } else {
+            alert("Hasła nie pasują")
+          }
+          //this.$router.push({ path: "/account" });
         } else {
           alert("Brakuje mejla")
         }
@@ -56,23 +94,26 @@
     <body>
       <form id="app" @submit="Login" >
         <p>Imię:</p>
-        <input v-model="name" type="text">
-        <p>Nazwisko:</p>
-        <input v-model="lastname" type="text">
+        <input v-model="nameField" type="text">
         <p>E-mail:</p>
-        <input for="email" v-model="email" type="email">
-        <p>Numer telefonu:</p>
-        <input v-model="number" type="text">
-        <p>Login:</p>
-        <input v-model="login" type="text">
+        <input for="email" v-model="emailField" type="email">
         <p>Hasło:</p>
-        <input v-model="password" type="text">
+        <input v-model="passwordField" type="password">
+        <p>Potwierdź hasło:</p>
+        <input v-model="confirmPasswordField" type="password"><br>
+        <button class="register" @click="submitForm">Zarejestruj</button>
+        
+        <!-- <p>Nazwisko:</p>
+        <input v-model="lastnameField" type="text" minlength="2" maxlength="4">
+        <p>Numer telefonu:</p>
+        <input v-model="numberField" type="tel">
         <p>Swój opis:</p>
-        <input class="description" v-model="password" type="text"><br>
+        <input class="description" v-model="descriptionField" type="text"><br>
         <button type="submit" @click="submitForm">Zarejestruj</button><br>
         <p>Dodaj zdjęcia</p><br>
-        <input type="file" @change="onFileSelected"/>
-        <button @click="onUpload">Dodaj</button>
+        <input type="file" @change="onFileSelected"/> -->
+        <!-- <button @click="onUpload">Dodaj</button> -->
+
         <div class="row">
           <img v-for="img in selectedFile" v-bind:src="img"/>
         </div>

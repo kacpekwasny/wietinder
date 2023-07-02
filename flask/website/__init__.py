@@ -23,13 +23,13 @@ def create_app():
     db.init_app(app)
 
 
-    @app.route('/', defaults={'path': 'index.html'})
-    @app.route('/<path:path>')
-    def index(path):
-        try:
-            return send_from_directory('../../dist/', path)
-        except exceptions.NotFound:
-            return send_from_directory('../../dist/', "index.html")
+    # @app.route('/', defaults={'path': 'index.html'})
+    # @app.route('/<path:path>')
+    # def index(path):
+    #     try:
+    #         return send_from_directory('../../dist/', path)
+    #     except exceptions.NotFound:
+    #         return send_from_directory('../../dist/', "index.html")
 
     from .views import views
     from .auth import auth

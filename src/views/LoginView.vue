@@ -25,6 +25,7 @@ export default {
   validations() {
     return {
       emailField: { email, required },
+      passwordField: { required }
     }
   },
   methods: {
@@ -38,20 +39,19 @@ export default {
           { email: this.emailField, password: this.passwordField }
         ).then(response => {
           // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
-          if (!response.ok) {
-            throw new Error('Request failed');
+          //Nie wiem o co chodzi -Dawid
+          if (!response.status == 200) {
+            alert('Błędny login lub hasło')
           }
           return response.json();
+        }).then(login => {
+          if (login.status == "failure") {
+            alert('Błędy login lub hasło')
+          } else {
+            this.$router.push({ path: "/account" });
+          }
         })
-          .then(login => {
-            if (login.status == "failure") {
-              showModal.value = true;
-              return errorMessage.value = "Błędny login lub hasło"
-            } else {
-              router.push(`/account`)
-            }
-          })
-        this.$router.push({ path: "/account" });
+        
       } else {
         alert('Brakuje mejla')
       }
@@ -76,7 +76,7 @@ export default {
       <p>E-mail:</p>
       <input for="email" v-model="emailField" type="email">
       <p>Hasło:</p>
-      <input v-model="passwordField" type="text"><br>
+      <input v-model="passwordField" type="password"><br>
       <button class="login" @click="submitForm">Zaloguj</button>
       <p>Nie masz konta? Kliknij <button class="registerButton" @click="navigateToRegister">tutaj!</button></p>
     </div>
