@@ -30,7 +30,6 @@ def login():
 
 
 @auth.route('/register', methods = ['POST'])
-
 def register():
     print("dupa")
     print(request.json.get('email'))
