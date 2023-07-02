@@ -54,29 +54,30 @@
       submitForm() {
         this.v$.$validate() 
         if (!this.v$.$error) {
-          console.log("dupa")
-          alert("dik")
           // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
           // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
           // czy hasło jest git.
           // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
           // użytkownikowi przedstawić.
           if (this.passwordField == this.confirmPasswordField){
-            alert("git mordo")
             postJson("/register",
             { name: this.nameField,  
               email: this.emailField,   
               password: this.passwordField, 
             }).then(response => {
-              if (response.status == 400){
-                alert()
+              if (response.status == 200){
+                this.$router.push({ path: "/account" });
+                return response.json()
+              } else if (response.status == 400){
+                return response.json()
               }
+            }).then(data =>{
+              alert(data.message)
             })
             
           } else {
             alert("Hasła nie pasują")
           }
-          //this.$router.push({ path: "/account" });
         } else {
           alert("Brakuje mejla")
         }
@@ -92,7 +93,7 @@
       <h1>WIETINDER</h1>
     </header>
     <body>
-      <form id="app" @submit="Login" >
+      <div id="app" @submit="Login" >
         <p>Imię:</p>
         <input v-model="nameField" type="text">
         <p>E-mail:</p>
@@ -117,7 +118,7 @@
         <div class="row">
           <img v-for="img in selectedFile" v-bind:src="img"/>
         </div>
-      </form>
+      </div>
     </body>
 </template>
 

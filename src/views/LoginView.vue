@@ -41,7 +41,7 @@ export default {
           // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
           //Nie wiem o co chodzi -Dawid
           if (!response.status == 200) {
-            alert('Błędny login lub hasło')
+            alert('Coś poszło nie tak')
           }
           return response.json();
         }).then(login => {
