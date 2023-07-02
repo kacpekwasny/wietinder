@@ -3,63 +3,69 @@ import { ref } from "vue";
 import useValidate from "@vuelidate/core"
 import { email, required } from "@vuelidate/validators"
 
+import { postJson } from "../common/requests"
+
 const showModal = ref(false);
 const errorMessage = ref("");
-const password = ref("");
+// const emailField = ref("");
+// const passwordField = ref("");
+// Mi to nie działało xD w sensie, że kiedy robiłem POST, to wysyłał się pusty string "", mimo, że wpisałem tam mail i hasło
+// więc teraz w data() ... zdefiniowałem te pola i w funkcji, która to wysyła nie ma jż emailField.value, tylko this.emailField
+// Zmieniłem też nazwę email na emailField, bo importujemy `email` z vuelidate, więc była kolizja nazw.
+
 
 export default {
-    data() {
-      return {
-        v$: useValidate(),
-        email: '',
-      }
-    },
-    validations() {
-      return {
-        email: {email, required},
-      }
-    },
-    methods: {
-      navigateToRegister() {
+  data() {
+    return {
+      v$: useValidate(),
+      emailField: "",
+      passwordField: "",
+    }
+  },
+  validations() {
+    return {
+      emailField: { email, required },
+    }
+  },
+  methods: {
+    navigateToRegister() {
       this.$router.push({ path: "/register" });
-      },
-      submitForm() {
-        this.v$.$validate() 
-          if (!this.v$.$error) {
-            this.$router.push({ path: "/account" });
-          } else {
-            fetch(import.meta.env.VITE_API_URL+"/login",
-          {
-            method: "POST", headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            }, body: JSON.stringify({ email: email.value, password: password.value })
-          }).then(response => {
-            if (!response.ok) {
-              throw new Error('Request failed');
-            }
-            return response.json();
-          })
+    },
+    submitForm() {
+      this.v$.$validate()
+      if (!this.v$.$error) {
+        postJson("/login",
+          { email: this.emailField, password: this.passwordField }
+        ).then(response => {
+          // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+          return response.json();
+        })
           .then(login => {
-            if (login.status == "failure"){
+            if (login.status == "failure") {
               showModal.value = true;
               return errorMessage.value = "Błędny login lub hasło"
-            } else{
+            } else {
               router.push(`/account`)
             }
           })
-             alert('Brakuje mejla')
-            }
-          }
+        this.$router.push({ path: "/account" });
+      } else {
+        alert('Brakuje mejla')
       }
+    }
   }
+}
 
 </script>
 
 <template>
   <header>
-      <h1>WIETINDER</h1>
-    </header>
+    <h1>WIETINDER</h1>
+  </header>
+
   <body>
     <div v-if="showModal" class="overlay">
       <p v-if="errorMessage">{{ errorMessage }}</p>><br>
@@ -68,9 +74,9 @@ export default {
     <div>
       <p>Masz już konto? Zaloguj się!</p>
       <p>E-mail:</p>
-      <input for="email" v-model="email" type="email">
+      <input for="email" v-model="emailField" type="email">
       <p>Hasło:</p>
-      <input v-model="password" type="text"><br>
+      <input v-model="passwordField" type="text"><br>
       <button class="login" @click="submitForm">Zaloguj</button>
       <p>Nie masz konta? Kliknij <button class="registerButton" @click="navigateToRegister">tutaj!</button></p>
     </div>
@@ -124,11 +130,12 @@ p {
 }
 
 h1 {
-    color: rgb(109, 134, 166);
-    display: flex;
-    justify-content: center;
-    font-size: 7em;
-  }
+  color: rgb(109, 134, 166);
+  display: flex;
+  justify-content: center;
+  font-size: 7em;
+}
+
 .registerButton {
   border: none;
   font-weight: bold;
@@ -136,4 +143,5 @@ h1 {
   cursor: pointer;
   color: rgb(191, 133, 120);
   background-color: rgb(193, 206, 217);
-}</style>
+}
+</style>

@@ -33,6 +33,11 @@
       submitForm() {
         this.v$.$validate() 
         if (!this.v$.$error) {
+          // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
+          // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
+          // czy hasło jest git.
+          // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
+          // użytkownikowi przedstawić.
           this.$router.push({ path: "/account" });
         } else {
           alert("Brakuje mejla")
