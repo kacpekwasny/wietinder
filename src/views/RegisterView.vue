@@ -1,37 +1,37 @@
 <script >
- 
-  import useValidate from "@vuelidate/core"
-  import { email, required } from "@vuelidate/validators"
-  import axios from'axios'
-  import { postJson } from "../common/requests"
 
-  export default {
-    data() {
-      return {
-        v$: useValidate(),
-        nameField: '',
-        lastnameField: '',
-        emailField: '',
-        numberField: '',
-        passwordField: '',
-        confirmPasswordField: '',
-        descriptionField: '',
-        passwordField: '',
-        selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png'] 
-        //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
-      }
-    },
-    validations() {
-      return {
-        emailField: {
-          email, 
-          required
-        },
-        passwordField: {
-          required, 
-        },
-        confirmPasswordField: {
-          required, 
+import useValidate from "@vuelidate/core"
+import { email, required } from "@vuelidate/validators"
+import axios from 'axios'
+import { postJson } from "../common/requests"
+
+export default {
+  data() {
+    return {
+      v$: useValidate(),
+      nameField: '',
+      lastnameField: '',
+      emailField: '',
+      numberField: '',
+      passwordField: '',
+      confirmPasswordField: '',
+      descriptionField: '',
+      passwordField: '',
+      selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png']
+      //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
+    }
+  },
+  validations() {
+    return {
+      emailField: {
+        email,
+        required
+      },
+      passwordField: {
+        required,
+      },
+      confirmPasswordField: {
+        required,
 
         },
         nameField: {
@@ -113,7 +113,7 @@
         <button type="submit" @click="submitForm">Zarejestruj</button><br>
         <p>Dodaj zdjęcia</p><br>
         <input type="file" @change="onFileSelected"/> -->
-        <!-- <button @click="onUpload">Dodaj</button> -->
+      <!-- <button @click="onUpload">Dodaj</button> -->
 
         <div class="row">
           <img v-for="img in selectedFile" v-bind:src="img"/>
@@ -123,38 +123,36 @@
 </template>
 
 <style>
-  body {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    align-items: center;
-    width: 100%;
-    background-color: rgb(193, 206, 217);
-    text-align: center;
-  }
+body {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+  width: 100%;
+  background-color: rgb(193, 206, 217);
+  text-align: center;
+}
 
 
-  input {
-    width: 300px;
-    height: 40px;
-  }
+input {
+  width: 300px;
+  height: 40px;
+}
 
-  p {
-    font-size: larger;
-    color: rgb(191, 133, 120);
-  }
- 
-  .description {
-    width: 300px;
-    height: 100px;
-  }
+p {
+  font-size: larger;
+  color: rgb(191, 133, 120);
+}
 
-  h1 {
-    color: rgb(109, 134, 166);
-    display: flex;
-    justify-content: center;
-    font-size: 7em;
-  }
+.description {
+  width: 300px;
+  height: 100px;
+}
 
-
+h1 {
+  color: rgb(109, 134, 166);
+  display: flex;
+  justify-content: center;
+  font-size: 7em;
+}
 </style>
