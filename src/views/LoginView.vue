@@ -1,53 +1,65 @@
-<script setup>
+<script>
 import { ref } from "vue";
-import Header from "../components/Header.vue";
-import { useRouter } from "vue-router";
+import useValidate from "@vuelidate/core"
+import { email, required } from "@vuelidate/validators"
 
-
-const router = useRouter();
 const showModal = ref(false);
 const errorMessage = ref("");
-const email = ref("");
 const password = ref("");
 
-const navigateToRegister = () => {
-  router.push(`/register`)
-}
-
-const log = () => {
-  if (email.value.includes(("@"))) {
-    fetch(import.meta.env.VITE_API_URL+"/login",
-      {
-        method: "POST", headers: {
-          "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        }, body: JSON.stringify({ email: email.value, password: password.value })
-      }).then(response => {
-        if (!response.ok) {
-          throw new Error('Request failed');
-        }
-        return response.json();
-      })
-      .then(login => {
-        if (login.status == "failure"){
-          showModal.value = true;
-          return errorMessage.value = "Błędny login lub hasło"
-        } else{
-          router.push(`/account`)
-        }
-      })
-  } else {
-    showModal.value = true;
-    return errorMessage.value = "Nie istnieje konto zarejestrowane na ten e-mail!"
+export default {
+    data() {
+      return {
+        v$: useValidate(),
+        email: '',
+      }
+    },
+    validations() {
+      return {
+        email: {email, required},
+      }
+    },
+    methods: {
+      navigateToRegister() {
+      this.$router.push({ path: "/register" });
+      },
+      submitForm() {
+        this.v$.$validate() 
+          if (!this.v$.$error) {
+            this.$router.push({ path: "/account" });
+          } else {
+            fetch(import.meta.env.VITE_API_URL+"/login",
+          {
+            method: "POST", headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            }, body: JSON.stringify({ email: email.value, password: password.value })
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error('Request failed');
+            }
+            return response.json();
+          })
+          .then(login => {
+            if (login.status == "failure"){
+              showModal.value = true;
+              return errorMessage.value = "Błędny login lub hasło"
+            } else{
+              router.push(`/account`)
+            }
+          })
+             alert('Brakuje mejla')
+            }
+          }
+      }
   }
 
-
-}
 </script>
 
 <template>
-  <Header />
-
+  <header>
+      <h1>WIETINDER</h1>
+    </header>
   <body>
     <div v-if="showModal" class="overlay">
       <p v-if="errorMessage">{{ errorMessage }}</p>><br>
@@ -56,10 +68,10 @@ const log = () => {
     <div>
       <p>Masz już konto? Zaloguj się!</p>
       <p>E-mail:</p>
-      <input v-model="email" type="text">
+      <input for="email" v-model="email" type="email">
       <p>Hasło:</p>
       <input v-model="password" type="text"><br>
-      <button class="login" @click="log">Zaloguj</button>
+      <button class="login" @click="submitForm">Zaloguj</button>
       <p>Nie masz konta? Kliknij <button class="registerButton" @click="navigateToRegister">tutaj!</button></p>
     </div>
   </body>
@@ -111,6 +123,12 @@ p {
   font-size: 20px;
 }
 
+h1 {
+    color: rgb(109, 134, 166);
+    display: flex;
+    justify-content: center;
+    font-size: 7em;
+  }
 .registerButton {
   border: none;
   font-weight: bold;
