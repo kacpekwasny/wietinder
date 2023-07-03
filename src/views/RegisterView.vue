@@ -106,15 +106,9 @@ export default {
         <input v-model="confirmPasswordField" type="password"><br>
         <button class="register" @click="submitForm">Zarejestruj</button>
         
-        <!-- <p>Nazwisko:</p>
-        <input v-model="lastnameField" type="text" minlength="2" maxlength="4">
-        <p>Numer telefonu:</p>
-        <input v-model="numberField" type="tel">
-        <p>Swój opis:</p>
-        <input class="description" v-model="descriptionField" type="text"><br>
-        <button type="submit" @click="submitForm">Zarejestruj</button><br>
-        <p>Dodaj zdjęcia</p><br>
-        <input type="file" @change="onFileSelected"/> -->
+      
+        <!-- <p>Dodaj zdjęcia</p><br>
+        <input type="file" @change="onFileSelected"/> --> -->
       <!-- <button @click="onUpload">Dodaj</button> -->
 
         <div class="row">
