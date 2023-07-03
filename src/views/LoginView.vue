@@ -38,22 +38,20 @@ export default {
         postJson("/login",
           { email: this.emailField, password: this.passwordField }
         ).then(response => {
-          // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
-          //Nie wiem o co chodzi -Dawid
-          if (!response.status == 200) {
-            alert('Błędny login lub hasło')
-          }
-          return response.json();
-        }).then(login => {
-          if (login.status == "failure") {
-            alert('Błędy login lub hasło')
-          } else {
+          if (response.status == 200) {
             this.$router.push({ path: "/account" });
           }
-        })
-        
+          // tutaj cos poszle zle
+          // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
+          //Nie wiem o co chodzi -Dawid
+          if (response.status == 401) {
+            alert('Błędne hasło')
+          } else if (response.status == 404) {
+            alert('Błędne email')
+          }
+        })        
       } else {
-        alert('Brakuje mejla')
+        
       }
     }
   }
