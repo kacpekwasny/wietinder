@@ -16,7 +16,6 @@ export default {
       passwordField: '',
       confirmPasswordField: '',
       descriptionField: '',
-      passwordField: '',
       selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png']
       //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
     }
@@ -34,11 +33,11 @@ export default {
         required,
 
         },
-        nameField: {
-          required, 
-        }
+      nameField: {
+        required, 
       }
-    },
+    }
+  },
     methods: {
       onFileSelected(event) {
         this.selectedFile = event.target.files[0]
@@ -52,7 +51,10 @@ export default {
           })
       },
       submitForm() {
-        this.v$.$validate() 
+        this.v$.$validate()
+        if (this.v$.emailField.$error){
+          return alert("Podaj poprawny email")
+        }
         if (!this.v$.$error) {
           // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
           // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
@@ -79,7 +81,7 @@ export default {
             alert("Hasła nie pasują")
           }
         } else {
-          alert("Brakuje mejla")
+          alert("Wszystkie pola wymagane")
         }
       }
     }
@@ -95,7 +97,7 @@ export default {
     <body>
       <div id="app" @submit="Login" >
         <p>Imię:</p>
-        <input v-model="nameField" type="text">
+        <input v-model="nameField" type="text" onkeydown="return /[a-z]/i.test(event.key)">
         <p>E-mail:</p>
         <input for="email" v-model="emailField" type="email">
         <p>Hasło:</p>

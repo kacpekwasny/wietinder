@@ -17,7 +17,6 @@ def login():
     print("dupa:", request.json.get('email'))
 
     user = User.query.filter_by(email = email).first()
-    # print(check_password_hash(user.password, password))
     if check_email_exists(email):
         if user.password == password:
             login_user(user, remember=True)
@@ -42,6 +41,8 @@ def register():
         return jsonify({'message': 'Niepoprawna długość maila'}), 400
     elif len(name) < 2 or len(name) > 50:
         return jsonify({'message': 'Niepoprawna długość imienia'}), 400
+    elif not name.isalpha():
+        return jsonify({'message': 'Imie może zawierać tylko litery'}), 400
     elif len(password) < 8:
         return jsonify({'message': 'Hasło musi miec conajmniej 8 znaków'}), 400
     else:
