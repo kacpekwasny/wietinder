@@ -17,7 +17,6 @@ def login():
     print("dupa:", request.json.get('email'))
 
     user = User.query.filter_by(email = email).first()
-    # print(check_password_hash(user.password, password))
     if check_email_exists(email):
         if user.password == password:
             login_user(user, remember=True)
@@ -31,27 +30,26 @@ def login():
 
 @auth.route('/register', methods = ['POST'])
 def register():
-    print("dupa")
-    print(request.json.get('email'))
-    
     email = request.json.get('email')
     password = request.json.get('password')
     name = request.json.get("name")
     
-    user = User.query.filter_by(email = email).first()
-    if check_email_exists(user):
+    
+    if check_email_exists(email):
         return jsonify({'message': 'Jest zarejestrowane konto na ten email już'}), 400
     elif len(email) < 5 or len(email) > 50 :
         return jsonify({'message': 'Niepoprawna długość maila'}), 400
     elif len(name) < 2 or len(name) > 50:
         return jsonify({'message': 'Niepoprawna długość imienia'}), 400
-    elif password < 8:
+    elif not name.isalpha():
+        return jsonify({'message': 'Imie może zawierać tylko litery'}), 400
+    elif len(password) < 8:
         return jsonify({'message': 'Hasło musi miec conajmniej 8 znaków'}), 400
     else:
         new_user = User(email=email, first_name=name, password = password)
         db.session.add(new_user)
         db.session.commit()
-        login_user(user, remember=True)
+        login_user(new_user, remember=True)
 
         return jsonify({'message': 'Konto zostało założone'}), 200
     
