@@ -15,10 +15,10 @@ def login():
     email = request.json.get('email')
     password = request.json.get('password')
     print("dupa:", request.json.get('email'))
-
+    
     user = User.query.filter_by(email = email).first()
     if check_email_exists(email):
-        if user.password == password:
+        if check_password_hash(user.password, password):
             login_user(user, remember=True)
             return jsonify({'status': 'success'}), 200
         else:
@@ -46,7 +46,7 @@ def register():
     elif len(password) < 8:
         return jsonify({'message': 'Hasło musi miec conajmniej 8 znaków'}), 400
     else:
-        new_user = User(email=email, first_name=name, password = password)
+        new_user = User(email=email, first_name=name, password = generate_password_hash(password, method='pbkdf2:sha1', salt_length=8))
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
