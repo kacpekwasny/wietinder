@@ -1,13 +1,17 @@
 <script >
-
+import { ref } from "vue";
 import useValidate from "@vuelidate/core"
 import { email, required, minLength } from "@vuelidate/validators"
 import axios from 'axios'
 import { postJson } from "../common/requests"
 
+const showModal = ref(false);
+const errorMessage = ref("");
+
 export default {
   data() {
     return {
+      showModal: false,
       v$: useValidate(),
       nameField: '',
       lastnameField: '',
@@ -65,7 +69,8 @@ export default {
     submitForm() {
       this.v$.$validate()
       if (this.v$.emailField.$error){
-        return alert("Podaj poprawny email")
+        this.showModal = true;
+        return this.errorMessage = 'Błędny email'
       }
       if (!this.v$.$error) {
         // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
@@ -90,10 +95,12 @@ export default {
           })
           
         } else {
-          alert("Hasła nie pasują")
+          this.showModal = true;
+          this.errorMessage = "Hasła nie pasują"
         }
       } else {
-        alert("Wszystkie pola wymagane")
+        this.showModal = true;
+        this.errorMessage = "Wszystkie pola wymagane"
       }
     }
   }
@@ -107,6 +114,12 @@ export default {
       <h1>WIETINDER</h1>
     </header>
     <body>
+      <div>
+        <div v-if="showModal" class="overlay">
+        <p v-if="errorMessage">{{ errorMessage }}</p>><br>
+        <button class="close" @click="showModal = false">Zamknij</button>
+    </div>
+      </div>
       <div id="app" @submit="Login" >
         <p>Imię:</p>
         <input v-model="nameField" type="text" onkeydown="return /[a-z]/i.test(event.key)">
