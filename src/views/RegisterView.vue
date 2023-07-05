@@ -1,7 +1,7 @@
 <script >
 
 import useValidate from "@vuelidate/core"
-import { email, required } from "@vuelidate/validators"
+import { email, required, minLength } from "@vuelidate/validators"
 import axios from 'axios'
 import { postJson } from "../common/requests"
 
@@ -15,8 +15,8 @@ export default {
       numberField: '',
       passwordField: '',
       confirmPasswordField: '',
-      descriptionField: '',
-      selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png']
+      // descriptionField: '',
+      // selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png']
       //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
     }
   },
@@ -28,63 +28,75 @@ export default {
       },
       passwordField: {
         required,
-      },
+        minLength: minLength(9),
+        containsUppercase: function(value) {
+          return /[A-Z]/.test(value)
+        },
+        containsLowercase: function(value) {
+          return /[a-z]/.test(value)
+        },
+        containsNumber: function(value) {
+          return /[0-9]/.test(value)
+        },
+        containsSpecial: function(value) {
+          return /[#?!@$%^&*-]/.test(value)
+        },
       confirmPasswordField: {
         required,
-
-        },
+      },
       nameField: {
         required, 
       }
+      } 
     }
   },
-    methods: {
-      onFileSelected(event) {
-        this.selectedFile = event.target.files[0]
-      },
-      onUpload() {
-        const fd = new FormData();
-        fd.append('image', this.selectedFile, this.selectedFile.name)
-        axios.post('link do bazy?')
-          .then(response =>{
-            console.log('udało się')
+  methods: {
+    onFileSelected(event) {
+      this.selectedFile = event.target.files[0]
+    },
+    onUpload() {
+      const fd = new FormData();
+      fd.append('image', this.selectedFile, this.selectedFile.name)
+      axios.post('link do bazy?')
+        .then(response =>{
+          console.log('udało się')
+        })
+    },
+    submitForm() {
+      this.v$.$validate()
+      if (this.v$.emailField.$error){
+        return alert("Podaj poprawny email")
+      }
+      if (!this.v$.$error) {
+        // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
+        // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
+        // czy hasło jest git.
+        // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
+        // użytkownikowi przedstawić.
+        if (this.passwordField == this.confirmPasswordField){
+          postJson("/register",
+          { name: this.nameField,  
+            email: this.emailField,   
+            password: this.passwordField, 
+          }).then(response => {
+            if (response.status == 200){
+              this.$router.push({ path: "/account" });
+              return response.json()
+            } else if (response.status == 400){
+              return response.json()
+            }
+          }).then(data =>{
+            alert(data.message)
           })
-      },
-      submitForm() {
-        this.v$.$validate()
-        if (this.v$.emailField.$error){
-          return alert("Podaj poprawny email")
-        }
-        if (!this.v$.$error) {
-          // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
-          // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
-          // czy hasło jest git.
-          // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
-          // użytkownikowi przedstawić.
-          if (this.passwordField == this.confirmPasswordField){
-            postJson("/register",
-            { name: this.nameField,  
-              email: this.emailField,   
-              password: this.passwordField, 
-            }).then(response => {
-              if (response.status == 200){
-                this.$router.push({ path: "/account" });
-                return response.json()
-              } else if (response.status == 400){
-                return response.json()
-              }
-            }).then(data =>{
-              alert(data.message)
-            })
-            
-          } else {
-            alert("Hasła nie pasują")
-          }
+          
         } else {
-          alert("Wszystkie pola wymagane")
+          alert("Hasła nie pasują")
         }
+      } else {
+        alert("Wszystkie pola wymagane")
       }
     }
+  }
   }
 
 </script>
@@ -101,7 +113,11 @@ export default {
         <p>E-mail:</p>
         <input for="email" v-model="emailField" type="email">
         <p>Hasło:</p>
-        <input v-model="passwordField" type="password">
+        <input v-model="passwordField" type="password"><br>
+        <span v-if="v$.passwordField && !v$.passwordField.valid">
+          Password contains atleast One Uppercase, One Lowercase, One Number
+            and One Special Chacter
+        </span>
         <p>Potwierdź hasło:</p>
         <input v-model="confirmPasswordField" type="password"><br>
         <button class="register" @click="submitForm">Zarejestruj</button>

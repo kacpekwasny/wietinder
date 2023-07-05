@@ -17,6 +17,7 @@ const errorMessage = ref("");
 export default {
   data() {
     return {
+      showModal: false,
       v$: useValidate(),
       emailField: "",
       passwordField: "",
@@ -41,17 +42,17 @@ export default {
           if (response.status == 200) {
             this.$router.push({ path: "/account" });
           }
-          // tutaj cos poszle zle
-          // TODO: tutaj poprawnie zająć się odpowiedzią z serwera
-          //Nie wiem o co chodzi -Dawid
           if (response.status == 401) {
-            alert('Błędne hasło')
+            showModal = true;
+            return errorMessage.value = 'Błędne hasło'
           } else if (response.status == 404) {
-            alert('Błędne email')
+            showModal.value = true;
+            return errorMessage.value = 'Błędny email'
           }
         })        
       } else {
-        
+        showModal.value = true;
+        return errorMessage.value = 'Wprowadzony tekst nie jest mejlem!'
       }
     }
   }
