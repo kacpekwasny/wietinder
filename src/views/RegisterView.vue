@@ -129,7 +129,7 @@ export default {
         <input v-model="passwordField" type="password"><br>
         <span v-if="v$.passwordField && !v$.passwordField.valid">
           Password contains atleast One Uppercase, One Lowercase, One Number
-            and One Special Chacter
+            and One Special Chacter and must contatain of minimum 9 characters!
         </span>
         <p>Potwierdź hasło:</p>
         <input v-model="confirmPasswordField" type="password"><br>
