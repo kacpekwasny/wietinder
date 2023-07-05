@@ -7,11 +7,13 @@ import { postJson } from "../common/requests"
 
 const showModal = ref(false);
 const errorMessage = ref("");
+const passwordValidationOff = ref(false);
 
 export default {
   data() {
     return {
       showModal: false,
+      passwordValidationOff: false,
       v$: useValidate(),
       nameField: '',
       lastnameField: '',
@@ -45,6 +47,7 @@ export default {
         containsSpecial: function(value) {
           return /[#?!@$%^&*-]/.test(value)
         },
+      },
       confirmPasswordField: {
         required,
       },
@@ -52,7 +55,6 @@ export default {
         required, 
       }
       } 
-    }
   },
   methods: {
     onFileSelected(event) {
@@ -72,6 +74,10 @@ export default {
         this.showModal = true;
         return this.errorMessage = 'Błędny email'
       }
+      if (this.v$.passwordField.invalid) {
+        this.showModal = true;
+        return this.errorMessage = 'Sprawdz swoje hasło';
+      } 
       if (!this.v$.$error) {
         // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
         // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
