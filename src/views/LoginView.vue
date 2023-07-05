@@ -43,16 +43,16 @@ export default {
             this.$router.push({ path: "/account" });
           }
           if (response.status == 401) {
-            showModal = true;
-            return errorMessage.value = 'Błędne hasło'
+            this.showModal = true;
+            return this.errorMessage = 'Błędne hasło'
           } else if (response.status == 404) {
-            showModal.value = true;
-            return errorMessage.value = 'Błędny email'
+            this.showModal = true;
+            return this.errorMessage = 'Błędny email'
           }
         })        
       } else {
-        showModal.value = true;
-        return errorMessage.value = 'Wprowadzony tekst nie jest mejlem!'
+        this.showModal = true;
+        return this.errorMessage = 'Wprowadzony tekst nie jest mejlem!'
       }
     }
   }
