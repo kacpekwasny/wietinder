@@ -7,13 +7,14 @@ import { postJson } from "../common/requests"
 
 const showModal = ref(false);
 const errorMessage = ref("");
-const passwordValidationOff = ref(false);
+const passwordValidationOff = ref(true); 
+
+novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
 
 export default {
   data() {
     return {
       showModal: false,
-      passwordValidationOff: false,
       v$: useValidate(),
       nameField: '',
       lastnameField: '',
@@ -34,6 +35,7 @@ export default {
       },
       passwordField: {
         required,
+        
         minLength: minLength(9),
         containsUppercase: function(value) {
           return /[A-Z]/.test(value)
@@ -97,7 +99,7 @@ export default {
               return response.json()
             }
           }).then(data =>{
-            alert(data.message)
+            alert(data.message) // nie wiem co to robi, co tu dac modal? - nata
           })
           
         } else {
@@ -132,7 +134,7 @@ export default {
         <p>E-mail:</p>
         <input for="email" v-model="emailField" type="email">
         <p>Hasło:</p>
-        <input v-model="passwordField" type="password"><br>
+        <input v-model="passwordField" type="password" novalidate><br>
         <span v-if="v$.passwordField && !v$.passwordField.valid">
           Password contains atleast One Uppercase, One Lowercase, One Number
             and One Special Chacter and must contatain of minimum 9 characters!
