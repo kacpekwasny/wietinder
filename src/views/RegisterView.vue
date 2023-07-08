@@ -9,7 +9,7 @@ const showModal = ref(false);
 const errorMessage = ref("");
 const passwordValidationOff = ref(true); 
 
-novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
+// novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
 
 export default {
   data() {
