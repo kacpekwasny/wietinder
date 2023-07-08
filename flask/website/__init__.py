@@ -1,40 +1,45 @@
-from flask import Flask, send_from_directory
+import os
+
+from dotenv import load_dotenv
+from pathlib import Path
 from werkzeug import exceptions
-from flask_sqlalchemy import SQLAlchemy
+
+from flask import Flask, send_from_directory
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from os import path
 from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 
- 
+
+WEBSITE_DIR = Path(__file__).resolve().parent
+
+
 db = SQLAlchemy()
-DB_NAME = 'database.db'
-
 
 
 def create_app():
-   
+    app = Flask(__name__)
+    
+    load_dotenv()
+
+    from .config import ConfigDev, ConfigProd
+
+    config = ConfigDev
+    if os.getenv("IS_PRODUCTION", "False") == "True":
+        # ustaw config pod produkcje, jeżewli zmienna środowiskowa 
+        # IS_PRODUCTION=True
+        config = ConfigProd
+
+    app.config.from_object(config)
+
+
+    db.init_app(app)
     
 
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'asdfjasdi'
-    db_path = path.join(app.root_path, DB_NAME)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-    db.init_app(app)
-
-
-    # @app.route('/', defaults={'path': 'index.html'})
-    # @app.route('/<path:path>')
-    # def index(path):
-    #     try:
-    #         return send_from_directory('../../dist/', path)
-    #     except exceptions.NotFound:
-    #         return send_from_directory('../../dist/', "index.html")
-
-    from .views import views
+    from .serve_frontend import serve_frontend
     from .auth import auth
 
-    app.register_blueprint(views, url_prefix='/')
+    app.register_blueprint(serve_frontend, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
     from .models import User
