@@ -9,7 +9,7 @@ const showModal = ref(false);
 const errorMessage = ref("");
 const passwordValidationOff = ref(true); 
 
-novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
+// novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
 
 export default {
   data() {
@@ -134,7 +134,7 @@ export default {
         <p>E-mail:</p>
         <input for="email" v-model="emailField" type="email">
         <p>Hasło:</p>
-        <input v-model="passwordField" type="password" novalidate><br>
+        <input v-model="passwordField" type="password"><br>
         <span v-if="v$.passwordField && !v$.passwordField.valid">
           Password contains atleast One Uppercase, One Lowercase, One Number
             and One Special Chacter and must contatain of minimum 9 characters!
