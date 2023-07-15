@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
 class Image(db.Model):
     __tablename__ = 'images'
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.BLOB)
+    filename = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates='images')
     
