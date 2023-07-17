@@ -9,8 +9,7 @@ from flask_login import LoginManager
  
 db = SQLAlchemy()
 DB_NAME = 'database.db'
-
-
+UPLOAD_FOLDER = 'uploads'
 
 def create_app():
    
@@ -21,6 +20,7 @@ def create_app():
     db_path = path.join(app.root_path, DB_NAME)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     db.init_app(app)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
     # @app.route('/', defaults={'path': 'index.html'})
@@ -37,7 +37,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User
+    from .models import User, Image
 
     with app.app_context():
         db.create_all()
@@ -52,6 +52,7 @@ def create_app():
 
     admin = Admin(app, name='Admin Page', template_mode='bootstrap3')
     admin.add_view(ModelView(User, db.session))
+    admin.add_view(ModelView(Image, db.session))
 
     return app
 

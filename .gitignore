@@ -26,6 +26,7 @@ coverage
 *.local
 __pycache__/
 database.db
+uploads/*
 
 /cypress/videos/
 /cypress/screenshots/

@@ -14,7 +14,6 @@ def login():
     
     email = request.json.get('email')
     password = request.json.get('password')
-    print("dupa:", request.json.get('email'))
     
     user = User.query.filter_by(email = email).first()
     if check_email_exists(email):
