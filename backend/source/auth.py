@@ -5,10 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# from . import db
-from .models import User
-
-
 def resp(code: int, info=None) -> tuple[Response, int]:
     ok = code == 200
     data = dict(ok=ok)
@@ -18,7 +14,8 @@ def resp(code: int, info=None) -> tuple[Response, int]:
 
     return jsonify(data), code
 
-def get_auth_bp(db: SQLAlchemy):
+def get_auth_bp(db: SQLAlchemy) -> Blueprint:
+    from .models import User
 
     auth = Blueprint('auth', __name__)
 
