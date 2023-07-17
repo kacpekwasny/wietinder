@@ -15,15 +15,13 @@ def resp(code: int, info=None) -> tuple[Response, int]:
     return jsonify(data), code
 
 def get_auth_bp(db: SQLAlchemy) -> Blueprint:
-    from .models import User
+    from ..models import User
 
     auth = Blueprint('auth', __name__)
 
     def check_email_exists(email):
         user = User.query.filter_by(email=email).first()
         return user is not None
-
-
 
     @auth.route('/login', methods=['POST'])
     def login():

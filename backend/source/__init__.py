@@ -10,7 +10,8 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 
-WEBSITE_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+UPLOADS_DIR = BACKEND_DIR / "uploads"
 
 db = SQLAlchemy()
 
@@ -35,13 +36,15 @@ def create_app():
     db.init_app(app)
 
     # Blueprints
-    from .auth import get_auth_bp
-    from .serve_frontend import get_serve_frontend_bp
+    from .blueprints.auth import get_auth_bp
+    from .blueprints.account import get_account_bp
+    from .blueprints.serve_frontend import get_serve_frontend_bp
     app.register_blueprint(get_serve_frontend_bp())
     app.register_blueprint(get_auth_bp(db))
+    app.register_blueprint(get_account_bp(db, UPLOADS_DIR))
 
 
-    from .models import User
+    from .models import User, Image
 
     with app.app_context():
         db.create_all()
@@ -56,6 +59,7 @@ def create_app():
 
     admin = Admin(app, name='Admin Page', template_mode='bootstrap3')
     admin.add_view(ModelView(User, db.session))
+    admin.add_view(ModelView(Image, db.session))
 
     return app
 

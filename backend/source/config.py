@@ -12,6 +12,9 @@ class Config:
     SECRET_KEY: str
     """ """
 
+    UPLOAD_FOLDER: str
+    """Folder do uploadowania zdjec???"""
+
 
 class ConfigDev(Config):
     """Development config to be run on local machine."""
