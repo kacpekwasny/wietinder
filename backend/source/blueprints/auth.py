@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, jsonify
 from flask.wrappers import Response
 from flask_login import login_user
@@ -47,32 +48,34 @@ def get_auth_bp(db: SQLAlchemy) -> Blueprint:
         password = request.json.get('password')
         name = request.json.get("name")
         
-        if check_email_exists(email):
-            return resp(400, 'email_registered')
 
-        elif len(email) < 5 or len(email) > 50 :
-            return resp(400, "email_bad")
+        if os.getenv("IS_PRODUCTION"):
+            # dont check for development
+            if check_email_exists(email):
+                return resp(400, 'email_registered')
 
-        elif len(name) < 2 or len(name) > 50:
-            return resp(400, "name_len_bad")
+            if len(email) < 5 or len(email) > 50 :
+                return resp(400, "email_bad")
 
-        elif not name.isalpha():
-            return resp(400, "name_alpha_bad")
+            if len(name) < 2 or len(name) > 50:
+                return resp(400, "name_len_bad")
 
-        elif len(password) < 8:
-            return resp(400, "password_len_bad")
+            if not name.isalpha():
+                return resp(400, "name_alpha_bad")
 
-        else:
-            new_user = User(email=email,
-                            first_name=name,
-                            password=generate_password_hash(password,
-                                                            method='pbkdf2:sha1',
-                                                            salt_length=8))
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user, remember=True)
+            if len(password) < 8:
+                return resp(400, "password_len_bad")
 
-            return resp(200)
+        new_user = User(email=email,
+                        first_name=name,
+                        password=generate_password_hash(password,
+                                                        method='pbkdf2:sha1',
+                                                        salt_length=8))
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user, remember=True)
+
+        return resp(200)
     
     return auth
 

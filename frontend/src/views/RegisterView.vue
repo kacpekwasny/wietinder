@@ -7,7 +7,7 @@ import { postJson } from "../common/requests"
 
 const showModal = ref(false);
 const errorMessage = ref("");
-const passwordValidationOff = ref(true); 
+const VALIDATION_OFF = String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "false"
 
 // novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
 
@@ -22,9 +22,6 @@ export default {
       numberField: '',
       passwordField: '',
       confirmPasswordField: '',
-      // descriptionField: '',
-      // selectedFile: ['https://kis.agh.edu.pl/wp-content/uploads/2019/09/LOGO2.png']
-      //tu trzeba jakos zrobic zeby sie zdjecia zapisywaly i wysietlay potem
     }
   },
   validations() {
@@ -35,18 +32,18 @@ export default {
       },
       passwordField: {
         required,
-        
+
         minLength: minLength(9),
-        containsUppercase: function(value) {
+        containsUppercase(value) {
           return /[A-Z]/.test(value)
         },
-        containsLowercase: function(value) {
+        containsLowercase(value) {
           return /[a-z]/.test(value)
         },
-        containsNumber: function(value) {
+        containsNumber(value) {
           return /[0-9]/.test(value)
         },
-        containsSpecial: function(value) {
+        containsSpecial(value) {
           return /[#?!@$%^&*-]/.test(value)
         },
       },
@@ -54,9 +51,9 @@ export default {
         required,
       },
       nameField: {
-        required, 
+        required,
       }
-      } 
+    }
   },
   methods: {
     onFileSelected(event) {
@@ -66,93 +63,97 @@ export default {
       const fd = new FormData();
       fd.append('image', this.selectedFile, this.selectedFile.name)
       axios.post('link do bazy?')
-        .then(response =>{
+        .then(response => {
           console.log('udało się')
         })
     },
     submitForm() {
       this.v$.$validate()
-      if (this.v$.emailField.$error){
-        this.showModal = true;
-        return this.errorMessage = 'Błędny email'
-      }
-      if (this.v$.passwordField.invalid) {
-        this.showModal = true;
-        return this.errorMessage = 'Sprawdz swoje hasło';
-      } 
-      if (!this.v$.$error) {
-        // TODO: Należy najpierw wysłać do backendu to co użytkownik wprowadził w celu utworzenia konta.
-        // Backend zwaliduje, czy nie istnieje już konto z takim mailem,
-        // czy hasło jest git.
-        // Potem backend odeśle odpowiedź i albo będzie git, albo coś będzie źle, i tą informacje będzie trzeba
-        // użytkownikowi przedstawić.
-        if (this.passwordField == this.confirmPasswordField){
-          postJson("/register",
-          { name: this.nameField,  
-            email: this.emailField,   
-            password: this.passwordField, 
-          }).then(response => {
-            if (response.status == 200){
-              this.$router.push({ path: "/account" });
-              return response.json()
-            } else if (response.status == 400){
-              return response.json()
-            }
-          }).then(data =>{
-            alert(data.message) // nie wiem co to robi, co tu dac modal? - nata
-          })
-          
-        } else {
+      // This is PROD (not DEV), and we will be validating fields
+      // To jest PROD (nie DEV), więc będziemy sprawdzać poprawność pul, które wypełnił użytkownik
+      if (VALIDATION_OFF) {
+        // sprawdzamy czy na email jest blad
+        if (this.v$.emailField.$error) {
+          this.showModal = true;
+          return this.errorMessage = 'Błędny email'
+        }
+
+        // sprawdzamy czy na hasle jest blad
+        if (this.v$.passwordField.invalid) {
+          this.showModal = true;
+          return this.errorMessage = 'Sprawdz swoje hasło';
+        }
+        
+        if (this.passwordField != this.confirmPasswordField) {
           this.showModal = true;
           this.errorMessage = "Hasła nie pasują"
+        } 
+
+        if (this.v$.$error) {
+          this.showModal = true;
+          this.errorMessage = "Nastąpił jakiś błąd"
+          return;
         }
-      } else {
-        this.showModal = true;
-        this.errorMessage = "Wszystkie pola wymagane"
+
+        // TODO: czy sprawdzilismy wszystkie mozliwosci błędu???
       }
+      
+      // Bylo kilka ifow, ktore by zrobil return, gdyby cos bylo zle.
+      // wszystko jest git, wiec wysylamy requesta.
+      postJson("/register",
+        {
+          name: this.nameField,
+          email: this.emailField,
+          password: this.passwordField,
+        }).then(response => {
+          if (response.status == 200) {
+            this.$router.push({ path: "/account" });
+            return response.json()
+          } else if (response.status == 400) {
+            return response.json()
+          }
+        }).then(data => {
+          alert(data.message) // nie wiem co to robi, co tu dac modal? - nata
+        })
     }
   }
-  }
-
+}
 </script>
 
 
 <template>
-    <header>
-      <h1>WIETINDER</h1>
-    </header>
-    <body>
-      <div>
-        <div v-if="showModal" class="overlay">
+  <header>
+    <h1>WIETINDER</h1>
+  </header>
+
+  <body>
+    <div>
+      <div v-if="showModal" class="overlay">
         <p v-if="errorMessage">{{ errorMessage }}</p>><br>
         <button class="close" @click="showModal = false">Zamknij</button>
+      </div>
     </div>
-      </div>
-      <div id="app" @submit="Login" >
-        <p>Imię:</p>
-        <input v-model="nameField" type="text" onkeydown="return /[a-z]/i.test(event.key)">
-        <p>E-mail:</p>
-        <input for="email" v-model="emailField" type="email">
-        <p>Hasło:</p>
-        <input v-model="passwordField" type="password"><br>
-        <span v-if="v$.passwordField && !v$.passwordField.valid">
-          Password contains atleast One Uppercase, One Lowercase, One Number
-            and One Special Chacter and must contatain of minimum 9 characters!
-        </span>
-        <p>Potwierdź hasło:</p>
-        <input v-model="confirmPasswordField" type="password"><br>
-        <button class="register" @click="submitForm">Zarejestruj</button>
-        
-      
-        <!-- <p>Dodaj zdjęcia</p><br>
-        <input type="file" @change="onFileSelected"/> --> -->
-      <!-- <button @click="onUpload">Dodaj</button> -->
+    <div id="app" @submit="Login">
+      <p>Imię:</p>
+      <input v-model="nameField" type="text" onkeydown="return /[a-z]/i.test(event.key)">
+      <p>E-mail:</p>
+      <input for="email" v-model="emailField" type="email">
+      <p>Hasło:</p>
+      <input v-model="passwordField" type="password"><br>
+      <span v-if="v$.passwordField && !v$.passwordField.valid">
+        Password contains atleast One Uppercase, One Lowercase, One Number
+        and One Special Chacter and must contatain of minimum 9 characters!
+      </span>
+      <p>Potwierdź hasło:</p>
+      <input v-model="confirmPasswordField" type="password"><br>
+      <button class="register" @click="submitForm">Zarejestruj</button>
 
-        <div class="row">
-          <img v-for="img in selectedFile" v-bind:src="img"/>
-        </div>
+
+      <div class="row">
+        <img v-for="img in selectedFile" v-bind:src="img" />
       </div>
-    </body>
+    </div>
+  </body>
 </template>
 
 <style>
