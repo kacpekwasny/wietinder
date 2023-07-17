@@ -2,9 +2,8 @@ import os
 
 from dotenv import load_dotenv
 from pathlib import Path
-from werkzeug import exceptions
 
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
@@ -13,9 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 WEBSITE_DIR = Path(__file__).resolve().parent
 
-
 db = SQLAlchemy()
-
 
 def create_app():
     app = Flask(__name__)
@@ -24,23 +21,25 @@ def create_app():
 
     from .config import ConfigDev, ConfigProd
 
-    config = ConfigDev
-    if os.getenv("IS_PRODUCTION", "False") == "True":
+    # Teraz nie tutaj ustawiamy link i haslo do SQL, tylko w objektach w pliku
+    # config.py. Także kolejne zmienne do konfiguracji (gdy się pojawią) ustawiamy tam.
+    conf = ConfigDev
+    if os.getenv("IS_PRODUCTION", "false").lower() == "true":
         # ustaw config pod produkcje, jeżewli zmienna środowiskowa 
         # IS_PRODUCTION=True
-        config = ConfigProd
+        conf = ConfigProd
 
-    app.config.from_object(config)
+    app.config.from_object(conf)
 
 
     db.init_app(app)
-    
 
-    from .serve_frontend import serve_frontend
-    from .auth import auth
+    # Blueprints
+    from .auth import get_auth_bp
+    from .serve_frontend import get_serve_frontend_bp
+    app.register_blueprint(get_serve_frontend_bp())
+    app.register_blueprint(get_auth_bp(db))
 
-    app.register_blueprint(serve_frontend, url_prefix='/')
-    app.register_blueprint(auth, url_prefix='/')
 
     from .models import User
 
@@ -60,7 +59,7 @@ def create_app():
 
     return app
 
-def create_database(app):
-    if not path.exists('website/' + DB_NAME):
+def create_database(db_path: Path, app: Flask):
+    if not db_path.exists():
         db.create_all(app=app)
         print("Created database")
