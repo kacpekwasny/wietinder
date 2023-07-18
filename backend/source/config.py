@@ -1,5 +1,9 @@
 from pathlib import Path
 
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = BACKEND_DIR.parent
+UPLOADS_DIR = BACKEND_DIR / "uploads"
+
 
 class Config:
     """
@@ -12,13 +16,10 @@ class Config:
     SECRET_KEY: str
     """ """
 
-    UPLOAD_FOLDER: str
-    """Folder do uploadowania zdjec???"""
-
 
 class ConfigDev(Config):
     """Development config to be run on local machine."""
-    db_path = str(Path(__file__).resolve().parent.parent / "database.db")
+    db_path = str(BACKEND_DIR / "database.db")
 
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
     

@@ -10,9 +10,6 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 
-BACKEND_DIR = Path(__file__).resolve().parent.parent
-REPO_DIR = BACKEND_DIR.parent
-UPLOADS_DIR = BACKEND_DIR / "uploads"
 
 db = SQLAlchemy()
 
@@ -21,7 +18,7 @@ def create_app():
     
     load_dotenv()
 
-    from .config import ConfigDev, ConfigProd
+    from .config import ConfigDev, ConfigProd, UPLOADS_DIR
 
     # Teraz nie tutaj ustawiamy link i haslo do SQL, tylko w objektach w pliku
     # config.py. Także kolejne zmienne do konfiguracji (gdy się pojawią) ustawiamy tam.
