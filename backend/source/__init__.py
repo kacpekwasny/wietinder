@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = BACKEND_DIR.parent
 UPLOADS_DIR = BACKEND_DIR / "uploads"
 
 db = SQLAlchemy()
