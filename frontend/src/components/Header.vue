@@ -1,15 +1,6 @@
 <template>
-    <header>
-      <h1>WIETINDER</h1>
-    </header>
+    <v-card width="700px" justify="center" blue-accent-2>
+      <v-card-title class="text-h3">WIETINDER</v-card-title>
+    </v-card>
 </template>
 
-<style>
-    
-  h1 {
-    color: rgb(109, 134, 166);
-    display: flex;
-    justify-content: center;
-    font-size: 7em;
-  }
-</style>
