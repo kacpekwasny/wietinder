@@ -8,7 +8,8 @@ export default {
     return {
       file: null,
       imageView: null,
-      description: ''
+      description: '',
+      targetSex: [], 
     };
   },
   methods: {
@@ -37,30 +38,31 @@ export default {
 <!-- zrobic zeby zdjecia sie wyswietlaly, check box kogo szukam, piwo/etc, nie widac boxów :(()) -->
 
 <template>
-  <v-layout> 
-    <v-app-bar><Header /></v-app-bar>
+  <v-layout>
+    <v-app-bar>
+      <Header />
+    </v-app-bar>
     <v-main>
-        <v-form class="px-3">
-          <v-text-field label="Opis" v-model="description"></v-text-field>
-          <v-file-input 
-          multiple 
-          accept="image/png, image/jpeg"
-          label="Dodaj zdjęcia" 
-          v-model="file"
+      <v-checkbox label="Checkbox"></v-checkbox>
+      <v-form class="px-3">
+        <v-text-field label="Opis" v-model="description"></v-text-field>
+        <v-file-input multiple accept="image/png, image/jpeg" label="Dodaj zdjęcia" v-model="file"
           @change="handleFileUpload"></v-file-input>
-          <button @click="submitForm">Upload</button>
-          <v-checkbox
-            v-model="selected"
-            label="Mężczyzna"
-            value="Mężczyzna"
-          ></v-checkbox>
-          <v-checkbox
-            v-model="selected"
-            label="Kobieta"
-            value="Kobieta"
-            color="black"
-          ></v-checkbox>
-        </v-form>
+        <button @click="submitForm">Upload</button>
+
+        <v-item-group multiple>
+          <v-container>
+            <v-row>
+              <v-col>
+                <v-checkbox v-model="targetSex" label="Mężczyzna" value="male"></v-checkbox>
+              </v-col>
+              <v-col>
+                <v-checkbox v-model="targetSex" label="Kobieta" value="female"></v-checkbox>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-item-group>
+      </v-form>
     </v-main>
   </v-layout>
 </template>
