@@ -1,15 +1,12 @@
 <script>
-import Header from "../components/Header.vue"
 export default {
-  components: {
-    Header
-  },
+
   data() {
     return {
       file: null,
       imageView: null,
       description: '',
-      targetSex: [], 
+      targetSex: [],
     };
   },
   methods: {
@@ -39,31 +36,23 @@ export default {
 
 <template>
   <v-layout>
-    <v-app-bar>
-      <Header />
-    </v-app-bar>
-    <v-main>
-      <v-checkbox label="Checkbox"></v-checkbox>
-      <v-form class="px-3">
-        <v-text-field label="Opis" v-model="description"></v-text-field>
-        <v-file-input multiple accept="image/png, image/jpeg" label="Dodaj zdjęcia" v-model="file"
-          @change="handleFileUpload"></v-file-input>
-        <button @click="submitForm">Upload</button>
+    <v-form>
+      <v-text-field label="Opis" v-model="description"></v-text-field>
+      <v-file-input multiple accept="image/png, image/jpeg" label="Dodaj zdjęcia" v-model="file"
+        @change="handleFileUpload"></v-file-input>
+      <button @click="submitForm">Upload</button>
 
-        <v-item-group multiple>
-          <v-container>
-            <v-row>
-              <v-col>
-                <v-checkbox v-model="targetSex" label="Mężczyzna" value="male"></v-checkbox>
-              </v-col>
-              <v-col>
-                <v-checkbox v-model="targetSex" label="Kobieta" value="female"></v-checkbox>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-item-group>
-      </v-form>
-    </v-main>
+      <v-card>
+        <v-card-title>
+          Płeć pary:
+        </v-card-title>
+        <v-card-action>
+          <v-checkbox v-model="targetSex" label="Mężczyzna" value="male"></v-checkbox>
+          <v-checkbox v-model="targetSex" label="Kobieta" value="female"></v-checkbox>
+
+        </v-card-action>
+      </v-card>
+    </v-form>
   </v-layout>
 </template>
   
