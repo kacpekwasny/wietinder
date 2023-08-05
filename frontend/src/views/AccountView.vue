@@ -1,5 +1,4 @@
 <script lang="ts">
-import { file } from "@babel/types";
 import draggable from "vuedraggable";
 
 export default {
