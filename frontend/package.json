@@ -9,14 +9,15 @@
     "lint": "eslint . --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@mdi/font": "7.0.96",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.3",
-    "@mdi/font": "7.0.96",
     "axios": "^1.4.0",
     "core-js": "^3.29.0",
     "roboto-fontface": "*",
     "vue": "^3.2.0",
     "vue-router": "^4.0.0",
+    "vuedraggable": "^4.1.0",
     "vuelidate": "^0.7.7",
     "vuetify": "^3.0.0",
     "webfontloader": "^1.0.0"
