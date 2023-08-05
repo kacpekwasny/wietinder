@@ -16,9 +16,10 @@ export default {
           if (files.length > 9) {
             return "Można dodać maksymalnie 9 zdjęć."
           }
+          let MB = 1_024_000;
           for (let f of files) {
-            if (f.size > 2_000_000) {
-              return `Images should be smaller than 2MB. ${f.name} has size: ${(f.size/1_000_000).toFixed(2)} MB.`;
+            if (f.size > 2 * MB) {
+              return `Images should be smaller than 2MB. ${f.name} has size: ${(f.size/MB).toFixed(2)} MB.`;
             }
           }
         }
