@@ -1,6 +1,6 @@
 <script lang="ts">
-import { reactive, defineComponent } from "vue";
-import useValidate, { useVuelidate } from "@vuelidate/core";
+import { defineComponent } from "vue";
+import { useVuelidate } from "@vuelidate/core";
 import { email, required } from "@vuelidate/validators";
 
 import { postJson } from "../common/requests";
@@ -61,16 +61,24 @@ export default defineComponent({
 
 <template>
   <v-container fluid class="d-flex flex-column" style="width: fit-content">
-
-    <v-card class="pa-4 ">
+    <v-card class="pa-4">
       <v-form v-on:keydown.enter="submitForm">
         <v-text-field
           class="input-field"
           density="compact"
           v-model="emailField"
           label="Email"
-          :error-messages="v$.emailField.$errors.map((e) => e.$message).concat(emailServerErrors)"
-          @input="() => {v$.emailField.$touch(); newFieldInputs()}"
+          :error-messages="
+            v$.emailField.$errors
+              .map((e) => e.$message)
+              .concat(emailServerErrors)
+          "
+          @input="
+            () => {
+              v$.emailField.$touch();
+              newFieldInputs();
+            }
+          "
           @blur="v$.emailField.$touch"
         >
         </v-text-field>
@@ -80,13 +88,22 @@ export default defineComponent({
           v-model="passwordField"
           label="Hasło"
           type="password"
-          :error-messages="v$.passwordField.$errors.map((e) => e.$message).concat(passwordServerErrors)"
-          @input="() => {v$.passwordField.$touch(); newFieldInputs()}"
+          :error-messages="
+            v$.passwordField.$errors
+              .map((e) => e.$message)
+              .concat(passwordServerErrors)
+          "
+          @input="
+            () => {
+              v$.passwordField.$touch();
+              newFieldInputs();
+            }
+          "
           @blur="v$.passwordField.$touch"
         >
         </v-text-field>
         <v-row class="ma-1" justify="end" style="max-width: 100%">
-          <v-btn @click="submitForm">Zaloguj</v-btn>
+          <v-btn @click="submitForm" color="blue">Zaloguj</v-btn>
         </v-row>
       </v-form>
       <v-card-text class="text-caption pt-4 pb-0 text-center">
