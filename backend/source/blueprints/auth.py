@@ -1,4 +1,3 @@
-import os
 from flask import Blueprint, request, jsonify
 from flask.wrappers import Response
 from flask_login import login_user
@@ -15,7 +14,7 @@ def resp(code: int, info=None) -> tuple[Response, int]:
 
     return jsonify(data), code
 
-def get_auth_bp(db: SQLAlchemy) -> Blueprint:
+def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     from ..models import User
 
     auth = Blueprint('auth', __name__)
@@ -49,7 +48,7 @@ def get_auth_bp(db: SQLAlchemy) -> Blueprint:
         name = request.json.get("name")
         
 
-        if os.getenv("IS_PRODUCTION"):
+        if is_prod:
             # dont check for development
             if check_email_exists(email):
                 return resp(400, 'email_registered')

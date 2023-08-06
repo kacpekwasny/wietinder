@@ -23,7 +23,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
                 "activity": current_user.activity
             },
             "college_major": current_user.college_major,
-            # "images": current_user.images
+            # "images": current_user.images - lista linków w odpowiedniej kolejności
         }
         return jsonify(response)
 
