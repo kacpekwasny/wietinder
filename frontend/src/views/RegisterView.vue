@@ -157,36 +157,4 @@ export default {
 </template>
 
 <style>
-body {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  align-items: center;
-  width: 100%;
-  background-color: rgb(193, 206, 217);
-  text-align: center;
-}
-
-
-input {
-  width: 300px;
-  height: 40px;
-}
-
-p {
-  font-size: larger;
-  color: rgb(191, 133, 120);
-}
-
-.description {
-  width: 300px;
-  height: 100px;
-}
-
-h1 {
-  color: rgb(109, 134, 166);
-  display: flex;
-  justify-content: center;
-  font-size: 7em;
-}
 </style>
