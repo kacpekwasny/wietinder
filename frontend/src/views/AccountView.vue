@@ -1,5 +1,6 @@
 <script lang="ts">
 import draggable from "vuedraggable";
+import { getJson, postJson } from '../common/requests';
 
 export default {
   data() {
@@ -51,6 +52,11 @@ export default {
     makeURL(file: File) {
       return URL.createObjectURL(file);
     },
+  },
+
+  async created() {
+    let accountData = await getJson("/account-data");
+    console.log(await accountData.json());
   },
 
   components: {

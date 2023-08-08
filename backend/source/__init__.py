@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, Request
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
@@ -56,8 +56,13 @@ def create_app():
     login_manager.init_app(app)
 
     @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(id_: str):
+        return User.query.get(int(id_))
+    
+    @login_manager.request_loader
+    def request_loader(r: Request):
+        print(r, r.cookies)
+        return
 
     admin = Admin(app, name='Admin Page', template_mode='bootstrap3')
     admin.add_view(ModelView(User, db.session))

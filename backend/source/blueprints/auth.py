@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask.wrappers import Response
+from flask_cors import cross_origin
 from flask_login import login_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,18 +28,51 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     def login():
         email = request.json.get('email')
         password = request.json.get('password')
-        print("dupa:", request.json.get('email'))
+        print("email:", request.json.get('email'))
         
         user = User.query.filter_by(email = email).first()
         if check_email_exists(email):
             if check_password_hash(user.password, password):
-                login_user(user, remember=True)
-                return resp(200)
+                if login_user(user, remember=True):
+                    return resp(200)
+                return resp(500, "unknown_fail")
 
             else:
                 return resp(401, "password_missmatch")
         else:
             return resp(404, "email_not_registered")
+
+    @auth.route('/login')
+    def get_login():
+        return """
+
+        <input id="e">
+        <input id="p">
+        <button onclick="postLogin()">awd</button>
+        
+        <script>
+        e = document.getElementById("e");
+        p = document.getElementById("p");
+        
+        function postLogin() {
+            object = {
+                "email": e.value,
+                "password": p.value,
+            }
+
+            fetch("/login", {
+                method: "POST", headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(object),
+                credentials: "same-origin",
+        }).then(console.log)
+        }
+
+
+        </script>
+
+        """
 
 
     @auth.route('/register', methods=['POST'])
