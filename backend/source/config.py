@@ -19,7 +19,7 @@ class Config:
 
 class ConfigDev(Config):
     """Development config to be run on local machine."""
-    db_path = str(BACKEND_DIR / "database.db")
+    db_path = str(BACKEND_DIR / "database_dev.db")
 
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
     
@@ -31,6 +31,6 @@ class ConfigProd(Config):
 
     SQLALCHEMY_DATABASE_URI = f'mysql:///127.0.0.1 costam costam'
     
-    SECRET_KEY = ''
+    SECRET_KEY = 'o87gouyvi65divuio6fb cu6f7'
 
 

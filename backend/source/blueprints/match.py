@@ -9,13 +9,13 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
 
     match = Blueprint('match', __name__)
 
-    @match.route('/pairs-undecided', methods=['GET'])
+    @match.route('/matches-undecided', methods=['GET'])
     @login_required
-    def pairs_undecided():
-        undecided = current_user.possible_pairs_undecided()
+    def matches_undecided():
+        undecided = current_user.possible_matches_undecided()
         # TODO - filtrowanie po preferencjach
         return jsonify([
-            [pair.user1_id, pair.user2_id] for pair in undecided
+            [match.user1_id, match.user2_id] for match in undecided
         ])
 
     return match

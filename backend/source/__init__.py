@@ -46,7 +46,7 @@ def create_app():
     app.register_blueprint(get_match_bp(db))
 
 
-    from .models import User, Image, PossiblePair
+    from .models import User, Image, PossibleMatch
 
     with app.app_context():
         db.create_all()
@@ -59,15 +59,11 @@ def create_app():
     def load_user(id_: str):
         return User.query.get(int(id_))
     
-    @login_manager.request_loader
-    def request_loader(r: Request):
-        print(r, r.cookies)
-        return
 
     admin = Admin(app, name='Admin Page', template_mode='bootstrap3')
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Image, db.session))
-    admin.add_view(ModelView(PossiblePair, db.session))
+    admin.add_view(ModelView(PossibleMatch, db.session))
 
     return app
 

@@ -5,27 +5,50 @@ from flask_login import UserMixin
 
 from . import db
 
+class Sex(Enum):
+    Male = 'Male'
+    Female = 'Female'
+
+
+class CollegeMajor(Enum):
+    pass
+
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), unique = True)
+    email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
-    first_name = db.Column(db.String(150))
-    bio = db.Column(db.String(150), default='')
-    sex = db.Column(db.String(150), default='')
-    activity = db.Column(db.String(150), default='')
-    college_major = db.Column(db.String(150), default='')
+    first_name = db.Column(db.String(30))
+    bio = db.Column(db.String(300), default='')
+    
+    sex = db.Column(db.Enum(Sex))
+    """The sex of user. Enum 'Female'/'Male' """
+
+    target_sex = db.Column(db.String(30), default='')
+    """
+    List of the target sex of interest for the user as a string.
+    Ex.: 'female;male'
+    """
+    target_activity = db.Column(db.String(150), default='')
+    """
+    The desired activity for the match.
+    """
+
+    college_major = db.Column(db.String(150), default='student debil')
+
+
     images = db.relationship('Image', back_populates='user')
 
-    def possible_pairs_all(self):
-        return PossiblePair.query.filter(
-            (PossiblePair.user1_id == self.id) | (PossiblePair.user2_id == self.id)
+    def possible_matches_all(self):
+        return PossibleMatch.query.filter(
+            (PossibleMatch.user1_id == self.id) | (PossibleMatch.user2_id == self.id)
         )
     
-    def possible_pairs_undecided(self):
-        return PossiblePair.query.filter(
-            (PossiblePair.user1_id == self.id & PossiblePair.user1_choice == PairChoice.NONE) \
-          | (PossiblePair.user2_id == self.id & PossiblePair.user2_choice == PairChoice.NONE) \
+    def possible_matches_undecided(self):
+        return PossibleMatch.query.filter(
+            (PossibleMatch.user1_id == self.id & PossibleMatch.user1_choice == MatchChoice.NONE) \
+          | (PossibleMatch.user2_id == self.id & PossibleMatch.user2_choice == MatchChoice.NONE) \
         )
 
 
@@ -37,20 +60,20 @@ class Image(db.Model):
     user = db.relationship('User', back_populates='images')
 
 
-class PairChoice(Enum):
+class MatchChoice(Enum):
     LIKE = 'like'
     DISLIKE = 'dislike'
     BLOCK = 'block'
     NONE = 'none'
 
-class PossiblePair(db.Model):
-    __tablename__ = 'possible_pairs'
+class PossibleMatch(db.Model):
+    __tablename__ = 'possible_matches'
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(36), default=lambda: str(uuid.uuid4()))
     user1_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user2_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user1_choice = db.Column(db.Enum(PairChoice))
-    user2_choice = db.Column(db.Enum(PairChoice))
+    user1_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.NONE)
+    user2_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.NONE)
 
 
 
