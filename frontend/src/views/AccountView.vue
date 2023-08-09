@@ -39,10 +39,7 @@ export default {
       const formData = new FormData();
       formData.append("image", this.selectedImages);
 
-      fetch("http://localhost:5000/account-data", {
-        method: "POST",
-        body: formData,
-      })
+      postJson("/account-data", formData)
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
