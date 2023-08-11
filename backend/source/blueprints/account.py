@@ -32,8 +32,13 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @login_required
     def post_account_data():
         j = request.json
+        print(j)
+
         current_user.bio = j["bio"]
         current_user.college_major = j["college_major"]
+        current_user.sex = j["my_sex"]
+        current_user.target_sex = j["target_sex"]
+        current_user.target_activity = j["target_activity"]
         
         db.session.commit()
 

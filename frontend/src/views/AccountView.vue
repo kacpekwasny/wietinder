@@ -10,6 +10,8 @@ export default {
       description: "",
       targetSex: [],
       mySex: "",
+      collegeMajor: "",
+      targetActivity: "",
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -36,10 +38,18 @@ export default {
       });
     },
     submitForm() {
-      const formData = new FormData();
-      formData.append("image", this.selectedImages);
+    
+    
 
-      postJson("/account-data", formData)
+      postJson("/account-data",
+      {
+        bio: this.description,
+        target_sex: this.targetSex,
+        target_activty: this.targetActivity,
+        my_sex: this.mySex,
+        images: this.selectedImages, //z tymi obrazkami trzeba inaczej
+        college_major: this.collegeMajor
+      })
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
