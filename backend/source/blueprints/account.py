@@ -18,11 +18,9 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     def get_account_data():
         response = {
             "bio": current_user.bio,
-            "my_sex": current_user.sex,
-            "target": {
-                "sex": current_user.target_sex,
-                "activity": current_user.target_activity
-            },
+            "my_sex": current_user.sex.value,
+            "target_sex": current_user.target_sex.split(";"),
+            "target_activity": current_user.target_activity,
             "college_major": current_user.college_major,
             "images": current_user.images, # lista linków w odpowiedniej kolejności
         }
@@ -33,16 +31,18 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     def post_account_data():
         j = request.json
         print(j)
-
-        current_user.bio = j["bio"]
-        current_user.college_major = j["college_major"]
-        current_user.sex = j["my_sex"]
-        current_user.target_sex = j["target_sex"]
-        current_user.target_activity = j["target_activity"]
+        try:
+            current_user.bio = j["bio"]
+            current_user.college_major = j["college_major"]
+            current_user.sex = j["my_sex"]
+            current_user.target_sex = ";".join(j["target_sex"])
+            current_user.target_activity = j["target_activity"]
+        except KeyError as e:
+            return jsonify({'ok': False, 'info': 'missing key: '+str(e)})
         
         db.session.commit()
 
-        return jsonify({'ok': True, 'info': 'updated'})
+        return get_account_data()
 
     # def post_account_data():
     #     file = request.files['image']

@@ -6,12 +6,9 @@ from flask_login import UserMixin
 from . import db
 
 class Sex(Enum):
-    Male = 'Male'
-    Female = 'Female'
+    male = 'male'
+    female = 'female'
 
-
-class CollegeMajor(Enum):
-    pass
 
 
 class User(db.Model, UserMixin):
@@ -22,7 +19,7 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(30))
     bio = db.Column(db.String(300), default='')
     
-    sex = db.Column(db.Enum(Sex))
+    sex = db.Column(db.Enum(Sex), default=Sex.male.value)
     """The sex of user. Enum 'Female'/'Male' """
 
     target_sex = db.Column(db.String(30), default='')
@@ -47,8 +44,8 @@ class User(db.Model, UserMixin):
     
     def possible_matches_undecided(self):
         return PossibleMatch.query.filter(
-            (PossibleMatch.user1_id == self.id & PossibleMatch.user1_choice == MatchChoice.NONE) \
-          | (PossibleMatch.user2_id == self.id & PossibleMatch.user2_choice == MatchChoice.NONE) \
+            (PossibleMatch.user1_id == self.id & PossibleMatch.user1_choice == MatchChoice.none) \
+          | (PossibleMatch.user2_id == self.id & PossibleMatch.user2_choice == MatchChoice.none) \
         )
 
 
@@ -61,10 +58,10 @@ class Image(db.Model):
 
 
 class MatchChoice(Enum):
-    LIKE = 'like'
-    DISLIKE = 'dislike'
-    BLOCK = 'block'
-    NONE = 'none'
+    like = 'like'
+    dislike = 'dislike'
+    block = 'block'
+    none = 'none'
 
 class PossibleMatch(db.Model):
     __tablename__ = 'possible_matches'
@@ -72,8 +69,8 @@ class PossibleMatch(db.Model):
     public_id = db.Column(db.String(36), default=lambda: str(uuid.uuid4()))
     user1_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user2_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user1_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.NONE)
-    user2_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.NONE)
+    user1_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.none.value)
+    user2_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.none.value)
 
 
 
