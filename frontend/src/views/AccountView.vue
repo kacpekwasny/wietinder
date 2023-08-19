@@ -1,6 +1,8 @@
 <script lang="ts">
 import draggable from "vuedraggable";
 import { getJson, postJson } from "../common/requests";
+import { assertExpressionStatement } from "@babel/types";
+import axios from "axios";
 
 export default {
   data() {
@@ -48,6 +50,7 @@ export default {
           alert("Not saved, Error :( ");
         });
     },
+
     makeURL(file: File) {
       return URL.createObjectURL(file);
     },
@@ -68,6 +71,14 @@ export default {
         target_activity: this.targetActivity,
         images: this.selectedImages.map(img => (img.name)),
       }
+    },
+
+    fetchData: function() {
+      axios.get("/account-data")
+      .then(function(response){
+        console.log(response)
+      }
+      )
     }
   },
 
