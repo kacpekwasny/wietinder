@@ -28,7 +28,6 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     def login():
         email = request.json.get('email')
         password = request.json.get('password')
-        print("email:", request.json.get('email'))
         
         user = User.query.filter_by(email = email).first()
         if check_email_exists(email):

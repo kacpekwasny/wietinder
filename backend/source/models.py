@@ -1,7 +1,9 @@
-from enum import Enum
 import uuid
 
+from enum import Enum
 from flask_login import UserMixin
+from sqlalchemy import event
+from sqlalchemy.schema import DDL
 
 from . import db
 
@@ -73,6 +75,20 @@ class PossibleMatch(db.Model):
     user2_choice = db.Column(db.Enum(MatchChoice), default=MatchChoice.none.value)
 
 
-
-
+event.listen(
+    User.__table__,
+    "after_create",
+    DDL(f"""
+CREATE TRIGGER make_pairs
+AFTER INSERT ON {User.__tablename__}
+FOR EACH ROW
+BEGIN
+INSERT INTO {PossibleMatch.__tablename__}
+    (user1_id, user2_id, user1_choice, user2_choice)
+SELECT
+    NEW.id, users.id, "none", "none"
+FROM users WHERE id!=NEW.id;
+END
+""")
+)
     
