@@ -38,7 +38,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
             current_user.target_sex = ";".join(j["target_sex"])
             current_user.target_activity = j["target_activity"]
         except KeyError as e:
-            return jsonify({'ok': False, 'info': 'missing key: '+str(e)})
+            return jsonify({'ok': False, 'info': f'missing key: {e}'})
         
         db.session.commit()
 
