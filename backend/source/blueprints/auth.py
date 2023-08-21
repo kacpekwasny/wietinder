@@ -34,6 +34,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
             if check_password_hash(user.password, password):
                 if login_user(user, remember=True):
                     return resp(200)
+        
                 return resp(500, "unknown_fail")
 
             else:
