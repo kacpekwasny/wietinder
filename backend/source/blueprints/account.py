@@ -7,8 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
-from ..models import Image
-
 
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     account_bp = Blueprint('views', __name__)
