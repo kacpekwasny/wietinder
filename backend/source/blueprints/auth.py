@@ -44,11 +44,12 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
 
     @auth.route('/login')
     def get_login():
+        # To jest taki zapasowy
         return """
 
         <input id="e">
         <input id="p">
-        <button onclick="postLogin()">awd</button>
+        <button onclick="postLogin()">post login</button>
         
         <script>
         e = document.getElementById("e");
