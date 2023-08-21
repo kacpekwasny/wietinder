@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, url_for
 from flask_login import current_user
 from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -38,26 +38,53 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         except KeyError as e:
             return jsonify({'ok': False, 'info': f'missing key: {e}'})
         
+        
+            
+
         db.session.commit()
 
         return get_account_data()
-
-    # def post_account_data():
-    #     file = request.files['image']
-    #     if not (file and allowed_file(file.filename)):
-    #         return jsonify({'ok': False, 'info': 'invalid_file'})
+   
+        # file = request.files['image']
+        # if not (file and allowed_file(file.filename)):
+        #     return jsonify({'ok': False, 'info': 'invalid_file'})
     
-    #     filename = secure_filename(file.filename)
+        # filename = secure_filename(file.filename)
 
-    #     file.save(str(upload_dir / filename))
+        # file.save(str(upload_dir / filename))
 
-    #     image = Image(filename=filename, user=current_user)
+        # file = Image(filename=filename, user=current_user)
         
-    #     db.session.add(image)
-    #     db.session.commit()
+        # db.session.add(file)
+        # db.session.commit()
 
-    #     return jsonify({'ok': True, 'info': 'updated'})
+        # return jsonify({'ok': True, 'info': 'updated'})
 
+    
+    @account_bp.route('/upload-images', methods=['GET'])
+    @login_required
+    def get_images():
+        response = {
+            "images": "link to imag" #TO DO 
+        }
+        return jsonify(response)
+
+    @account_bp.route('/upload-images', methods=['POST'])
+    @login_required
+    def upload_images():
+        files = request.files
+        image_urls = []
+
+        for key, file in files.items():
+            if not (file and allowed_file(file.filename)):
+                print("dupa")
+                return jsonify({'ok': False, 'info': 'invalid_file'})
+            imageName = secure_filename(file.filename)
+            file.save(str(upload_dir / imageName))
+            # image_url = url_for('static', filename='uploads/' + imageName)
+            # print(image_url)
+
+        return jsonify({'ok': True})
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
     def allowed_file(filename: str):

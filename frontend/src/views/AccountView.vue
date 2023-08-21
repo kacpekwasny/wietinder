@@ -41,6 +41,22 @@ export default {
       });
     },
     submitForm() {
+      const formData = new FormData();
+      // this.selectedImages.forEach((image, i)=>formData.append('images['+i+']',image));
+      console.log(this.selectedImages)
+      
+      for (let i = 0; i < this.selectedImages.length; i++) {
+        formData.append('images', this.selectedImages[i]);
+      }
+      axios.post("http://localhost:5000/upload-images", formData, {
+        headers: {
+                'Content-Type': 'multipart/form-data'
+                    
+        },
+        withCredentials:true
+    }).then(response =>{
+        console.log(response)
+      })
       postJson("/account-data", this.buildAccountDataObject())
         .then((response) => response.json())
         .then((data) => {
@@ -80,6 +96,8 @@ export default {
       }
       )
     }
+
+    
   },
 
   async created() {
