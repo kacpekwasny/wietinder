@@ -18,17 +18,24 @@ class TargetActivity(Enum):
     life = 'life'   # Na stałe
     project = 'project' # Do projektu
 
+class MatchChoice(Enum):
+    like    = 'like'
+    dislike = 'dislike'
+    block   = 'block'
+    none    = 'none'
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id          = db.Column(db.Integer, primary_key=True)
     public_id   = db.Column(db.String(36), unique=True, default=lambda: str(uuid.uuid4()))
     email       = db.Column(db.String(150), unique=True)
-    password    = db.Column(db.String(150))
+    password    = db.Column(db.String(250))
     first_name  = db.Column(db.String(30))
     bio         = db.Column(db.String(300), default='')
     sex         = db.Column(db.Enum(Sex), default=Sex.male.value)
     """The sex of user. Enum 'Female'/'Male' """
+
+    college_major = db.Column(db.String(250), default="Inżynieria Studenta Debila")
 
     target_sex  = db.Column(db.String(30), default='')
     """
@@ -41,8 +48,10 @@ class User(db.Model, UserMixin):
     The desired activity for the match.
     """
 
-    images = db.Column(db.Text(), default="")
-    """List of filenames in JSON format."""
+    images      = db.relationship('Image', back_populates='user')
+    # images = db.Column(db.Text(), default="")
+    # """List of filenames in JSON format."""
+    
 
     def possible_matches_all(self):
         return PossibleMatch.query.filter(
@@ -56,7 +65,12 @@ class User(db.Model, UserMixin):
         )
 
 
-
+class Image(db.Model):
+    __tablename__ = 'images'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates='images')
 
 
 class PossibleMatch(db.Model):
@@ -64,8 +78,8 @@ class PossibleMatch(db.Model):
     id              = db.Column(db.Integer, primary_key=True)
     user1_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
     user2_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
-    user1_choice    = db.Column(db.String(150), default="") # "beer;"
-    user2_choice    = db.Column(db.String(150), default="")
+    user1_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
+    user2_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
 
 
 # Stwórz trigger `make_pairs`.
