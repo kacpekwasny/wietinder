@@ -10,10 +10,10 @@ export default {
       selectedImages: [],
       imageView: null,
       bio: "",
-      targetSex: [],
       mySex: "",
       collegeMajor: "",
-      targetActivity: "",
+      targetSex: [],
+      targetActivity: [],
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -40,6 +40,7 @@ export default {
         return { img: img, url: URL.createObjectURL(img) };
       });
     },
+
     submitForm() {
       const formData = new FormData();
       // this.selectedImages.forEach((image, i)=>formData.append('images['+i+']',image));
@@ -71,6 +72,7 @@ export default {
       return URL.createObjectURL(file);
     },
     setAccountData(accountJson: Object) {
+    console.log(accountJson)
       this.bio = accountJson.bio;
       this.collegeMajor = accountJson.college_major;
       this.mySex = accountJson.my_sex;
@@ -176,7 +178,7 @@ export default {
             <v-checkbox
               v-model="targetSex"
               label="Kobieta"
-              value="Female"
+              value="female"
               hideDetails
               density="compact"
               class="ml-2"
@@ -184,7 +186,38 @@ export default {
             <v-checkbox
               v-model="targetSex"
               label="Mężczyzna"
-              value="Male"
+              value="male"
+              hideDetails
+              density="compact"
+              class="ml-2"
+            ></v-checkbox>
+          </v-card-action>
+        </v-card>
+      </v-col>
+      <v-col col="6">
+        <v-card class="align-end" height="100%">
+          <v-card-title class="text-left"> Czynność: </v-card-title>
+          <v-card-action>
+            <v-checkbox
+              v-model="targetActivity"
+              label="Na piwo"
+              value="beer"
+              hideDetails
+              density="compact"
+              class="ml-2"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="targetActivity"
+              label="Na życie"
+              value="life"
+              hideDetails
+              density="compact"
+              class="ml-2"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="targetActivity"
+              label="Do projektu"
+              value="project"
               hideDetails
               density="compact"
               class="ml-2"

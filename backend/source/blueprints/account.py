@@ -1,3 +1,4 @@
+import json
 import os
 
 from flask import Blueprint, request, jsonify, url_for
@@ -14,12 +15,13 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/account-data', methods=['GET'])
     @login_required
     def get_account_data():
+        filter_empty = lambda ls_str: [s for s in ls_str if len(s)]
+
         response = {
             "bio": current_user.bio,
             "my_sex": current_user.sex.value,
-            "target_sex": current_user.target_sex.split(";"),
-            "target_activity": current_user.target_activity,
-            "college_major": current_user.college_major,
+            "target_sex": filter_empty(current_user.target_sex.split(";")),
+            "target_activity": filter_empty(current_user.target_activity.split(";")),
             "images": current_user.images, # lista linków w odpowiedniej kolejności
         }
         return jsonify(response)
@@ -28,19 +30,15 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @login_required
     def post_account_data():
         j = request.json
-        print(j)
+        print(json.dumps(j, indent=4))
         try:
             current_user.bio = j["bio"]
-            current_user.college_major = j["college_major"]
             current_user.sex = j["my_sex"]
             current_user.target_sex = ";".join(j["target_sex"])
-            current_user.target_activity = j["target_activity"]
+            current_user.target_activity = ";".join(j["target_activity"])
         except KeyError as e:
             return jsonify({'ok': False, 'info': f'missing key: {e}'})
         
-        
-            
-
         db.session.commit()
 
         return get_account_data()
@@ -61,7 +59,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         # return jsonify({'ok': True, 'info': 'updated'})
 
     
-    @account_bp.route('/upload-images', methods=['GET'])
+    @account_bp.route('/upload-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
     @login_required
     def get_images():
         response = {

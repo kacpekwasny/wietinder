@@ -5,12 +5,18 @@ from flask_login import UserMixin
 from sqlalchemy import event
 from sqlalchemy.schema import DDL
 
+
 from . import db
+
 
 class Sex(Enum):
     male = 'male'
     female = 'female'
 
+class TargetActivity(Enum):
+    beer = 'beer'   # Na piwo
+    life = 'life'   # Na stałe
+    project = 'project' # Do projektu
 
 
 class User(db.Model, UserMixin):
@@ -30,12 +36,10 @@ class User(db.Model, UserMixin):
     Ex.: 'female;male'
     """
 
-    target_activity = db.Column(db.String(150), default='')
+    target_activity = db.Column(db.String(150), default=";".join([t.value for t in TargetActivity]))
     """
     The desired activity for the match.
     """
-
-    college_major   = db.Column(db.String(150), default='student debil')
 
     images = db.Column(db.Text(), default="")
     """List of filenames in JSON format."""
@@ -52,21 +56,22 @@ class User(db.Model, UserMixin):
         )
 
 
-class MatchChoice(Enum):
-    like    = 'like'
-    dislike = 'dislike'
-    block   = 'block'
-    none    = 'none'
+
+
 
 class PossibleMatch(db.Model):
     __tablename__ = 'possible_matches'
     id              = db.Column(db.Integer, primary_key=True)
     user1_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
     user2_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
-    user1_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none.value)
-    user2_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none.value)
+    user1_choice    = db.Column(db.String(150), default="") # "beer;"
+    user2_choice    = db.Column(db.String(150), default="")
 
 
+# Stwórz trigger `make_pairs`.
+# Aktywuj trigger za każdym razem po INSERT w tabeli `users` - czyli po utworzeniu nowego usera
+# Treść triggera - właściwie zbiór komend, które zostaną uruchomione:
+#   - Stwórz PossibleMatch dla nowego usera i każdego dotychczasowego usera w bazie danych
 event.listen(
     User.__table__,
     "after_create",
