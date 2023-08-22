@@ -11,9 +11,6 @@ import random
 import string
 
 
-from ..models import Image
-
-
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     account_bp = Blueprint('views', __name__)
 
