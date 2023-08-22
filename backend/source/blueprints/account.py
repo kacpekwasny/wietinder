@@ -1,5 +1,8 @@
-import json
 import os
+import json
+import time
+import random
+import string
 
 from flask import Blueprint, request, jsonify, url_for
 from flask_login import current_user
@@ -7,9 +10,8 @@ from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.utils import secure_filename
-import time
-import random
-import string
+
+from ..models import Image
 
 
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
