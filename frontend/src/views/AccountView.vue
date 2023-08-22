@@ -8,6 +8,7 @@ export default {
   data() {
     return {
       selectedImages: [],
+      images: [],
       imageView: null,
       bio: "",
       targetSex: [],
@@ -42,9 +43,6 @@ export default {
     },
     submitForm() {
       const formData = new FormData();
-      // this.selectedImages.forEach((image, i)=>formData.append('images['+i+']',image));
-      console.log(this.selectedImages)
-      
       for (let i = 0; i < this.selectedImages.length; i++) {
         formData.append('images', this.selectedImages[i]);
       }
@@ -65,9 +63,11 @@ export default {
           }
           alert("Not saved, Error :( ");
         });
-        getJson
-    },
 
+    },
+    getImageURL(imageName: string) {
+      return `uploads/${imageName}`;
+    },
     makeURL(file: File) {
       return URL.createObjectURL(file);
     },
@@ -77,8 +77,9 @@ export default {
       this.mySex = accountJson.my_sex;
       this.targetSex = accountJson.target_sex;
       this.targetActivity = accountJson.target_activity;
+      this.images = accountJson.images;
     },
-
+    
     buildAccountDataObject(): Object {
       return {
         bio: this.bio,
@@ -196,4 +197,7 @@ export default {
     </v-row>
     <v-btn class="mt-2 mb-2" @click="submitForm">Zapisz zmiany!</v-btn>
   </v-container>
+  <div v-for="imageName in images" :key="imageName">
+    <img :src="getImageURL(imageName)" alt="Image" />
+  </div>
 </template>
