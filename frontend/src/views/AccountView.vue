@@ -65,6 +65,7 @@ export default {
           }
           alert("Not saved, Error :( ");
         });
+        getJson
     },
 
     makeURL(file: File) {
@@ -85,7 +86,7 @@ export default {
         my_sex: this.mySex,
         target_sex: this.targetSex,
         target_activity: this.targetActivity,
-        images: this.selectedImages.map(img => (img.name)),
+        images: this.selectedImages.map(img => (img.name)) //czy to jest nam potrzebne?
       }
     },
 
