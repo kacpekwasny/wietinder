@@ -4,14 +4,12 @@ import time
 import random
 import string
 
-from flask import Blueprint, request, jsonify, url_for
+from flask import Blueprint, request, jsonify, send_from_directory, url_for
 from flask_login import current_user
 from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.utils import secure_filename
-
-from ..models import Image
 
 
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
@@ -96,6 +94,13 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         db.session.commit()
        
         return jsonify({'ok': True})
+
+
+    @account_bp.route('/uploads/<path:filepath>')
+    @login_required
+    def get_image(filepath: str):
+        print("uploads ad", filepath)
+        return send_from_directory('/home/kacper/code/wietinder/backend/uploads/', filepath)
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
     def allowed_file(filename: str):

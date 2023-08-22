@@ -66,12 +66,16 @@ export default {
         });
 
     },
+
     getImageURL(imageName: string) {
-      return `uploads/${imageName}`;
+      return `http://localhost:5000/uploads/${imageName}`;
     },
+
     makeURL(file: File) {
+      return this.getImageURL(file)
       return URL.createObjectURL(file);
     },
+
     setAccountData(accountJson: Object) {
     console.log(accountJson)
       this.bio = accountJson.bio;
@@ -130,9 +134,22 @@ export default {
       v-model="selectedImages"
       @change="addImagesChanged"
     ></v-file-input>
+    <!--
+      TODO:
+      tutaj było `selectedImages` zamiast `images`
+      teraz możemy przeciągać i zmieniać kolejność zdjęć, które już są zuploadowane na serwer,
+      
+      Czyli używamy tego v-file-input do wybrania zdjec tak jak do tej pory, ale upload zdjec odbywa sie osobno od zapisywania ustawien profilu - trzeba dodać przycisk obok tego v-file-input.
+      Po udanym upload należy wyczyścić selectedImages, żeby było wrażenie, że się powiodło i że znikneły pliki z pola v-file-input.
+      Jednocześnie powinny się pokazać w draggable.
+      Jak już zuploadujemy zdjęcia, to powinny się pokazać w tym draggable (powinny być od teraz w `images` a draggable je wyrenderuje.)
+      Ten dotychczasowy przycisk na dole będzie służyć do zapisywania ustawien profilu i kolejności wyświetlania zdjęć. nie będzie uploadował zdjęć.
+      Draggable powinno umożliwić usunięcie zdjęć jakichś z tych co już są - czyli jakiś znaczek x na zdjęciu każdym w prawym górnym rogu który by wywoływał funkcję,
+      która robi requesta GET /delete-img/<filename> a na backendzie sprawdzamy, czy to jest plik tego usera, co chce usunąć.
 
+    -->
     <draggable
-      v-model="selectedImages"
+      v-model="images" 
       item-key="url"
       group="people"
       style="align-items: center; display: flex; flex-wrap: wrap"
@@ -230,7 +247,4 @@ export default {
     </v-row>
     <v-btn class="mt-2 mb-2" @click="submitForm">Zapisz zmiany!</v-btn>
   </v-container>
-  <div v-for="imageName in images" :key="imageName">
-    <img :src="getImageURL(imageName)" alt="Image" />
-  </div>
 </template>

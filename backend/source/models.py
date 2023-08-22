@@ -48,9 +48,9 @@ class User(db.Model, UserMixin):
     The desired activity for the match.
     """
 
-    images      = db.relationship('Image', back_populates='user')
-    # images = db.Column(db.Text(), default="")
-    # """List of filenames in JSON format."""
+    # images      = db.relationship('Image', back_populates='user')
+    images = db.Column(db.Text(), default="[]")
+    """List of filenames in JSON format."""
     
 
     def possible_matches_all(self):
@@ -65,12 +65,12 @@ class User(db.Model, UserMixin):
         )
 
 
-class Image(db.Model):
-    __tablename__ = 'images'
-    id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', back_populates='images')
+# class Image(db.Model):
+#     __tablename__ = 'images'
+#     id = db.Column(db.Integer, primary_key=True)
+#     filename = db.Column(db.String)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+#     user = db.relationship('User', back_populates='images')
 
 
 class PossibleMatch(db.Model):
