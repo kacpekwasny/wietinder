@@ -28,7 +28,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
             "target_sex": filter_empty(current_user.target_sex.split(";")),
             "target_activity": filter_empty(current_user.target_activity.split(";")),
             "college_major": current_user.college_major,
-            "images": [image.filename for image in current_user.images]
+            "images": get_images()
         }
         return jsonify(response)
 
@@ -68,26 +68,31 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/upload-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
     @login_required
     def get_images():
-        image_filenames = [image.filename for image in current_user.images]
-        response = {
-            "images": image_filenames
-        }
-        return jsonify(response)
+        
+        if current_user.images:
+            images_list = json.loads(current_user.images)
+        else:
+            images_list = []
+        return images_list
 
     @account_bp.route('/upload-images', methods=['POST'])
     @login_required
     def upload_images():
-        files = request.files
+        files = request.files.getlist('images')
+        images = []
 
-        for key, file in files.items():
+        for file in files:
             if not (file and allowed_file(file.filename)):
-                print("dupa")
                 return jsonify({'ok': False, 'info': 'invalid_file'})
+            
             imageName = secure_filename(file.filename)
             unique_imagename = generate_unique_image_name(imageName, current_user.email)
             file.save(str(upload_dir / unique_imagename))
-            file = Image(filename=unique_imagename, user=current_user)
-            db.session.add(file)
+            images.append(unique_imagename)
+        
+        old_images = get_images()
+        images.extend(old_images)
+        current_user.images = json.dumps(images)
         db.session.commit()
        
         return jsonify({'ok': True})
