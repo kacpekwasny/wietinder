@@ -43,6 +43,19 @@ export default {
     },
 
     submitForm() {
+      this.selectedImages = []
+      postJson("/account-data", this.buildAccountDataObject())
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok === undefined) {
+            return this.setAccountData(data);
+          }
+          alert("Not saved, Error :( ");
+        });
+
+    },
+
+    uploadImages(){
       const formData = new FormData();
       for (let i = 0; i < this.selectedImages.length; i++) {
         formData.append('images', this.selectedImages[i]);
@@ -53,18 +66,38 @@ export default {
                     
         },
         withCredentials:true
-    }).then(response =>{
-        console.log(response)
-      })
-      postJson("/account-data", this.buildAccountDataObject())
+
+      }).then(response =>{
+          console.log(response);
+          this.selectedImages = [];
+
+        getJson("/get-images")
         .then((response) => response.json())
         .then((data) => {
           if (data.ok === undefined) {
-            return this.setAccountData(data);
+            console.log(data.images)
+            return this.images = data.images;;
           }
           alert("Not saved, Error :( ");
         });
+        })
+    },
 
+    removeImage(index){
+      console.log(this.images)
+      const removedImageName = this.images[index];
+      console.log(removedImageName)
+      this.images.splice(index, 1);
+      const data = {
+        removed_image_name: removedImageName
+      };
+      postJson("/delete-image", data)
+      .then((response) => response.json())
+        .then((data) => {
+          if (!data.ok) {
+            return alert("Not saved, Error :( ");
+          }
+        });
     },
 
     getImageURL(imageName: string) {
@@ -93,7 +126,7 @@ export default {
         my_sex: this.mySex,
         target_sex: this.targetSex,
         target_activity: this.targetActivity,
-        images: this.selectedImages.map(img => (img.name)) //czy to jest nam potrzebne?
+        images: this.images
       }
     },
 
@@ -130,10 +163,11 @@ export default {
       :rules="rules"
       prepend-icon="mdi-camera"
       accept="image/*"
-      label="Dodaj zdjęcia"
+      label="Wybierz zdjęcia"
       v-model="selectedImages"
       @change="addImagesChanged"
     ></v-file-input>
+    <v-btn class="mt-2 mb-2" @click="uploadImages">Dodaj zdjęcia</v-btn>
     <!--
       TODO:
       tutaj było `selectedImages` zamiast `images`
@@ -157,12 +191,17 @@ export default {
       <!-- Had to mannulay add these style elements copied from https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VGrid/VGrid.sass
     for the column layout to start working, because when v-row was the parent of draggable,
     draggable became a column of width 2/12 I think, and as such its children became even thinnger :/ -->
-      <template #item="{ element: preview }">
+      <template #item="{ element: preview, index }">
         <v-col cols="6" sm="4" class="pa-2">
           <v-card density="compact">
-            <v-img :src="makeURL(preview)" max-height="150px"></v-img>
+            <v-img :src="makeURL(preview)" max-height="150px">
+              <v-btn icon @click="removeImage(index)">
+                  <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-img>
             <div class="text-caption ma-1">
               {{ preview.name }}
+              
             </div>
           </v-card>
         </v-col>

@@ -26,7 +26,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
             "target_sex": filter_empty(current_user.target_sex.split(";")),
             "target_activity": filter_empty(current_user.target_activity.split(";")),
             "college_major": current_user.college_major,
-            "images": get_images()
+            "images": get_images_from_db()
         }
         return jsonify(response)
 
@@ -40,6 +40,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
             current_user.sex = j["my_sex"]
             current_user.target_sex = ";".join(j["target_sex"])
             current_user.target_activity = ";".join(j["target_activity"])
+            current_user.images = json.dumps(j["images"])
         except KeyError as e:
             return jsonify({'ok': False, 'info': f'missing key: {e}'})
         
@@ -63,15 +64,13 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         # return jsonify({'ok': True, 'info': 'updated'})
 
     
-    @account_bp.route('/upload-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
+    @account_bp.route('/get-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
     @login_required
     def get_images():
-        
-        if current_user.images:
-            images_list = json.loads(current_user.images)
-        else:
-            images_list = []
-        return images_list
+        response = {
+            "images": get_images_from_db()
+        }
+        return jsonify(response)
 
     @account_bp.route('/upload-images', methods=['POST'])
     @login_required
@@ -84,11 +83,11 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
                 return jsonify({'ok': False, 'info': 'invalid_file'})
             
             imageName = secure_filename(file.filename)
-            unique_imagename = generate_unique_image_name(imageName, current_user.email)
+            unique_imagename = generate_unique_image_name(imageName)
             file.save(str(upload_dir / unique_imagename))
             images.append(unique_imagename)
         
-        old_images = get_images()
+        old_images = get_images_from_db()
         images.extend(old_images)
         current_user.images = json.dumps(images)
         db.session.commit()
@@ -100,21 +99,50 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @login_required
     def get_image(filepath: str):
         print("uploads ad", filepath)
-        return send_from_directory('/home/kacper/code/wietinder/backend/uploads/', filepath)
+        directory_path = str(Path(__file__).parent.parent.parent / "uploads")
+        return send_from_directory(directory_path, filepath)
+    
+    @account_bp.route('/delete-image', methods=['POST'])
+    @login_required
+    def delete_image():
+        j = request.json
+        removedImageName = j["removed_image_name"]
+        images = get_images_from_db()
+
+        if not removedImageName in images:
+            return jsonify({'ok': False, 'info': "No image found"})
+        
+        directory_path = str(Path(__file__).parent.parent.parent / "uploads")
+
+        try:
+            os.remove(os.path.join(directory_path, removedImageName))
+        except OSError as e:
+            return jsonify({'ok': False, 'info': "No image found"})
+        
+        images.remove(removedImageName)
+        current_user.images = json.dumps(images)
+        db.session.commit()
+        return jsonify({'ok': True})
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
     def allowed_file(filename: str):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
     
-    def generate_unique_image_name(imagename, username):
+    def generate_unique_image_name(imagename):
         timestamp = int(time.time())
         random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
         unique_prefix = f"{timestamp}_{random_string}"
-        base_name, extension = os.path.splitext(imagename)
-        image_unique_name = unique_prefix + base_name + username + extension
+        image_unique_name = unique_prefix + imagename
         return image_unique_name
 
+    def get_images_from_db():
+        
+        if current_user.images:
+            images_list = json.loads(current_user.images)
+        else:
+            images_list = []
+        return images_list
         
     
     return account_bp
