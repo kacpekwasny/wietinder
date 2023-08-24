@@ -7,14 +7,17 @@ import axios from "axios";
 export default {
   data() {
     return {
-      selectedImages: [],
-      images: [],
+      accountData: {
+        images: [],
+        bio: "",
+        sex: "",
+        fields_of_study: "",
+        target_sex: [],
+        target_activity: [],
+      },
       imageView: null,
-      bio: "",
-      my_sex: "",
-      fields_of_study: "",
-      target_sex: [],
-      target_activity: [],
+      selectedImages: [],
+      imagePreviews: [],
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -37,122 +40,77 @@ export default {
   methods: {
     addImagesChanged(_: Event) {
       console.log(this.selectedImages);
-      this.imagePreviews = this.selectedImages.map((img) => {
-        return { img: img, url: URL.createObjectURL(img) };
+      this.imagePreviews = this.selectedImages.map((imgFile) => {
+        return { file: imgFile, url: URL.createObjectURL(imgFile) };
       });
     },
 
-    submitForm() {
-      this.selectedImages = []
-      postJson("/account-data", this.buildAccountDataObject())
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.ok === undefined) {
-            return this.setAccountData(data);
-          }
-          alert("Not saved, Error :( ");
-        });
-
+    async sendAccountData() {
+      this.selectedImages = [];
+      let resp = await postJson("/account-data", this.accountData);
+      let json = resp.json();
+      if (json.ok === undefined) {
+        this.accountData = json;
+      }
     },
 
-    uploadImages(){
+    async updateAccountData() {
+      this.accountData = await (await getJson("/account-data")).json();
+    },
+
+    async uploadImages() {
       const formData = new FormData();
-      if (this.selectedImages.length == 0) {
-        return;
-      }
       for (let i = 0; i < this.selectedImages.length; i++) {
-        formData.append('images', this.selectedImages[i]);
+        formData.append("images", this.selectedImages[i]);
       }
-      axios.post(`${getBackendHostname()}/upload-images`, formData, {
-        headers: {
-                'Content-Type': 'multipart/form-data'
-                    
-        },
-        withCredentials:true
-
-      }).then(response =>{
-          console.log(response);
-          this.selectedImages = [];
-
-        getJson("/get-images")
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.ok === undefined) {
-            console.log(data.images)
-            return this.images = data.images;;
-          }
-          alert("Not saved, Error :( ");
-        });
+      const resp = await axios
+        .post(`${getBackendHostname()}/upload-images`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
         })
+      console.log(resp);
+      this.selectedImages = [];
+      this.updateAccountData()
     },
 
-    removeImage(index){
-      console.log(this.images)
-      const removedImageName = this.images[index];
-      console.log(removedImageName)
-      this.images.splice(index, 1);
-      const data = {
-        removed_image_name: removedImageName
-      };
-      postJson("/delete-image", data)
-      .then((response) => response.json())
-        .then((data) => {
-          if (!data.ok) {
-            return alert("Not saved, Error :( ");
-          }
-        });
+    async removeImageFromRemote(index: int) {
+      const removedImageName = this.accountData.images[index];
+      this.accountData.images.splice(index, 1);
+
+      const resp = await postJson("/delete-image", {
+        removed_image_name: removedImageName,
+      });
+      const data = await resp.json();
+      console.log(data)
+      if (!data.ok) {
+        return alert("Nie powiodło się, Error :( ");
+      }
     },
 
-    getImageURL(imageName: string) {
+    removeImageFromUploadList(index: int) {
+      this.selectedImages.splice(index, 1);
+    },
+
+    remoteURL(imageName: string) {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },
 
-    makeURL(file: File) {
-      return this.getImageURL(file)
+    localURL(file: File) {
       return URL.createObjectURL(file);
     },
-
-    setAccountData(accountJson: Object) {
-    console.log(accountJson)
-      this.bio = accountJson.bio;
-      this.fields_of_study = accountJson.fields_of_study;
-      this.my_sex = accountJson.sex;
-      this.target_sex = accountJson.target_sex;
-      this.target_activity = accountJson.target_activity;
-      this.images = accountJson.images;
-    },
-    
-    buildAccountDataObject(): Object {
-      return {
-        bio: this.bio,
-        fields_of_study: this.fields_of_study,
-        my_sex: this.my_sex,
-        target_sex: this.target_sex,
-        target_activity: this.target_activity,
-        images: this.images
-      }
-    },
-
-    fetchData: function() {
-      axios.get("/account-data")
-      .then(function(response){
-        console.log(response)
-      }
-      )
-    }
-
-    
-  },
-
-  async created() {
-    let accountData = await getJson("/account-data");
-    this.setAccountData(await accountData.json());
   },
 
   components: {
     draggable,
   },
-  computed: {}
+
+  computed: {},
+
+  async created() {
+    await this.updateAccountData();
+  },
 };
 </script>
 
@@ -160,19 +118,53 @@ export default {
 
 <template>
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
-    <v-textarea label="Opis profilu" v-model="bio"></v-textarea>
-    <v-file-input
-      chips
-      multiple
-      :rules="rules"
-      prepend-icon="mdi-camera"
-      accept="image/*"
-      label="Wybierz zdjęcia"
-      v-model="selectedImages"
-      @change="addImagesChanged"
-    ></v-file-input>
-    <v-btn class="mt-2 mb-2" @click="uploadImages()" :disabled="(selectedImages.length == 0)">Dodaj zdjęcia</v-btn>
-    <!--
+    <v-textarea label="Opis profilu" v-model="accountData.bio"></v-textarea>
+    <v-card class="pa-2 mt-2 mb-2">
+      <div class="text-h5 ma-2">Dodaj zdjęcia</div>
+      <v-file-input
+        chips
+        multiple
+        :rules="rules"
+        prepend-icon="mdi-camera"
+        accept="image/*"
+        label="Wybierz zdjęcia"
+        v-model="selectedImages"
+        @change="addImagesChanged"
+      ></v-file-input>
+      <v-row>
+        <v-col
+          v-for="(file, index) in selectedImages"
+          cols="6"
+          sm="4"
+          class="pa-2"
+        >
+          <v-card density="compact">
+            <v-img :src="localURL(file)" max-height="150px">
+              <v-btn
+                class="ma-1 float-right"
+                icon
+                @click="removeImageFromUploadList(index)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-img>
+            <div class="text-caption ma-1">
+              {{ file.name }}
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-btn
+        class="float-right mt-2"
+        @click="uploadImages()"
+        :disabled="selectedImages.length == 0"
+        >Wyślij {{selectedImages.length == 1 ? "zdjęcie" : "zdjęcia"}}</v-btn
+      >
+    </v-card>
+    <v-card class="pa-2 mt-2 mb-2">
+      <div class="text-h5">Moje zdjęcia</div>
+
+      <!--
       TODO:
       tutaj było `selectedImages` zamiast `images`
       teraz możemy przeciągać i zmieniać kolejność zdjęć, które już są zuploadowane na serwer,
@@ -186,108 +178,119 @@ export default {
       która robi requesta GET /delete-img/<filename> a na backendzie sprawdzamy, czy to jest plik tego usera, co chce usunąć.
 
     -->
-    <draggable
-      v-model="images" 
-      item-key="url"
-      group="people"
-      style="align-items: center; display: flex; flex-wrap: wrap"
-    >
-      <!-- Had to mannulay add these style elements copied from https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VGrid/VGrid.sass
+      <draggable
+        v-if="accountData.images.length > 0"
+        v-model="accountData.images"
+        item-key="url"
+        group="people"
+        style="align-items: center; display: flex; flex-wrap: wrap"
+      >
+        <!-- Had to mannulay add these style elements copied from https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VGrid/VGrid.sass
     for the column layout to start working, because when v-row was the parent of draggable,
     draggable became a column of width 2/12 I think, and as such its children became even thinnger :/ -->
-      <template #item="{ element: preview, index }">
-        <v-col cols="6" sm="4" class="pa-2">
-          <v-card density="compact">
-            <v-img :src="makeURL(preview)" max-height="150px">
-              <v-btn class="ma-1 float-right" icon @click="removeImage(index)">
+        <template #item="{ element: preview, index }">
+          <v-col cols="6" sm="4" class="pa-2">
+            <v-card density="compact">
+              <v-img :src="remoteURL(preview)" max-height="150px">
+                <v-btn
+                  class="ma-1 float-right"
+                  icon
+                  @click="removeImageFromRemote(index)"
+                >
                   <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </v-img>
-            <div class="text-caption ma-1">
-              {{ preview.name }}
-              
-            </div>
+                </v-btn>
+              </v-img>
+              <div class="text-caption ma-1">
+                {{ preview.name }}
+              </div>
+            </v-card>
+          </v-col>
+        </template>
+      </draggable>
+      <div v-else class="ma-1 text-subtitle-1">
+        Nie masz jeszcze obrazów do wyświetlania. Dodaj używając opcji powyżej.
+      </div>
+      <br />
+      <v-row dense>
+        <v-col col="6">
+          <v-card class="align-end" height="100%">
+            <v-card-title class="text-left"> Moja płeć: </v-card-title>
+            <v-card-action>
+              <v-radio-group v-model="accountData.sex" column>
+                <v-radio
+                  label="Kobieta"
+                  color="blue"
+                  value="female"
+                  density="default"
+                ></v-radio>
+                <v-radio
+                  label="Mężczyzna"
+                  color="blue"
+                  value="male"
+                  density="default"
+                ></v-radio>
+              </v-radio-group>
+            </v-card-action>
           </v-card>
         </v-col>
-      </template>
-    </draggable>
-    <v-row dense>
-      <v-col col="6">
-        <v-card class="align-end" height="100%">
-          <v-card-title class="text-left"> Moja płeć: </v-card-title>
-          <v-card-action>
-            <v-radio-group v-model="my_sex" column>
-              <v-radio
+        <v-col col="6">
+          <v-card class="align-end" height="100%">
+            <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
+            <v-card-action>
+              <v-checkbox
+                v-model="accountData.target_sex"
                 label="Kobieta"
-                color="blue"
                 value="female"
-                density="default"
-              ></v-radio>
-              <v-radio
+                hideDetails
+                density="compact"
+                class="ml-2"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="accountData.target_sex"
                 label="Mężczyzna"
-                color="blue"
                 value="male"
-                density="default"
-              ></v-radio>
-            </v-radio-group>
-          </v-card-action>
-        </v-card>
-      </v-col>
-      <v-col col="6">
-        <v-card class="align-end" height="100%">
-          <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
-          <v-card-action>
-            <v-checkbox
-              v-model="target_sex"
-              label="Kobieta"
-              value="female"
-              hideDetails
-              density="compact"
-              class="ml-2"
-            ></v-checkbox>
-            <v-checkbox
-              v-model="target_sex"
-              label="Mężczyzna"
-              value="male"
-              hideDetails
-              density="compact"
-              class="ml-2"
-            ></v-checkbox>
-          </v-card-action>
-        </v-card>
-      </v-col>
-      <v-col col="6">
-        <v-card class="align-end" height="100%">
-          <v-card-title class="text-left"> Czynność: </v-card-title>
-          <v-card-action>
-            <v-checkbox
-              v-model="target_activity"
-              label="Na piwo"
-              value="beer"
-              hideDetails
-              density="compact"
-              class="ml-2"
-            ></v-checkbox>
-            <v-checkbox
-              v-model="target_activity"
-              label="Na życie"
-              value="life"
-              hideDetails
-              density="compact"
-              class="ml-2"
-            ></v-checkbox>
-            <v-checkbox
-              v-model="target_activity"
-              label="Do projektu"
-              value="project"
-              hideDetails
-              density="compact"
-              class="ml-2"
-            ></v-checkbox>
-          </v-card-action>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-btn class="mt-2 mb-2" @click="submitForm">Zapisz zmiany!</v-btn>
+                hideDetails
+                density="compact"
+                class="ml-2"
+              ></v-checkbox>
+            </v-card-action>
+          </v-card>
+        </v-col>
+        <v-col col="6">
+          <v-card class="align-end" height="100%">
+            <v-card-title class="text-left"> Czynność: </v-card-title>
+            <v-card-action>
+              <v-checkbox
+                v-model="accountData.target_activity"
+                label="Na piwo"
+                value="beer"
+                hideDetails
+                density="compact"
+                class="ml-2"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="accountData.target_activity"
+                label="Na życie"
+                value="life"
+                hideDetails
+                density="compact"
+                class="ml-2"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="accountData.target_activity"
+                label="Do projektu"
+                value="project"
+                hideDetails
+                density="compact"
+                class="ml-2"
+              ></v-checkbox>
+            </v-card-action>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-btn class="mt-2 float-right" @click="sendAccountData()"
+        >Zapisz zmiany!</v-btn
+      >
+    </v-card>
   </v-container>
 </template>

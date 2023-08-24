@@ -14,6 +14,8 @@ from werkzeug.security import safe_join
 
 from ..models import User
 from ..tools.files import secure_unique_filename_for_directory
+from ..config import UPLOADS_DIR
+
 
 
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
@@ -82,21 +84,21 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/delete-image', methods=['POST'])
     @login_required
     def delete_image():
-        j = request.json
-        removedImageName = j["removed_image_name"]
+        removed_img_name = request.json["removed_image_name"]
         user_owned_images = User.get_images(current_user)
 
-        if not removedImageName in user_owned_images:
-            return jsonify({'ok': False, 'info': "No image found"})
-        
-        from ..config import UPLOADS_DIR
+        if not removed_img_name in user_owned_images:
+            return jsonify({'ok': False, 'info': "No image found"}), 404
 
-        try:
-            os.remove(safe_join(str(UPLOADS_DIR), removedImageName))
-        except OSError as e:
-            return jsonify({'ok': False, 'info': "No image found"})
-        
-        user_owned_images.remove(removedImageName)
+        imgpath = safe_join(str(UPLOADS_DIR), removed_img_name)
+        if Path(imgpath).exists():
+            try:
+                os.remove(imgpath)
+            except OSError as e:
+                return jsonify({'ok': False, 'info': "No image found"}), 404
+
+        # Checked above the image is contained in the list.
+        user_owned_images.remove(removed_img_name)
         User.set_images(current_user, user_owned_images)
         db.session.commit()
 
