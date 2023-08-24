@@ -1,6 +1,6 @@
 <script lang="ts">
 import draggable from "vuedraggable";
-import { getJson, postJson } from "../common/requests";
+import { getBackendHostname, getJson, postJson } from "../common/requests";
 import { assertExpressionStatement } from "@babel/types";
 import axios from "axios";
 
@@ -60,7 +60,7 @@ export default {
       for (let i = 0; i < this.selectedImages.length; i++) {
         formData.append('images', this.selectedImages[i]);
       }
-      axios.post("http://localhost:5000/upload-images", formData, {
+      axios.post(`${getBackendHostname()}/upload-images`, formData, {
         headers: {
                 'Content-Type': 'multipart/form-data'
                     
@@ -101,7 +101,7 @@ export default {
     },
 
     getImageURL(imageName: string) {
-      return `http://localhost:5000/uploads/${imageName}`;
+      return `${getBackendHostname()}/uploads/${imageName}`;
     },
 
     makeURL(file: File) {
