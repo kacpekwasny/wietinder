@@ -18,7 +18,7 @@ export function postJson(url: string, object: object) {
     })
 }
 
-export function getJson(url: string): Response {
+export function getJson(url: string): Promise<Response> {
     return fetch(import.meta.env.VITE_API_URL + url, {
         credentials: "include",
     })
