@@ -34,3 +34,7 @@ class ConfigProd(Config):
     SECRET_KEY = 'o87gouyvi65divuio6fb cu6f7'
 
 
+
+from . import IS_PROD
+
+CONFIG: Config = ConfigProd if IS_PROD else ConfigDev

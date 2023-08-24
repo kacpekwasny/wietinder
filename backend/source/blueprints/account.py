@@ -10,6 +10,10 @@ from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.utils import secure_filename
+from werkzeug.security import safe_join
+
+from ..models import User
+from ..tools.files import secure_unique_filename_for_directory
 
 
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
@@ -18,17 +22,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/account-data', methods=['GET'])
     @login_required
     def get_account_data():
-        filter_empty = lambda ls_str: [s for s in ls_str if len(s)]
-
-        response = {
-            "bio": current_user.bio,
-            "my_sex": current_user.sex.value,
-            "target_sex": filter_empty(current_user.target_sex.split(";")),
-            "target_activity": filter_empty(current_user.target_activity.split(";")),
-            "college_major": current_user.college_major,
-            "images": get_images_from_db()
-        }
-        return jsonify(response)
+        return jsonify(User.get_json(current_user))
 
     @account_bp.route('/account-data', methods=['POST'])
     @login_required
@@ -36,39 +30,25 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         j = request.json
         print(json.dumps(j, indent=4))
         try:
-            current_user.bio = j["bio"]
-            current_user.sex = j["my_sex"]
-            current_user.target_sex = ";".join(j["target_sex"])
-            current_user.target_activity = ";".join(j["target_activity"])
-            current_user.images = json.dumps(j["images"])
+            User.set_from_json(current_user, **j)
+
         except KeyError as e:
             return jsonify({'ok': False, 'info': f'missing key: {e}'})
         
         db.session.commit()
-
         return get_account_data()
-   
-        # file = request.files['image']
-        # if not (file and allowed_file(file.filename)):
-        #     return jsonify({'ok': False, 'info': 'invalid_file'})
     
-        # filename = secure_filename(file.filename)
-
-        # file.save(str(upload_dir / filename))
-
-        # file = Image(filename=filename, user=current_user)
-        
-        # db.session.add(file)
-        # db.session.commit()
-
-        # return jsonify({'ok': True, 'info': 'updated'})
-
+    @account_bp.route('/profile/<profile_id>')
+    @login_required
+    def get_profile(profile_id: str):
+        return jsonify(User.query.filter_by(public_id=profile_id)
+                       .first_or_404().get_json())
     
     @account_bp.route('/get-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
     @login_required
     def get_images():
         response = {
-            "images": get_images_from_db()
+            "images": User.get_images(current_user)
         }
         return jsonify(response)
 
@@ -76,20 +56,18 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @login_required
     def upload_images():
         files = request.files.getlist('images')
-        images = []
+        new_images = []
+        print(files)
 
         for file in files:
-            if not (file and allowed_file(file.filename)):
+            if not (file and allowed_img_extension(file.filename)):
                 return jsonify({'ok': False, 'info': 'invalid_file'})
             
-            imageName = secure_filename(file.filename)
-            unique_imagename = generate_unique_image_name(imageName)
+            unique_imagename = secure_unique_filename_for_directory(file.filename, directory=upload_dir)
             file.save(str(upload_dir / unique_imagename))
-            images.append(unique_imagename)
+            new_images.append(unique_imagename)
         
-        old_images = get_images_from_db()
-        images.extend(old_images)
-        current_user.images = json.dumps(images)
+        User.set_images(current_user, User.get_images(current_user) + new_images)
         db.session.commit()
        
         return jsonify({'ok': True})
@@ -98,7 +76,6 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/uploads/<path:filepath>')
     @login_required
     def get_image(filepath: str):
-        print("uploads ad", filepath)
         directory_path = str(Path(__file__).parent.parent.parent / "uploads")
         return send_from_directory(directory_path, filepath)
     
@@ -107,42 +84,27 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     def delete_image():
         j = request.json
         removedImageName = j["removed_image_name"]
-        images = get_images_from_db()
+        user_owned_images = User.get_images(current_user)
 
-        if not removedImageName in images:
+        if not removedImageName in user_owned_images:
             return jsonify({'ok': False, 'info': "No image found"})
         
-        directory_path = str(Path(__file__).parent.parent.parent / "uploads")
+        from ..config import UPLOADS_DIR
 
         try:
-            os.remove(os.path.join(directory_path, removedImageName))
+            os.remove(safe_join(str(UPLOADS_DIR), removedImageName))
         except OSError as e:
             return jsonify({'ok': False, 'info': "No image found"})
         
-        images.remove(removedImageName)
-        current_user.images = json.dumps(images)
+        user_owned_images.remove(removedImageName)
+        User.set_images(current_user, user_owned_images)
         db.session.commit()
+
         return jsonify({'ok': True})
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
-    def allowed_file(filename: str):
-        return '.' in filename and \
-            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    
-    def generate_unique_image_name(imagename):
-        timestamp = int(time.time())
-        random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-        unique_prefix = f"{timestamp}_{random_string}"
-        image_unique_name = unique_prefix + imagename
-        return image_unique_name
-
-    def get_images_from_db():
-        
-        if current_user.images:
-            images_list = json.loads(current_user.images)
-        else:
-            images_list = []
-        return images_list
-        
-    
+    def allowed_img_extension(filename: str):
+        print(Path(filename).suffix.lower())
+        return Path(filename).suffix.lower().replace(".", "") in ALLOWED_EXTENSIONS
+       
     return account_bp

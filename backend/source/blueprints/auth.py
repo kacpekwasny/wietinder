@@ -101,7 +101,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
                 return resp(400, "password_len_bad")
 
         new_user = User(email=email,
-                        first_name=name,
+                        name=name,
                         password=generate_password_hash(password,
                                                         method='pbkdf2:sha1',
                                                         salt_length=8))

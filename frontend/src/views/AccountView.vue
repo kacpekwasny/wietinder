@@ -11,10 +11,10 @@ export default {
       images: [],
       imageView: null,
       bio: "",
-      mySex: "",
-      collegeMajor: "",
-      targetSex: [],
-      targetActivity: [],
+      my_sex: "",
+      fields_of_study: "",
+      target_sex: [],
+      target_activity: [],
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -57,6 +57,9 @@ export default {
 
     uploadImages(){
       const formData = new FormData();
+      if (this.selectedImages.length == 0) {
+        return;
+      }
       for (let i = 0; i < this.selectedImages.length; i++) {
         formData.append('images', this.selectedImages[i]);
       }
@@ -112,20 +115,20 @@ export default {
     setAccountData(accountJson: Object) {
     console.log(accountJson)
       this.bio = accountJson.bio;
-      this.collegeMajor = accountJson.college_major;
-      this.mySex = accountJson.my_sex;
-      this.targetSex = accountJson.target_sex;
-      this.targetActivity = accountJson.target_activity;
+      this.fields_of_study = accountJson.fields_of_study;
+      this.my_sex = accountJson.sex;
+      this.target_sex = accountJson.target_sex;
+      this.target_activity = accountJson.target_activity;
       this.images = accountJson.images;
     },
     
     buildAccountDataObject(): Object {
       return {
         bio: this.bio,
-        college_major: this.collegeMajor,
-        my_sex: this.mySex,
-        target_sex: this.targetSex,
-        target_activity: this.targetActivity,
+        fields_of_study: this.fields_of_study,
+        my_sex: this.my_sex,
+        target_sex: this.target_sex,
+        target_activity: this.target_activity,
         images: this.images
       }
     },
@@ -149,6 +152,7 @@ export default {
   components: {
     draggable,
   },
+  computed: {}
 };
 </script>
 
@@ -167,7 +171,7 @@ export default {
       v-model="selectedImages"
       @change="addImagesChanged"
     ></v-file-input>
-    <v-btn class="mt-2 mb-2" @click="uploadImages">Dodaj zdjęcia</v-btn>
+    <v-btn class="mt-2 mb-2" @click="uploadImages()" :disabled="(selectedImages.length == 0)">Dodaj zdjęcia</v-btn>
     <!--
       TODO:
       tutaj było `selectedImages` zamiast `images`
@@ -195,7 +199,7 @@ export default {
         <v-col cols="6" sm="4" class="pa-2">
           <v-card density="compact">
             <v-img :src="makeURL(preview)" max-height="150px">
-              <v-btn icon @click="removeImage(index)">
+              <v-btn class="ma-1 float-right" icon @click="removeImage(index)">
                   <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-img>
@@ -212,7 +216,7 @@ export default {
         <v-card class="align-end" height="100%">
           <v-card-title class="text-left"> Moja płeć: </v-card-title>
           <v-card-action>
-            <v-radio-group v-model="mySex" column>
+            <v-radio-group v-model="my_sex" column>
               <v-radio
                 label="Kobieta"
                 color="blue"
@@ -234,7 +238,7 @@ export default {
           <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
           <v-card-action>
             <v-checkbox
-              v-model="targetSex"
+              v-model="target_sex"
               label="Kobieta"
               value="female"
               hideDetails
@@ -242,7 +246,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetSex"
+              v-model="target_sex"
               label="Mężczyzna"
               value="male"
               hideDetails
@@ -257,7 +261,7 @@ export default {
           <v-card-title class="text-left"> Czynność: </v-card-title>
           <v-card-action>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="target_activity"
               label="Na piwo"
               value="beer"
               hideDetails
@@ -265,7 +269,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="target_activity"
               label="Na życie"
               value="life"
               hideDetails
@@ -273,7 +277,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="target_activity"
               label="Do projektu"
               value="project"
               hideDetails
