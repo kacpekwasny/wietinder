@@ -139,16 +139,6 @@ def set_enum_valid(self: object, enum_: Enum, values: list, propname: str):
     setattr(self, propname, json.dumps([v for v in values if v in enum_]))
 
 
-
-
-# class Image(db.Model):
-#     __tablename__ = 'images'
-#     id = db.Column(db.Integer, primary_key=True)
-#     filename = db.Column(db.String)
-#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-#     user = db.relationship('User', back_populates='images')
-
-
 class PossibleMatch(db.Model):
     __tablename__ = 'possible_matches'
     id              = db.Column(db.Integer, primary_key=True)
