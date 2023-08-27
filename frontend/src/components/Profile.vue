@@ -7,16 +7,18 @@ export default {
   data() {
     return {
       prof: {
-        name: "",
-        sex: "male",
-        bio: "Lorem ipsum dolor sominet dupa wolowa ala kapone sezamie otworz sie.",
-        target_activity: "beer;life;project",
+        name: [],
         images: [],
+        bio: "",
+        sex: "",
+        fields_of_study: [],
+        target_sex: [],
+        target_activity: [],
       },
     };
   },
 
-  async mounted() {
+  async created() {
     let r = await getJson(`/profile/${this.profile_id}`);
     if (r.status != 200) {
         this.prof.name = "404"
@@ -45,9 +47,15 @@ export default {
             <v-table>
                 <tbody>
                     <tr
-                        v-for="item in "
+                        v-for="(key_val) in [
+                          ['Płeć', prof.sex],
+                          ['Czynność', prof.target_activity],
+                          ['Płeć pary', prof.target_sex],
+                          ['Kierunki', prof.fields_of_study],
+                        ]"
                     >
-
+                      <td>{{ key_val[0] }}</td>
+                      <td>{{ key_val[1] }}</td>
                     </tr>
                 </tbody>
             </v-table>
@@ -56,7 +64,7 @@ export default {
 
     <v-col cols="6" sm="4" class="pa-2">
       <v-card density="compact">
-        <v-img :src="makeURL(preview)" max-height="150px"></v-img>
+        <v-img src="/" max-height="150px"></v-img>
       </v-card>
     </v-col>
     <v-row dense>
@@ -86,7 +94,7 @@ export default {
           <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
           <v-card-action>
             <v-checkbox
-              v-model="targetSex"
+              v-model="prof.target_sex"
               label="Kobieta"
               value="female"
               hideDetails
@@ -94,7 +102,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetSex"
+              v-model="prof.target_sex"
               label="Mężczyzna"
               value="male"
               hideDetails
@@ -109,7 +117,7 @@ export default {
           <v-card-title class="text-left"> Czynność: </v-card-title>
           <v-card-action>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="prof.target_activity"
               label="Na piwo"
               value="beer"
               hideDetails
@@ -117,7 +125,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="prof.target_activity"
               label="Na życie"
               value="life"
               hideDetails
@@ -125,7 +133,7 @@ export default {
               class="ml-2"
             ></v-checkbox>
             <v-checkbox
-              v-model="targetActivity"
+              v-model="prof.target_activity"
               label="Do projektu"
               value="project"
               hideDetails
@@ -136,6 +144,5 @@ export default {
         </v-card>
       </v-col>
     </v-row>
-    <v-btn class="mt-2 mb-2" @click="submitForm">Zapisz zmiany!</v-btn>
   </v-container>
 </template>
