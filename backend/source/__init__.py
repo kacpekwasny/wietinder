@@ -40,10 +40,12 @@ def create_app():
     from .blueprints.account import get_account_bp
     from .blueprints.serve_frontend import get_serve_frontend_bp
     from .blueprints.match import get_match_bp
+    from .blueprints.data import get_data_bp
     app.register_blueprint(get_serve_frontend_bp())
     app.register_blueprint(get_auth_bp(db, is_prod=IS_PROD))
     app.register_blueprint(get_account_bp(db, UPLOADS_DIR))
     app.register_blueprint(get_match_bp(db))
+    app.register_blueprint(get_data_bp())
 
 
     from .models import User, PossibleMatch
