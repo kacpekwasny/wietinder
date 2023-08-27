@@ -8,7 +8,7 @@ export function getBackendHostname(): string {
     return import.meta.env.VITE_API_URL
 }
 
-export function postJson(url: string, object: object) {
+export function postJson(url: string, object: object): Promise<Response> {
     return fetch(getBackendHostname() + url, {
         method: "POST", headers: {
             "Content-Type": "application/json",
