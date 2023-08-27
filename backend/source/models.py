@@ -1,7 +1,7 @@
 import json
 import uuid
 
-from enum import Enum
+from enum import Enum, EnumType
 from flask_login import UserMixin
 from sqlalchemy import event
 from sqlalchemy.schema import DDL
@@ -79,7 +79,7 @@ class User(db.Model, UserMixin):
 
     def set_sex(self, sex: str):
         sex = str(sex)
-        if sex in Sex:
+        if Sex(sex) in Sex:
             self.sex = sex
             return
         raise ValueError(f"{sex} not in {Sex}")
@@ -135,8 +135,10 @@ class User(db.Model, UserMixin):
         target_activity is not None and self.set_target_activity(target_activity)
         images          is not None and self.set_images(images)
 
-def set_enum_valid(self: object, enum_: Enum, values: list, propname: str):
-    setattr(self, propname, json.dumps([v for v in values if v in enum_]))
+def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
+    if isinstance(enum_, EnumType):
+        return setattr(self, propname, json.dumps([v for v in values if enum_(v) in enum_]))
+    return setattr(self, propname, json.dumps([v for v in values if v in enum_]))
 
 
 class PossibleMatch(db.Model):
