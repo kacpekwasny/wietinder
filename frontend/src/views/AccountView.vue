@@ -2,7 +2,6 @@
 import draggable from "vuedraggable";
 import { getBackendHostname, getJson, postJson } from "../common/requests";
 import Profile from "../components/Profile.vue";
-import { assertExpressionStatement, throwStatement } from "@babel/types";
 import axios from "axios";
 
 export default {
@@ -15,7 +14,7 @@ export default {
         fields_of_study: [],
         target_sex: [],
         target_activity: [],
-      },
+    },
       imageView: null,
       selectedImages: [],
       imagePreviews: [],
@@ -39,7 +38,6 @@ export default {
       css: {
         dispImgMaxHeight: "150px",
       },
-      profile_id: "",
     };
   },
 
@@ -122,10 +120,6 @@ export default {
     .then(j => {
       this.allPossibleFieldsOfStudyAGH = j
     }))
-    let resp = await getJson('/matches-undecided')
-    let j = await resp.json()
-    console.log(j)
-    this.profile_id = j[0][0]
   },
 };
 </script>
@@ -317,5 +311,4 @@ export default {
       >
     </v-card>
   </v-container>
-  <Profile :profile_id="profile_id"></Profile>
 </template>
