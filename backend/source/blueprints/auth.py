@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask.wrappers import Response
 from flask_cors import cross_origin
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -23,6 +23,19 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     def check_email_exists(email):
         user = User.query.filter_by(email=email).first()
         return user is not None
+    
+    @auth.route('/is-user-logged-in', methods = ['GET'])
+    def is_user_logged_in():
+        if current_user.is_authenticated:
+            return resp(200, "user_logged_in")
+        else:
+            return resp(401, "user_not_logged_in")
+        
+    @auth.route('/logout', methods = ['POST'])
+    @login_required
+    def logout():
+        logout_user()
+        return resp(200, "git")
 
     @auth.route('/login', methods=['POST'])
     def login():
