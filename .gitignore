@@ -5,6 +5,7 @@ Tutaj wpisujemy rzeczy, które git ma ignorować.
 *.pyc
 *egg-info
 node_modules
+database_dev.db
 
 ########################################################
 

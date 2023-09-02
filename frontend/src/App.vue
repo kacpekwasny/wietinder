@@ -1,9 +1,9 @@
 <script lang="ts">
 import Header from "./components/Header.vue";
 import Drawer from "./components/Drawer.vue";
-import { getJson, postJson } from "./common/requests";
+import { getJson } from "./common/requests";
 import router from "./router";
-import { nextTick } from "process";
+
 
 export default {
   name: "App",

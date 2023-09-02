@@ -106,13 +106,14 @@ class User(db.Model, UserMixin):
 
     def get_json(self) -> dict[str, str | list[str]]:
         return {
-            "name": self.name,
-            "bio": self.bio,
-            "sex": self.sex.value,
+            "name":      self.name,
+            "public_id": self.public_id,
+            "bio":       self.bio,
+            "sex":       self.sex.value,
             "fields_of_study": self.get_fields_of_study(),
-            "target_sex": self.get_target_sex(),
+            "target_sex":      self.get_target_sex(),
             "target_activity": self.get_target_activity(),
-            "images": self.get_images(),
+            "images":          self.get_images(),
         }
     
     def set_from_json(self, *,

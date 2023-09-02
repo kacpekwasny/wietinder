@@ -3,19 +3,22 @@ import draggable from "vuedraggable";
 import { getBackendHostname, getJson, postJson } from "../common/requests";
 import Profile from "../components/Profile.vue";
 import axios from "axios";
-import router from "../router"; //dałem do testu, do wywalenia jakbym zapomniał 
+import router from "../router"; //dałem do testu, do wywalenia jakbym zapomniał
+
+import { useUserAccountStore } from "../stores/AccountDataStore";
+import { mapState } from "pinia";
 
 export default {
   data() {
     return {
       accountData: {
-        images: [],
+        images: [] as string[],
         bio: "",
         sex: "",
-        fields_of_study: [],
-        target_sex: [],
-        target_activity: [],
-    },
+        fields_of_study: [] as string[],
+        target_sex: [] as string[],
+        target_activity: [] as string[],
+      },
       imageView: null,
       selectedImages: [],
       imagePreviews: [],
@@ -49,10 +52,11 @@ export default {
       });
     },
 
-    async logout(){ //testowa funkcja do logoutu do wywalenia potem stąd 
-     let respo = await postJson("/logout", {logout: "true"})
-     router.push('/login')
-    }, 
+    async logout() {
+      //testowa funkcja do logoutu do wywalenia potem stąd
+      let respo = await postJson("/logout", { logout: "true" });
+      router.push("/login");
+    },
 
     async sendAccountData() {
       let resp = await postJson("/account-data", this.accountData);
@@ -86,8 +90,8 @@ export default {
     },
 
     async removeImageFromRemote(index: int) {
-      const removedImageName = this.accountData.images[index];
-      this.accountData.images.splice(index, 1);
+      const removedImageName = this.accountData_S.images[index];
+      this.accountData_S.images.splice(index, 1);
 
       const resp = await postJson("/delete-image", {
         removed_image_name: removedImageName,
@@ -113,19 +117,26 @@ export default {
 
   components: {
     draggable,
-    Profile
+    Profile,
   },
 
-  computed: {},
+  computed: {
+    ...mapState(useUserAccountStore, {
+      accountData_S: 'accountData',
+    })
+  },
 
   async created() {
-    await this.updateAccountData();
+    const accountDataStore = useUserAccountStore();
+    accountDataStore.refreshUserData(true);
+    // this.accountData = accountDataStore.accountData;
+    // await this.updateAccountData();
 
-    getJson('/static/agh-fields-of-study')
-    .then(r => r.json()
-    .then(j => {
-      this.allPossibleFieldsOfStudyAGH = j
-    }))
+    getJson("/static/agh-fields-of-study").then((r) =>
+      r.json().then((j) => {
+        this.allPossibleFieldsOfStudyAGH = j;
+      })
+    );
   },
 };
 </script>
@@ -134,7 +145,12 @@ export default {
 
 <template>
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
-    <v-textarea hide-details class="elevation-3 rounded" label="Opis profilu" v-model="accountData.bio"></v-textarea>
+    <v-textarea
+      hide-details
+      class="elevation-3 rounded"
+      label="Opis profilu"
+      v-model="accountData_S.bio"
+    ></v-textarea>
     <v-card class="pa-3 mt-2 mb-2 elevation-3">
       <div>
         <div class="text-h5 mb-2">Dodaj zdjęcia</div>
@@ -177,16 +193,17 @@ export default {
           color="yellow"
           @click="uploadImages()"
           :disabled="selectedImages.length == 0"
-          >Wyślij {{ selectedImages.length == 1 ? "zdjęcie" : "zdjęcia" }}</v-btn
+          >Wyślij
+          {{ selectedImages.length == 1 ? "zdjęcie" : "zdjęcia" }}</v-btn
         >
       </div>
-      <br>
-      <br>
+      <br />
+      <br />
       <div class="">
         <div class="text-h5">Moje zdjęcia</div>
         <draggable
-          v-if="accountData.images.length > 0"
-          v-model="accountData.images"
+          v-if="accountData_S.images.length > 0"
+          v-model="accountData_S.images"
           item-key="url"
           group="people"
           style="align-items: center; display: flex; flex-wrap: wrap"
@@ -197,7 +214,10 @@ export default {
           <template #item="{ element: preview, index }">
             <v-col cols="6" sm="4" class="pa-2">
               <v-card density="compact" :height="css.dispImgMaxHeight">
-                <v-img :src="remoteURL(preview)" :max-height="css.dispImgMaxHeight">
+                <v-img
+                  :src="remoteURL(preview)"
+                  :max-height="css.dispImgMaxHeight"
+                >
                   <v-btn
                     class="ma-1 float-right"
                     icon
@@ -214,18 +234,18 @@ export default {
           </template>
         </draggable>
         <div v-else class="ma-1 text-subtitle-1">
-          Nie masz jeszcze obrazów do wyświetlania. Dodaj używając opcji powyżej.
+          Nie masz jeszcze obrazów do wyświetlania. Dodaj używając opcji
+          powyżej.
         </div>
       </div>
     </v-card>
     <v-card class="pa-3 mt-2 mb-2 elevation-3">
-
       <v-row dense>
         <v-col col="6">
           <v-card class="align-end" height="100%">
             <v-card-title class="text-left"> Moja płeć: </v-card-title>
             <v-card-action>
-              <v-radio-group v-model="accountData.sex" column>
+              <v-radio-group v-model="accountData_S.sex" column>
                 <v-radio
                   label="Kobieta"
                   color="blue"
@@ -247,7 +267,7 @@ export default {
             <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
             <v-card-action>
               <v-checkbox
-                v-model="accountData.target_sex"
+                v-model="accountData_S.target_sex"
                 label="Kobieta"
                 value="female"
                 hideDetails
@@ -255,7 +275,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData.target_sex"
+                v-model="accountData_S.target_sex"
                 label="Mężczyzna"
                 value="male"
                 hideDetails
@@ -270,7 +290,7 @@ export default {
             <v-card-title class="text-left"> Czynność: </v-card-title>
             <v-card-action>
               <v-checkbox
-                v-model="accountData.target_activity"
+                v-model="accountData_S.target_activity"
                 label="Na piwo"
                 value="beer"
                 hideDetails
@@ -278,7 +298,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData.target_activity"
+                v-model="accountData_S.target_activity"
                 label="Na życie"
                 value="life"
                 hideDetails
@@ -286,7 +306,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData.target_activity"
+                v-model="accountData_S.target_activity"
                 label="Do projektu"
                 value="project"
                 hideDetails
@@ -299,10 +319,10 @@ export default {
         <v-col col="6">
           <v-card class="align-end" height="100%">
             <v-card-title class="text-left"> Kierunek: </v-card-title>
-            <v-card-action >
+            <v-card-action>
               <v-select
-              class="ma-1"
-                v-model="accountData.fields_of_study"
+                class="ma-1"
+                v-model="accountData_S.fields_of_study"
                 :items="allPossibleFieldsOfStudyAGH"
                 chips
                 label="Kierunki studiów:"
@@ -312,11 +332,13 @@ export default {
           </v-card>
         </v-col>
       </v-row>
-      <v-btn color="yellow" class="mt-2 float-right " @click="sendAccountData()"
+      <v-btn color="yellow" class="mt-2 float-right" @click="sendAccountData()"
         >Zapisz zmiany!</v-btn
       >
     </v-card>
   </v-container>
-  <v-btn color="yellow" class="mt-2 float-right " @click="logout"
-        >testowe wyloguj</v-btn>
+  <v-btn color="yellow" class="mt-2 float-right" @click="logout"
+    >testowe wyloguj</v-btn
+  >
 </template>
+../stores/AccountDataStore
