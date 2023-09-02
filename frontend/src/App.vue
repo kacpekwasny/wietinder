@@ -3,6 +3,8 @@ import Header from "./components/Header.vue";
 import Drawer from "./components/Drawer.vue";
 import { getJson } from "./common/requests";
 import router from "./router";
+import { usePanelStore } from "./stores/SidePanelStore";
+import { mapState } from "pinia";
 
 
 export default {
@@ -13,9 +15,10 @@ export default {
   },
   data() {
     return {
-      showSidePanel: true,
+      showSidePanel: usePanelStore().showSidePanel,
     };
   },
+  
   watch: {
     $route: function (to, from) {
       this.isUserLoggedIn();
@@ -39,7 +42,7 @@ export default {
         });
     },
     toggleSidePanel() {
-      this.showSidePanel = !this.showSidePanel;
+      usePanelStore().toggleSidePanel();
     },
   },
 };

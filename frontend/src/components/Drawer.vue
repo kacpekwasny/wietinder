@@ -1,16 +1,26 @@
 <script lang="ts">
+
+import { usePanelStore } from "../stores/SidePanelStore";
+
 export default { 
-    data() {
-      return {
-        showSidePanel: true,
-      };
+  data() {
+    return {panelStore: usePanelStore()}
+  },
+  methods: {
+    toggleSidePanel() {
+      this.panelStore.toggleSidePanel();
     },
-    
-    methods:{
-      toggleSidePanel() {
-        this.showSidePanel = !this.showSidePanel;
+  },
+  computed: {
+    showSidePanel: {
+      get() {
+        return this.panelStore.showSidePanel
       },
-    },
+      set(newValue: boolean) {
+        usePanelStore().$patch({showSidePanel: newValue})
+      }
+    }
+  },
 };
 </script>
 
