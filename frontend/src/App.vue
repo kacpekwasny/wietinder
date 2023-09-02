@@ -4,7 +4,8 @@ import Drawer from "./components/Drawer.vue";
 import { getJson } from "./common/requests";
 import router from "./router";
 import { useUserAccountStore } from "./stores/AccountDataStore";
-import { storeToRefs } from "pinia";
+import { usePanelStore } from "./stores/SidePanelStore";
+import { mapState } from "pinia";
 
 
 export default {
@@ -18,10 +19,11 @@ export default {
     return {
       showSidePanel: true,
       accountDataStore: store,
-      loggedIn: storeToRefs(store).loggedIn,
+      loggedIn: store.loggedIn,
+      showSidePanel: usePanelStore().showSidePanel,
     };
   },
-
+  
   watch: {
     $route: function (to, from) {
       const store = useUserAccountStore()
@@ -56,8 +58,11 @@ export default {
         });
     },
     toggleSidePanel() {
-      this.showSidePanel = !this.showSidePanel;
+      usePanelStore().toggleSidePanel();
     },
+  },
+  computed: {
+    ...mapState(useUserAccountStore, ['loggedIn'])
   },
 };
 </script>
@@ -65,8 +70,8 @@ export default {
 <template>
   <v-app>
     <v-app-bar app density="compact">
-      <v-app-bar-nav-icon @click="toggleSidePanel"></v-app-bar-nav-icon>
-      <Header  />
+      <v-app-bar-nav-icon v-if="loggedIn" @click="toggleSidePanel"></v-app-bar-nav-icon>
+      <Header />
     </v-app-bar>
     <Drawer />
     <v-main>
