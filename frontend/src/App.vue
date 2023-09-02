@@ -1,5 +1,6 @@
 <script lang="ts">
 import Header from "./components/Header.vue";
+import Drawer from "./components/Drawer.vue";
 import { getJson, postJson } from "./common/requests";
 import router from "./router";
 import { nextTick } from "process";
@@ -8,6 +9,7 @@ export default {
   name: "App",
   components: {
     Header,
+    Drawer,
   },
   data() {
     return {
@@ -27,7 +29,9 @@ export default {
         })
         .then((json) => {
           if (json.info === "user_not_logged_in") {
-            return router.push("/login");
+            if (this.$route.name != "register"){
+              return router.push("/login");
+            }
           }
         })
         .catch((error) => {
@@ -47,25 +51,10 @@ export default {
       <v-app-bar-nav-icon @click="toggleSidePanel"></v-app-bar-nav-icon>
       <Header />
     </v-app-bar>
-    <v-navigation-drawer
-      v-model="showSidePanel"
-      temporary
-      :permanent="!$vuetify.display.sm"
-    >
-      <v-list>
-        <v-list-item link>
-          <v-list-item-icon>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <!-- Add more menu items as needed -->
-      </v-list>
-    </v-navigation-drawer>
+    <Drawer />
     <v-main>
       <router-view />
     </v-main>
   </v-app>
 </template>
+
