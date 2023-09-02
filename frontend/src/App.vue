@@ -1,8 +1,8 @@
 <script lang="ts">
 import Header from "./components/Header.vue";
-import { getJson, postJson } from "./common/requests";
+import { getJson } from "./common/requests";
 import router from "./router";
-import { nextTick } from "process";
+
 
 export default {
   name: "App",
@@ -50,7 +50,7 @@ export default {
     <v-navigation-drawer
       v-model="showSidePanel"
       temporary
-      :permanent="!$vuetify.display.sm"
+      :permanent="$vuetify.display.width > 1100"
     >
       <v-list>
         <v-list-item link>
