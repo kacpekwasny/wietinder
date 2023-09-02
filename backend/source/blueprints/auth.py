@@ -95,11 +95,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         password = request.json.get('password')
         name = request.json.get("name")
         
-
         if is_prod:
-            # dont check for development
-            if check_email_exists(email):
-                return resp(400, 'email_registered')
 
             if len(email) < 5 or len(email) > 50 :
                 return resp(400, "email_bad")
@@ -111,7 +107,12 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
                 return resp(400, "name_alpha_bad")
 
             if len(password) < 8:
-                return resp(400, "password_len_bad")
+                return resp(422, "password_len_bad")
+
+        # Even in development database wont let us create multiple accounts with the same email,
+        # so this is a required check even in development mode.    
+        if check_email_exists(email):
+            return resp(409, 'user_alredy_exist')
 
         new_user = User(email=email,
                         name=name,
