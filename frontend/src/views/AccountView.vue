@@ -58,10 +58,6 @@ export default {
       }
     },
 
-    async updateAccountData() {
-      this.accountData = await (await getJson("/account-data")).json();
-    },
-
     async uploadImages() {
       const formData = new FormData();
       for (let i = 0; i < this.selectedImages.length; i++) {
@@ -78,7 +74,7 @@ export default {
         }
       );
       this.selectedImages = [];
-      this.updateAccountData();
+      useUserAccountStore().refreshUserData(true);
     },
 
     async removeImageFromRemote(index: number) {

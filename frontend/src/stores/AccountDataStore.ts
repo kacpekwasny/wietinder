@@ -35,8 +35,6 @@ export const useUserAccountStore = defineStore('UserAccount', {
     actions: {
         async refreshUserData(force: boolean = false) {
             const timePassed = Date.now() - this._lastChecked
-            console.log(timePassed)
-            console.trace()
 
             if (!force && (timePassed < 1000 * 30)) {
                 // If we dont force
@@ -56,7 +54,6 @@ export const useUserAccountStore = defineStore('UserAccount', {
             this.$patch({loggedIn: true})
             const j = await r.json()
 
-            console.log('patch', j, this.loggedIn)
             this.$patch({ accountData: j })
         },
         setLoggedOut() {

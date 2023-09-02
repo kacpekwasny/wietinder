@@ -3,7 +3,7 @@
 import { usePanelStore } from "../stores/SidePanelStore";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 import { mapState } from "pinia";
-import { getBackendHostname, postJson} from "../common/requests";
+import { getBackendHostname, getJson, postJson} from "../common/requests";
 import router from "../router";
 
 export default { 
@@ -20,7 +20,8 @@ export default {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },
     async logout() {
-      let respo = await postJson("/logout", { logout: "true" });
+      let respo = await getJson("/logout");
+      useUserAccountStore().setLoggedOut()
       router.push("/login");
     },
     navigateToAccount(){
@@ -46,36 +47,45 @@ export default {
       v-model="showSidePanel"
       temporary
       :permanent="$vuetify.display.width > 1100"
-      class = "drawer"
+      class = "drawer h-100"
     >
-      <v-list>
-        <v-list-item 
-          @click="navigateToAccount"
-          lines="two"
-          :prepend-avatar="remoteURL(accountData.images[0])"
-          :title="accountData.name"
-          subtitle="Zalogowane"
-        ></v-list-item>
-        <v-divider></v-divider>
-        <v-list-item 
-          prepend-icon="mdi-cards" 
-          title="Chybił trafił" 
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-heart" 
-          title="Polubienia" 
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-account" 
-          title="Profil" 
-          :to="{ name: 'account'}"
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-logout" 
-          title="Wyloguj" 
-          @click="logout"
-        ></v-list-item>
-      </v-list>
+      <div
+        class="d-flex flex-column h-100 justify-space-between pb-12"
+      >
+        <v-list class="">
+          <v-list-item 
+            @click="navigateToAccount"
+            lines="two"
+            :prepend-avatar="remoteURL(accountData.images[0])"
+            :title="accountData.name"
+            subtitle="Zalogowane"
+          ></v-list-item>
+          <v-divider></v-divider>
+          <v-list-item 
+            prepend-icon="mdi-cards" 
+            title="Chybił trafił" 
+          ></v-list-item>
+          <v-list-item 
+            prepend-icon="mdi-heart" 
+            title="Polubienia" 
+          ></v-list-item>
+          <v-list-item 
+            prepend-icon="mdi-account" 
+            title="Profil" 
+            :to="{ name: 'account'}"
+          ></v-list-item>
+        </v-list>
+  
+        <v-list>
+          <v-list-item 
+            prepend-icon="mdi-logout"
+            class="elevation-3 ma-2 pa-2 rounded"
+            title="Wyloguj"
+            @click="logout"
+            style="background-color: yellow;"
+          ></v-list-item>
+        </v-list>
+      </div>
     </v-navigation-drawer>
 </template>
 

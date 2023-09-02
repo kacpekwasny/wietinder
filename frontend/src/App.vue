@@ -7,7 +7,6 @@ import { useUserAccountStore } from "./stores/AccountDataStore";
 import { usePanelStore } from "./stores/SidePanelStore";
 import { mapState } from "pinia";
 
-
 export default {
   name: "App",
   components: {
@@ -15,54 +14,28 @@ export default {
     Drawer,
   },
   data() {
-    const store = useUserAccountStore();
-    return {
-      showSidePanel: true,
-      accountDataStore: store,
-      loggedIn: store.loggedIn,
-      showSidePanel: usePanelStore().showSidePanel,
-    };
+    return {};
   },
-  
+
   watch: {
     $route: async function (to, from) {
-      const store = useUserAccountStore()
-      await store.refreshUserData()
-    },
-    loggedIn: (to, from) => {
-      if (to === false) {
-        if (this.$route.name.startsWith('/register')) {
-          return
+      const store = useUserAccountStore();
+      await store.refreshUserData();
+      if (!store.loggedIn) {
+        if (this.$route.name.startsWith("/register")) {
+          return router.push("/login");
         }
-        return router.push("/login");
       }
-    }
-
+    },
   },
   methods: {
-    isUserLoggedIn() {
-
-      getJson("/is-user-logged-in")
-        .then((resp) => {
-          return resp.json();
-        })
-        .then((json) => {
-          if (json.info === "user_not_logged_in") {
-            if (this.$route.name != "register"){
-              return router.push("/login");
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("An error occurred:", error);
-        });
-    },
     toggleSidePanel() {
       usePanelStore().toggleSidePanel();
     },
   },
   computed: {
-    ...mapState(useUserAccountStore, ['loggedIn'])
+    ...mapState(useUserAccountStore, ["loggedIn", "accountData"]),
+    ...mapState(usePanelStore, ["showSidePanel"]),
   },
 };
 </script>
@@ -70,7 +43,10 @@ export default {
 <template>
   <v-app>
     <v-app-bar app density="compact">
-      <v-app-bar-nav-icon v-if="loggedIn" @click="toggleSidePanel"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-if="loggedIn"
+        @click="toggleSidePanel"
+      ></v-app-bar-nav-icon>
       <Header />
     </v-app-bar>
     <Drawer />
@@ -79,4 +55,3 @@ export default {
     </v-main>
   </v-app>
 </template>
-

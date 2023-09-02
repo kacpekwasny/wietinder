@@ -49,7 +49,6 @@ export default {
           chips: this.profileData.fields_of_study.map((v) => ({ text: v })),
         },
       ];
-      console.log(items);
       return items;
     },
     backendHostname() {
