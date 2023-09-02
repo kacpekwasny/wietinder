@@ -8,14 +8,14 @@ import { defineStore } from 'pinia'
 export const useUserAccountStore = defineStore('UserAccount', {
     state() {
         return {
-            
+
             // `_lastChecked` - keeps the date of when was the last `GET /account-data` sent.
             // It is a number representing the Unix timestamp, so ms since the date 01.01.1970
             // 0 - zero means we have never before checked for the state.
             // Date.now() will be set when we send a request.
             // check `refreshAccountData` method to understand purpose of this param.
             _lastChecked: 0 as number,
-            
+
             loggedIn: false as boolean,
             accountData: {
                 name: "" as string,
@@ -28,12 +28,12 @@ export const useUserAccountStore = defineStore('UserAccount', {
                 target_activity: [] as string[],
             },
             matches: {
-        
+
             },
         }
     },
     actions: {
-        refreshUserData(force: boolean=false) {
+        async refreshUserData(force: boolean = false) {
             const timePassed = Date.now() - this._lastChecked
             console.log(timePassed)
             console.trace()
@@ -48,22 +48,20 @@ export const useUserAccountStore = defineStore('UserAccount', {
 
             // We are either forcing or previous request was long time ago
             // so the data may have changed.
-            getJson('/account-data').then(r => {
-                console.log(r.status, r)
-                if (r.status != 200) {
-                    this.loggedIn = false
-                    this.resetAccoutnData()
-                    return
-                }
-                this.loggedIn = true
-                console.log('ret json')
-                return r.json()
-            }).then(j => {
-                console.log('patch', j, this.loggedIn)
-                this.$patch({accountData: j})
-            })
+            const r = await getJson('/account-data')
+            if (r.status != 200) {
+                this.$patch({loggedIn: false})
+                return
+            }
+            this.$patch({loggedIn: true})
+            const j = await r.json()
+
+            console.log('patch', j, this.loggedIn)
+            this.$patch({ accountData: j })
         },
-        resetAccoutnData() {
+        setLoggedOut() {
+            this._lastChecked = Date.now()
+            this.loggedIn = false
             this.accountData = {
                 name: "",
                 public_id: "",
@@ -75,6 +73,5 @@ export const useUserAccountStore = defineStore('UserAccount', {
                 target_activity: [],
             }
         }
-    }
-},
-)
+    },
+})

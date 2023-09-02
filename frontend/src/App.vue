@@ -25,9 +25,9 @@ export default {
   },
   
   watch: {
-    $route: function (to, from) {
+    $route: async function (to, from) {
       const store = useUserAccountStore()
-      store.refreshUserData()
+      await store.refreshUserData()
     },
     loggedIn: (to, from) => {
       if (to === false) {

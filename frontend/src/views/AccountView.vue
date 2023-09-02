@@ -1,27 +1,18 @@
 <script lang="ts">
 import draggable from "vuedraggable";
 import { getBackendHostname, getJson, postJson } from "../common/requests";
-import Profile from "../components/Profile.vue";
 import axios from "axios";
+import router from "../router"; //dałem do testu, do wywalenia jakbym zapomniał
 
 import { useUserAccountStore } from "../stores/AccountDataStore";
 import { mapState } from "pinia";
 
-
 export default {
   data() {
     return {
-      accountData: {
-        images: [] as string[],
-        bio: "",
-        sex: "",
-        fields_of_study: [] as string[],
-        target_sex: [] as string[],
-        target_activity: [] as string[],
-      },
       imageView: null,
       selectedImages: [] as File[],
-      imagePreviews: [] as {file: File, url: string}[],
+      imagePreviews: [] as { file: File; url: string }[],
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -51,6 +42,13 @@ export default {
         return { file: imgFile, url: URL.createObjectURL(imgFile) };
       });
     },
+    async logout() {
+      //testowa funkcja do logoutu do wywalenia potem stąd
+      useUserAccountStore().setLoggedOut();
+      await getJson("/logout");
+      router.push("/login");
+    },
+
 
     async sendAccountData() {
       let resp = await postJson("/account-data", this.accountData);
@@ -84,8 +82,8 @@ export default {
     },
 
     async removeImageFromRemote(index: number) {
-      const removedImageName = this.accountData_S.images[index];
-      this.accountData_S.images.splice(index, 1);
+      const removedImageName = this.accountData.images[index];
+      this.accountData.images.splice(index, 1);
 
       const resp = await postJson("/delete-image", {
         removed_image_name: removedImageName,
@@ -111,27 +109,18 @@ export default {
 
   components: {
     draggable,
-    Profile,
   },
 
   computed: {
-    ...mapState(useUserAccountStore, {
-      accountData_S: "accountData",
-    }),
+    ...mapState(useUserAccountStore, ["accountData"]),
   },
 
   async created() {
-    const accountDataStore = useUserAccountStore();
-    console.log(1, accountDataStore.accountData, accountDataStore.loggedIn)
-    accountDataStore.refreshUserData(true);
-    // this.accountData = accountDataStore.accountData;
-    // await this.updateAccountData();
+    const store = useUserAccountStore()
+    await store.refreshUserData();
 
-    getJson("/static/agh-fields-of-study").then((r) =>
-      r.json().then((j) => {
-        this.allPossibleFieldsOfStudyAGH = j;
-      })
-    );
+    const resp = await getJson("/static/agh-fields-of-study");
+    this.allPossibleFieldsOfStudyAGH = await resp.json();
   },
 };
 </script>
@@ -144,7 +133,7 @@ export default {
       hide-details
       class="elevation-3 rounded"
       label="Opis profilu"
-      v-model="accountData_S.bio"
+      v-model="accountData.bio"
     ></v-textarea>
     <v-card class="pa-3 mt-2 mb-2 elevation-3">
       <div>
@@ -197,8 +186,8 @@ export default {
       <div class="">
         <div class="text-h5">Moje zdjęcia</div>
         <draggable
-          v-if="accountData_S.images.length > 0"
-          v-model="accountData_S.images"
+          v-if="accountData.images.length > 0"
+          v-model="accountData.images"
           item-key="url"
           group="people"
           style="align-items: center; display: flex; flex-wrap: wrap"
@@ -240,7 +229,7 @@ export default {
           <v-card class="align-end" height="100%">
             <v-card-title class="text-left"> Moja płeć: </v-card-title>
             <v-card-action>
-              <v-radio-group v-model="accountData_S.sex" column>
+              <v-radio-group v-model="accountData.sex" column>
                 <v-radio
                   label="Kobieta"
                   color="blue"
@@ -262,7 +251,7 @@ export default {
             <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
             <v-card-action>
               <v-checkbox
-                v-model="accountData_S.target_sex"
+                v-model="accountData.target_sex"
                 label="Kobieta"
                 value="female"
                 hideDetails
@@ -270,7 +259,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData_S.target_sex"
+                v-model="accountData.target_sex"
                 label="Mężczyzna"
                 value="male"
                 hideDetails
@@ -285,7 +274,7 @@ export default {
             <v-card-title class="text-left"> Czynność: </v-card-title>
             <v-card-action>
               <v-checkbox
-                v-model="accountData_S.target_activity"
+                v-model="accountData.target_activity"
                 label="Na piwo"
                 value="beer"
                 hideDetails
@@ -293,7 +282,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData_S.target_activity"
+                v-model="accountData.target_activity"
                 label="Na życie"
                 value="life"
                 hideDetails
@@ -301,7 +290,7 @@ export default {
                 class="ml-2"
               ></v-checkbox>
               <v-checkbox
-                v-model="accountData_S.target_activity"
+                v-model="accountData.target_activity"
                 label="Do projektu"
                 value="project"
                 hideDetails
@@ -317,7 +306,7 @@ export default {
             <v-card-action>
               <v-select
                 class="ma-1"
-                v-model="accountData_S.fields_of_study"
+                v-model="accountData.fields_of_study"
                 :items="allPossibleFieldsOfStudyAGH"
                 chips
                 label="Kierunki studiów:"
@@ -331,5 +320,8 @@ export default {
         >Zapisz zmiany!</v-btn
       >
     </v-card>
+    <v-btn color="yellow" class="mt-2 float-right" @click="logout"
+      >testowe wyloguj</v-btn
+    >
   </v-container>
 </template>
