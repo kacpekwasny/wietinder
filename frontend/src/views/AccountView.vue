@@ -3,7 +3,6 @@ import draggable from "vuedraggable";
 import { getBackendHostname, getJson, postJson } from "../common/requests";
 import Profile from "../components/Profile.vue";
 import axios from "axios";
-import router from "../router"; //dałem do testu, do wywalenia jakbym zapomniał
 
 import { useUserAccountStore } from "../stores/AccountDataStore";
 import { mapState } from "pinia";
@@ -50,12 +49,6 @@ export default {
       this.imagePreviews = this.selectedImages.map((imgFile) => {
         return { file: imgFile, url: URL.createObjectURL(imgFile) };
       });
-    },
-
-    async logout() {
-      //testowa funkcja do logoutu do wywalenia potem stąd
-      let respo = await postJson("/logout", { logout: "true" });
-      router.push("/login");
     },
 
     async sendAccountData() {
@@ -337,8 +330,5 @@ export default {
       >
     </v-card>
   </v-container>
-  <v-btn color="yellow" class="mt-2 float-right" @click="logout"
-    >testowe wyloguj</v-btn
-  >
 </template>
 ../stores/AccountDataStore

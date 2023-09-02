@@ -4,6 +4,7 @@ import Drawer from "./components/Drawer.vue";
 import { getJson } from "./common/requests";
 import router from "./router";
 import { usePanelStore } from "./stores/SidePanelStore";
+import { useUserAccountStore } from "./stores/AccountDataStore";
 import { mapState } from "pinia";
 
 
@@ -45,13 +46,16 @@ export default {
       usePanelStore().toggleSidePanel();
     },
   },
+  computed: {
+    ...mapState(useUserAccountStore, ['loggedIn'])
+  },
 };
 </script>
 
 <template>
   <v-app>
     <v-app-bar app density="compact">
-      <v-app-bar-nav-icon @click="toggleSidePanel"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="loggedIn" @click="toggleSidePanel"></v-app-bar-nav-icon>
       <Header />
     </v-app-bar>
     <Drawer />

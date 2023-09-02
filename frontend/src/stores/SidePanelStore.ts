@@ -8,7 +8,6 @@ export const usePanelStore = defineStore('SidePanel', {
     },
     actions: {
         toggleSidePanel(){
-            console.log(this.showSidePanel)
             this.showSidePanel = !this.showSidePanel;
         }
     }
