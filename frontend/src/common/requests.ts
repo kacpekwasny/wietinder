@@ -8,19 +8,21 @@ export function getBackendHostname(): string {
     return import.meta.env.VITE_API_URL
 }
 
-export function postJson(url: string, object: object): Promise<Response> {
+export function postJson(url: string, object: object, redirect: RequestRedirect = 'manual'): Promise<Response> {
     return fetch(getBackendHostname() + url, {
         method: "POST", headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(object),
         credentials: "include",
+        redirect: redirect,
     })
 }
 
-export function getJson(url: string): Promise<Response> {
+export function getJson(url: string, redirect: RequestRedirect = 'manual'): Promise<Response> {
     return fetch(import.meta.env.VITE_API_URL + url, {
         credentials: "include",
+        redirect: redirect,
     })
 }
 

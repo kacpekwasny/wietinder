@@ -31,7 +31,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         else:
             return resp(401, "user_not_logged_in")
         
-    @auth.route('/logout', methods = ['POST'])
+    @auth.route('/logout')
     @login_required
     def logout():
         logout_user()

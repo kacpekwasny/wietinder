@@ -4,6 +4,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { email, required } from "@vuelidate/validators";
 
 import { postJson } from "../common/requests";
+import { useUserAccountStore } from "@/stores/AccountDataStore";
 
 export default defineComponent({
   setup() {
@@ -30,27 +31,29 @@ export default defineComponent({
     navigateToRegister() {
       this.$router.push({ path: "/register" });
     },
-    submitForm() {
+    async submitForm() {
       this.v$.$validate();
       if (this.v$.$error) {
         return;
       }
-      postJson("/login", {
+      const resp = await postJson("/login", {
         email: this.emailField,
         password: this.passwordField,
-      }).then((response) => {
-        if (response.status == 200) {
-          this.$router.push({ path: "/account" });
-        }
-        if (response.status == 401) {
-          this.passwordServerErrors = ["Błędne hasło!"];
-          return;
-        } else if (response.status == 404) {
-          this.emailServerErrors = ["Email nie istnieje!"];
-          return;
-        }
       });
+
+      if (resp.status == 200) {
+        useUserAccountStore().refreshUserData(true)
+        this.$router.push({ path: "/account" });
+      }
+      if (resp.status == 401) {
+        this.passwordServerErrors = ["Błędne hasło!"];
+        return;
+      } else if (resp.status == 404) {
+        this.emailServerErrors = ["Email nie istnieje!"];
+        return;
+      }
     },
+
     newFieldInputs() {
       this.emailServerErrors = [];
       this.passwordServerErrors = [];

@@ -8,6 +8,7 @@ import router from "../router"; //dałem do testu, do wywalenia jakbym zapomnia�
 import { useUserAccountStore } from "../stores/AccountDataStore";
 import { mapState } from "pinia";
 
+
 export default {
   data() {
     return {
@@ -20,8 +21,8 @@ export default {
         target_activity: [] as string[],
       },
       imageView: null,
-      selectedImages: [],
-      imagePreviews: [],
+      selectedImages: [] as File[],
+      imagePreviews: [] as {file: File, url: string}[],
       overlay: false,
       rules: [
         (files: File[]) => {
@@ -37,8 +38,8 @@ export default {
             }
           }
         },
-      ],
-      allPossibleFieldsOfStudyAGH: [],
+      ] as ValidationRule[],
+      allPossibleFieldsOfStudyAGH: [] as string[],
       css: {
         dispImgMaxHeight: "150px",
       },
@@ -54,7 +55,8 @@ export default {
 
     async logout() {
       //testowa funkcja do logoutu do wywalenia potem stąd
-      let respo = await postJson("/logout", { logout: "true" });
+      let respo = await getJson("/logout");
+      useUserAccountStore().refreshUserData(true);
       router.push("/login");
     },
 
@@ -89,7 +91,7 @@ export default {
       this.updateAccountData();
     },
 
-    async removeImageFromRemote(index: int) {
+    async removeImageFromRemote(index: number) {
       const removedImageName = this.accountData_S.images[index];
       this.accountData_S.images.splice(index, 1);
 
@@ -102,7 +104,7 @@ export default {
       }
     },
 
-    removeImageFromUploadList(index: int) {
+    removeImageFromUploadList(index: number) {
       this.selectedImages.splice(index, 1);
     },
 
@@ -122,12 +124,13 @@ export default {
 
   computed: {
     ...mapState(useUserAccountStore, {
-      accountData_S: 'accountData',
-    })
+      accountData_S: "accountData",
+    }),
   },
 
   async created() {
     const accountDataStore = useUserAccountStore();
+    console.log(1, accountDataStore.accountData, accountDataStore.loggedIn)
     accountDataStore.refreshUserData(true);
     // this.accountData = accountDataStore.accountData;
     // await this.updateAccountData();
@@ -336,9 +339,9 @@ export default {
         >Zapisz zmiany!</v-btn
       >
     </v-card>
+    <v-btn color="yellow" class="mt-2 float-right" @click="logout"
+      >testowe wyloguj</v-btn
+    >
   </v-container>
-  <v-btn color="yellow" class="mt-2 float-right" @click="logout"
-    >testowe wyloguj</v-btn
-  >
+  
 </template>
-../stores/AccountDataStore

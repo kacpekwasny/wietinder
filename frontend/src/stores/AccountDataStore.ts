@@ -34,26 +34,33 @@ export const useUserAccountStore = defineStore('UserAccount', {
     },
     actions: {
         refreshUserData(force: boolean=false) {
+            const timePassed = Date.now() - this._lastChecked
+            console.log(timePassed)
+            console.trace()
 
-            if (!force && (Date.now() - this._lastChecked < 1000 * 30)) {
+            if (!force && (timePassed < 1000 * 30)) {
                 // If we dont force
                 // and to early for a new request
                 // return.
                 return
             }
+            this._lastChecked = Date.now()
 
             // We are either forcing or previous request was long time ago
             // so the data may have changed.
             getJson('/account-data').then(r => {
-                this._lastChecked = Date.now()
+                console.log(r.status, r)
                 if (r.status != 200) {
                     this.loggedIn = false
                     this.resetAccoutnData()
+                    return
                 }
                 this.loggedIn = true
+                console.log('ret json')
                 return r.json()
             }).then(j => {
-                this.accountData = j;
+                console.log('patch', j, this.loggedIn)
+                this.$patch({accountData: j})
             })
         },
         resetAccoutnData() {

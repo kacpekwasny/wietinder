@@ -3,6 +3,8 @@ import Header from "./components/Header.vue";
 import Drawer from "./components/Drawer.vue";
 import { getJson } from "./common/requests";
 import router from "./router";
+import { useUserAccountStore } from "./stores/AccountDataStore";
+import { storeToRefs } from "pinia";
 
 
 export default {
@@ -12,17 +14,32 @@ export default {
     Drawer,
   },
   data() {
+    const store = useUserAccountStore();
     return {
       showSidePanel: true,
+      accountDataStore: store,
+      loggedIn: storeToRefs(store).loggedIn,
     };
   },
+
   watch: {
     $route: function (to, from) {
-      this.isUserLoggedIn();
+      const store = useUserAccountStore()
+      store.refreshUserData()
     },
+    loggedIn: (to, from) => {
+      if (to === false) {
+        if (this.$route.name.startsWith('/register')) {
+          return
+        }
+        return router.push("/login");
+      }
+    }
+
   },
   methods: {
     isUserLoggedIn() {
+
       getJson("/is-user-logged-in")
         .then((resp) => {
           return resp.json();
@@ -49,7 +66,7 @@ export default {
   <v-app>
     <v-app-bar app density="compact">
       <v-app-bar-nav-icon @click="toggleSidePanel"></v-app-bar-nav-icon>
-      <Header />
+      <Header  />
     </v-app-bar>
     <Drawer />
     <v-main>

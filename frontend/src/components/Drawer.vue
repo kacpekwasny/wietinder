@@ -1,5 +1,9 @@
 <script lang="ts">
 export default { 
+    props: {
+      open: false,
+    },
+
     data() {
       return {
         showSidePanel: true,
