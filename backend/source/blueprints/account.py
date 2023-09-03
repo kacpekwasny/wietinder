@@ -59,7 +59,6 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     def upload_images():
         files = request.files.getlist('images')
         new_images = []
-        print(files)
 
         for file in files:
             if not (file and allowed_img_extension(file.filename)):

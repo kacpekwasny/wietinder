@@ -10,6 +10,8 @@ import { mapState } from "pinia";
 export default {
   data() {
     return {
+      userAccountStore: useUserAccountStore(),
+
       imageView: null,
       selectedImages: [] as File[],
       imagePreviews: [] as { file: File; url: string }[],
@@ -45,9 +47,9 @@ export default {
 
     async sendAccountData() {
       let resp = await postJson("/account-data", this.accountData);
-      let json = resp.json();
+      let json = await resp.json();
       if (json.ok === undefined) {
-        this.accountData = json;
+        this.accountData = json
       }
     },
 
@@ -66,8 +68,12 @@ export default {
           withCredentials: true,
         }
       );
+      if (resp.status != 200) {
+        console.log('uploadImages returned status: ', resp.status)
+        return
+      }
       this.selectedImages = [];
-      useUserAccountStore().refreshUserData(true);
+      this.userAccountStore.refreshUserData(true);
     },
 
     async removeImageFromRemote(index: number) {
@@ -101,12 +107,20 @@ export default {
   },
 
   computed: {
-    ...mapState(useUserAccountStore, ["accountData"]),
+    accountData: {
+      get() {
+        return this.userAccountStore.accountData
+      },
+      set(v) {
+        console.log('set(AccountData)')
+        console.log(v)
+        this.userAccountStore.$patch({accountData: v})
+      }
+    },
   },
 
   async created() {
-    const store = useUserAccountStore()
-    await store.refreshUserData();
+    this.userAccountStore.refreshUserData();
 
     getJson("/static/agh-fields-of-study").then(async resp => {
       this.allPossibleFieldsOfStudyAGH = await resp.json();

@@ -1,28 +1,28 @@
 <script lang="ts">
-import { ref } from "vue";
 import useValidate from "@vuelidate/core";
-import { email, required, minLength, sameAs } from "@vuelidate/validators";
-import axios from "axios";
+import { email, required, minLength, helpers } from "@vuelidate/validators";
 import { postJson } from "../common/requests";
 
-const showModal = ref(false);
-const errorMessage = ref("");
-const VALIDATION_OFF =
-  String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "false";
+const IS_PROD =
+  String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "true";
 
-// novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy passwordField i powinno usuwac te ograniczenia
+console.info(`IS_PROD = ${IS_PROD}`)
+
+// novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy registerForm.passwordField i powinno usuwac te ograniczenia
 
 export default {
   data() {
     return {
       showModal: false,
       v$: useValidate(),
+      registerForm: {
+        nameField: "",
+        emailField: "",
+        passwordField: "",
+        confirmPasswordField: "",
+        sexField: "",
 
-      nameField: "",
-      lastnameField: "",
-      emailField: "",
-      passwordField: "",
-      confirmPasswordField: "",
+      },
       nameServerErrors: [],
       emailServerErrors: [],
       passwordServerErrors: [],
@@ -32,33 +32,31 @@ export default {
   },
   validations() {
     return {
-      emailField: {
-        email,
-        required,
-      },
-      passwordField: {
-        required,
+      registerForm: {
+        nameField: {
+          required,
+        },
+        emailField: {
+          email,
+          required,
+        },
+        passwordField: {
+          required,
+          minLength: minLength(8),
+        },
+        confirmPasswordField: {
+          required,
+          sameAsPassword: helpers.withMessage("Passwords need to match", (v: string) => v === this.registerForm.passwordField)
+        },
 
-        minLength: minLength(8),
-      },
-      confirmPasswordField: {
-        required,
-        // sameAsPassword: sameAs(sameAs(function() {
-        //     return this.passwordField;
-        //   }))   //nie wiem czemu nie chce to działać
-      },
-      nameField: {
-        required,
-      },
+      }
     };
   },
   methods: {
     submitForm() {
       this.v$.$validate();
 
-      // This is PROD (not DEV), and we will be validating fields
-      // To jest PROD (nie DEV), więc będziemy sprawdzać poprawność pul, które wypełnił użytkownik
-      if (VALIDATION_OFF) {
+      if (IS_PROD) {
         this.checkPasswordChar();
         if (this.v$.$error) {
           return;
@@ -66,9 +64,9 @@ export default {
       }
 
       postJson("/register", {
-        name: this.nameField,
-        email: this.emailField,
-        password: this.passwordField,
+        name: this.registerForm.nameField,
+        email: this.registerForm.emailField,
+        password: this.registerForm.passwordField,
       }).then((response) => {
         if (response.status == 200) {
           this.$router.push({ path: "/account" });
@@ -94,34 +92,34 @@ export default {
       });
     },
     checkPasswordChar() {
-      if (!/[A-Z]/.test(this.passwordField)) {
+      if (!/[A-Z]/.test(this.registerForm.passwordField)) {
         this.passwordServerErrors.push(
           "Hasło musi zawierać przynajmniej jedną dużą litere"
         );
         return;
       }
 
-      if (!/[a-z]/.test(this.passwordField)) {
+      if (!/[a-z]/.test(this.registerForm.passwordField)) {
         this.passwordServerErrors.push(
           "Hasło musi zawierać przynajmniej jedną małą litere."
         );
         return;
       }
 
-      if (!/[0-9]/.test(this.passwordField)) {
+      if (!/[0-9]/.test(this.registerForm.passwordField)) {
         this.passwordServerErrors.push(
           "Hasło musi zaweirać przynajmniej jedną cyfre"
         );
         return;
       }
 
-      if (!/[#?!@$%^&*-]/.test(this.passwordField)) {
+      if (!/[#?!@$%^&*-]/.test(this.registerForm.passwordField)) {
         this.passwordServerErrors.push(
           "Hasło musi zaweirać przynajmniej jeden znak specjalny (#?!@$%^&*-)."
         );
         return;
       }
-      if (this.passwordField != this.confirmPasswordField) {
+      if (this.registerForm.passwordField != this.registerForm.confirmPasswordField) {
         this.confirmPasswordServerErrors.push("Hasła są rózne");
         return;
       }
@@ -149,81 +147,81 @@ export default {
         <v-text-field
           class="input-field-register"
           density="compact"
-          v-model="nameField"
+          v-model="registerForm.nameField"
           label="First Name"
           :error-messages="
-            v$.nameField.$errors.map((e) => e.$message).concat(nameServerErrors)
+            v$.registerForm.nameField.$errors.map((e) => e.$message).concat(nameServerErrors)
           "
           @input="
             () => {
-              v$.nameField.$touch();
+              v$.registerForm.nameField.$touch();
               newFieldInputs();
             }
           "
-          @blur="v$.nameField.$touch"
+          @blur="v$.registerForm.nameField.$touch"
         >
         </v-text-field>
         <v-text-field
           class="input-field-register"
           density="compact"
-          v-model="emailField"
+          v-model="registerForm.emailField"
           label="Email"
           :error-messages="
-            v$.emailField.$errors
+            v$.registerForm.emailField.$errors
               .map((e) => e.$message)
               .concat(emailServerErrors)
           "
           @input="
             () => {
-              v$.emailField.$touch();
+              v$.registerForm.emailField.$touch();
               newFieldInputs();
             }
           "
-          @blur="v$.emailField.$touch"
+          @blur="v$.registerForm.emailField.$touch"
         >
         </v-text-field>
         <v-text-field
           class="input-field-register"
           density="compact"
-          v-model="passwordField"
+          v-model="registerForm.passwordField"
           label="Hasło"
           type="password"
           :error-messages="
-            v$.passwordField.$errors
+            v$.registerForm.passwordField.$errors
               .map((e) => e.$message)
               .concat(passwordServerErrors)
           "
           @input="
             () => {
-              v$.passwordField.$touch();
+              v$.registerForm.passwordField.$touch();
               newFieldInputs();
             }
           "
-          @blur="v$.passwordField.$touch"
+          @blur="v$.registerForm.passwordField.$touch"
         >
         </v-text-field>
         <v-text-field
           class="input-field-register"
           density="compact"
-          v-model="confirmPasswordField"
-          label="Hasło"
+          v-model="registerForm.confirmPasswordField"
+          label="Powtórz hasło"
           type="password"
           :error-messages="
-            v$.confirmPasswordField.$errors
+            v$.registerForm.confirmPasswordField.$errors
               .map((e) => e.$message)
               .concat(confirmPasswordServerErrors)
           "
           @input="
             () => {
-              v$.confirmPasswordField.$touch();
+              v$.registerForm.confirmPasswordField.$touch();
               newFieldInputs();
             }
           "
-          @blur="v$.confirmPasswordField.$touch"
+          @blur="v$.registerForm.confirmPasswordField.$touch"
         >
         </v-text-field>
         <v-row class="ma-1" justify="end" style="max-width: 100%">
-          <v-btn @click="submitForm" color="blue">Zarejestruj</v-btn>
+          <v-btn @click="submitForm" color="blue" :disabled="v$.$invalid">Zarejestruj</v-btn>
         </v-row>
       </v-form>
       <v-card-text class="text-caption pt-4 pb-0 text-center">

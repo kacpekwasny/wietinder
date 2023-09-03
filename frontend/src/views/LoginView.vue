@@ -65,6 +65,7 @@ export default defineComponent({
 <template>
   <v-container fluid class="d-flex flex-column" style="width: fit-content">
     <v-card class="pa-4">
+      <v-card-text class="text-h3 mb-8 text-center"> Logowanie </v-card-text>
       <v-form v-on:keydown.enter="submitForm">
         <v-text-field
           class="input-field"
@@ -106,7 +107,7 @@ export default defineComponent({
         >
         </v-text-field>
         <v-row class="ma-1" justify="end" style="max-width: 100%">
-          <v-btn @click="submitForm" color="blue">Zaloguj</v-btn>
+          <v-btn @click="submitForm" color="blue" :disabled="v$.$invalid">Zaloguj</v-btn>
         </v-row>
       </v-form>
       <v-card-text class="text-caption pt-4 pb-0 text-center">
