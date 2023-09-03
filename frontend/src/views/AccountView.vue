@@ -232,27 +232,6 @@ export default {
       <v-row dense>
         <v-col col="6">
           <v-card class="align-end" height="100%">
-            <v-card-title class="text-left"> Moja płeć: </v-card-title>
-            <v-card-action>
-              <v-radio-group v-model="accountData.sex" column>
-                <v-radio
-                  label="Kobieta"
-                  color="blue"
-                  value="female"
-                  density="default"
-                ></v-radio>
-                <v-radio
-                  label="Mężczyzna"
-                  color="blue"
-                  value="male"
-                  density="default"
-                ></v-radio>
-              </v-radio-group>
-            </v-card-action>
-          </v-card>
-        </v-col>
-        <v-col col="6">
-          <v-card class="align-end" height="100%">
             <v-card-title class="text-left"> Pożądana płeć pary: </v-card-title>
             <v-card-action>
               <v-checkbox

@@ -2,34 +2,36 @@
 import useValidate from "@vuelidate/core";
 import { email, required, minLength, helpers } from "@vuelidate/validators";
 import { postJson } from "../common/requests";
+import { useUserAccountStore } from "@/stores/AccountDataStore";
 
-const IS_PROD =
-  String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "true";
 
-console.info(`IS_PROD = ${IS_PROD}`)
 
-// novalidate.value = passwordValidationOff; //ogolnie to novalidate jest wpisane w html przy registerForm.passwordField i powinno usuwac te ograniczenia
 
 export default {
   data() {
+    const IS_PROD = String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "true"
+    console.info(`IS_PROD = ${IS_PROD}`);
+
     return {
-      showModal: false,
+      IS_PROD,
+
       v$: useValidate(),
+
       registerForm: {
         nameField: "",
         emailField: "",
         passwordField: "",
         confirmPasswordField: "",
-        sexField: "",
-
+        sexField: "female",
       },
+
       nameServerErrors: [],
       emailServerErrors: [],
       passwordServerErrors: [],
       confirmPasswordServerErrors: [],
-
     };
   },
+
   validations() {
     return {
       registerForm: {
@@ -46,17 +48,20 @@ export default {
         },
         confirmPasswordField: {
           required,
-          sameAsPassword: helpers.withMessage("Passwords need to match", (v: string) => v === this.registerForm.passwordField)
+          sameAsPassword: helpers.withMessage(
+            "Passwords need to match",
+            (v: string) => v === this.registerForm.passwordField
+          ),
         },
-
-      }
+      },
     };
   },
+
   methods: {
     submitForm() {
       this.v$.$validate();
 
-      if (IS_PROD) {
+      if (this.IS_PROD) {
         this.checkPasswordChar();
         if (this.v$.$error) {
           return;
@@ -67,8 +72,10 @@ export default {
         name: this.registerForm.nameField,
         email: this.registerForm.emailField,
         password: this.registerForm.passwordField,
-      }).then((response) => {
+        sex: this.registerForm.sexField,
+      }).then(async (response) => {
         if (response.status == 200) {
+          await useUserAccountStore().refreshUserData(true)
           this.$router.push({ path: "/account" });
           return;
         } else if (response.status == 409) {
@@ -119,12 +126,15 @@ export default {
         );
         return;
       }
-      if (this.registerForm.passwordField != this.registerForm.confirmPasswordField) {
+      if (
+        this.registerForm.passwordField !=
+        this.registerForm.confirmPasswordField
+      ) {
         this.confirmPasswordServerErrors.push("Hasła są rózne");
         return;
       }
     },
-    
+
     newFieldInputs() {
       this.emailServerErrors = [];
       this.passwordServerErrors = [];
@@ -150,7 +160,9 @@ export default {
           v-model="registerForm.nameField"
           label="First Name"
           :error-messages="
-            v$.registerForm.nameField.$errors.map((e) => e.$message).concat(nameServerErrors)
+            v$.registerForm.nameField.$errors
+              .map((e) => e.$message)
+              .concat(nameServerErrors)
           "
           @input="
             () => {
@@ -220,8 +232,25 @@ export default {
           @blur="v$.registerForm.confirmPasswordField.$touch"
         >
         </v-text-field>
+        <v-radio-group v-model="registerForm.sexField" inline class="pl-2">
+          <v-radio
+            label="Kobieta"
+            color="blue"
+            value="female"
+            density="compact"
+            class="mr-5"
+          ></v-radio>
+          <v-radio
+            label="Mężczyzna"
+            color="blue"
+            value="male"
+            density="compact"
+          ></v-radio>
+        </v-radio-group>
         <v-row class="ma-1" justify="end" style="max-width: 100%">
-          <v-btn @click="submitForm" color="blue" :disabled="v$.$invalid">Zarejestruj</v-btn>
+          <v-btn @click="submitForm" color="blue" :disabled="v$.$invalid && IS_PROD"
+            >Zarejestruj</v-btn
+          >
         </v-row>
       </v-form>
       <v-card-text class="text-caption pt-4 pb-0 text-center">

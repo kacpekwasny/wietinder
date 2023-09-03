@@ -5,6 +5,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from ..models import Sex
+
 
 def resp(code: int, info=None) -> tuple[Response, int]:
     ok = code == 200
@@ -113,12 +115,16 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         # so this is a required check even in development mode.    
         if check_email_exists(email):
             return resp(409, 'user_alredy_exist')
+        
+        if sex not in Sex._value2member_map_:
+            return resp(422, "bad_sex")
 
         new_user = User(email=email,
                         name=name,
                         password=generate_password_hash(password,
                                                         method='pbkdf2:sha1',
-                                                        salt_length=8))
+                                                        salt_length=8),
+                        sex=Sex(sex))
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
