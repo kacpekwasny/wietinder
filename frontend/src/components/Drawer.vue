@@ -9,7 +9,8 @@ import router from "../router";
 export default { 
   data() {
     return {
-      panelStore: usePanelStore()
+      panelStore: usePanelStore(),
+      userAccountStore: useUserAccountStore(),
     }
   },
   methods: {
@@ -20,7 +21,7 @@ export default {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },
     async logout() {
-      let respo = await getJson("/logout");
+      await getJson("/logout");
       useUserAccountStore().setLoggedOut()
       router.push("/login");
     },
@@ -31,7 +32,10 @@ export default {
   computed: {
     showSidePanel: {
       get() {
-        return this.panelStore.showSidePanel
+        if (this.userAccountStore.loggedIn) {
+          return this.panelStore.showSidePanel
+        }
+        return false;
       },
       set(newValue: boolean) {
         usePanelStore().$patch({showSidePanel: newValue})

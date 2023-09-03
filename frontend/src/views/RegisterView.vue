@@ -17,16 +17,17 @@ export default {
     return {
       showModal: false,
       v$: useValidate(),
+
       nameField: "",
       lastnameField: "",
       emailField: "",
-      numberField: "",
       passwordField: "",
       confirmPasswordField: "",
       nameServerErrors: [],
       emailServerErrors: [],
       passwordServerErrors: [],
       confirmPasswordServerErrors: [],
+
     };
   },
   validations() {

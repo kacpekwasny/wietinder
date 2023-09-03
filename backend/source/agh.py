@@ -1,6 +1,6 @@
 
 AGH_FIELDS_OF_STUDY = [
-        "Automatyka i robotyka"
+        "Automatyka i robotyka",
         "Automatyka przemysłowa i robotyka",
         "Budownictwo",
         "Ceramika",
@@ -79,7 +79,7 @@ AGH_FIELDS_OF_STUDY = [
         "Tworzywa i technologie motoryzacyjne",
         "Zarządzanie",
         "Zarządzanie i inżynieria produkcji",
-        "Zmiany klimatu - przeciwdziałanie i adaptacja"
+        "Zmiany klimatu - przeciwdziałanie i adaptacja",
     ]	
 
 

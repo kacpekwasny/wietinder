@@ -42,13 +42,6 @@ export default {
         return { file: imgFile, url: URL.createObjectURL(imgFile) };
       });
     },
-    async logout() {
-      //testowa funkcja do logoutu do wywalenia potem stąd
-      useUserAccountStore().setLoggedOut();
-      await getJson("/logout");
-      router.push("/login");
-    },
-
 
     async sendAccountData() {
       let resp = await postJson("/account-data", this.accountData);
@@ -115,8 +108,9 @@ export default {
     const store = useUserAccountStore()
     await store.refreshUserData();
 
-    const resp = await getJson("/static/agh-fields-of-study");
-    this.allPossibleFieldsOfStudyAGH = await resp.json();
+    getJson("/static/agh-fields-of-study").then(async resp => {
+      this.allPossibleFieldsOfStudyAGH = await resp.json();
+    })
   },
 };
 </script>
@@ -180,6 +174,7 @@ export default {
       <br />
       <br />
       <div class="">
+        <v-divider class="mt-4 mb-4"></v-divider>
         <div class="text-h5">Moje zdjęcia</div>
         <draggable
           v-if="accountData.images.length > 0"
@@ -297,8 +292,8 @@ export default {
           </v-card>
         </v-col>
         <v-col col="6">
-          <v-card class="align-end" height="100%">
-            <v-card-title class="text-left"> Kierunek: </v-card-title>
+          <v-card class="align-end" height="100%"  style="min-width: 14em;">
+            <v-card-title class=""> Kierunek: </v-card-title>
             <v-card-action>
               <v-select
                 class="ma-1"
@@ -316,8 +311,5 @@ export default {
         >Zapisz zmiany!</v-btn
       >
     </v-card>
-    <v-btn color="yellow" class="mt-2 float-right" @click="logout"
-      >testowe wyloguj</v-btn
-    >
   </v-container>
 </template>
