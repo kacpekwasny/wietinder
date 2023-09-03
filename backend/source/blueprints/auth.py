@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask.wrappers import Response
 from flask_cors import cross_origin
 from flask_login import login_user, current_user, logout_user, login_required
@@ -6,16 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ..models import Sex
+from ..tools.response import resp
 
 
-def resp(code: int, info=None) -> tuple[Response, int]:
-    ok = code == 200
-    data = dict(ok=ok)
-
-    if isinstance(info, str):
-        data |= dict(info=info)
-
-    return jsonify(data), code
 
 def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     from ..models import User

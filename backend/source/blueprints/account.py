@@ -12,6 +12,8 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from werkzeug.security import safe_join
 
+from backend.source.tools.response import resp
+
 from ..models import User
 from ..tools.files import secure_unique_filename_for_directory
 from ..config import UPLOADS_DIR
@@ -29,13 +31,13 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/account-data', methods=['POST'])
     @login_required
     def post_account_data():
-        j = request.json
-        print(json.dumps(j, indent=4))
+        j: dict = request.json
+        j.pop("sex", None)
         try:
             User.set_from_json(current_user, **j)
 
         except KeyError as e:
-            return jsonify({'ok': False, 'info': f'missing key: {e}'})
+            return resp(400, f'missing key: {e}')
         
         db.session.commit()
         return get_account_data()
@@ -46,32 +48,30 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         return jsonify(User.query.filter_by(public_id=profile_id)
                        .first_or_404().get_json())
     
-    @account_bp.route('/get-images', methods=['GET'])    # moze GET /get-images? albo /profile-images, myśle, że można w domyśle mieć, że to jest GET i nie trzeba go by wtedy dawać z przodu linku.
-    @login_required
-    def get_images():
-        response = {
-            "images": User.get_images(current_user)
-        }
-        return jsonify(response)
-
     @account_bp.route('/upload-images', methods=['POST'])
     @login_required
     def upload_images():
         files = request.files.getlist('images')
         new_images = []
 
+        current_images = User.get_images(current_user)
+
+        if len(current_images) + len(files) > 9:
+            return resp(400, 'too_many_images')
+
+
         for file in files:
             if not (file and allowed_img_extension(file.filename)):
-                return jsonify({'ok': False, 'info': 'invalid_file'})
+                return resp(400, 'invalid_file')
             
             unique_imagename = secure_unique_filename_for_directory(file.filename, directory=upload_dir)
             file.save(str(upload_dir / unique_imagename))
             new_images.append(unique_imagename)
         
-        User.set_images(current_user, User.get_images(current_user) + new_images)
+        User.set_images(current_user, current_images + new_images)
         db.session.commit()
        
-        return jsonify({'ok': True})
+        return resp(200)
 
 
     @account_bp.route('/uploads/<path:filepath>')
@@ -87,21 +87,21 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         user_owned_images = User.get_images(current_user)
 
         if not removed_img_name in user_owned_images:
-            return jsonify({'ok': False, 'info': "No image found"}), 404
+            return resp(404, "No image found")
 
         imgpath = safe_join(str(UPLOADS_DIR), removed_img_name)
         if Path(imgpath).exists():
             try:
                 os.remove(imgpath)
             except OSError as e:
-                return jsonify({'ok': False, 'info': "No image found"}), 404
+                return resp(404, "No image found")
 
         # Checked above the image is contained in the list.
         user_owned_images.remove(removed_img_name)
         User.set_images(current_user, user_owned_images)
         db.session.commit()
 
-        return jsonify({'ok': True})
+        return resp(200)
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
     def allowed_img_extension(filename: str):
