@@ -1,13 +1,13 @@
 <script lang="ts">
-import draggable from "vuedraggable";
-import { getBackendHostname, getJson, postJson } from "../common/requests";
+import { useProfilesStore } from "@/stores/ProfilesStore";
+import { getJson } from "../common/requests";
 import Profile from "../components/Profile.vue";
-import axios from "axios";
-import { profile } from "console";
+
 
 export default {
   data() {
     return {
+      profilesStore: useProfilesStore(),
       profileData: {
         name: "",
         images: [],
@@ -29,9 +29,13 @@ export default {
   },
 
   async created() {
-    const resp = await getJson(`/profile/${this.$route.params.profile_id}`);
-    this.profileData = await resp.json();
-    console.log(this.profileData);
+    const p = await this.profilesStore.profile(this.$route.params.profile_id)
+    if (p === undefined) {
+      this.profileData.name = "404, profile not found"
+      this.profileData.bio = "profile with this ID was not found"
+      return
+    }
+    this.profileData = p
   },
 };
 </script>
