@@ -94,6 +94,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         email = request.json.get('email')
         password = request.json.get('password')
         name = request.json.get("name")
+        sex = request.json.get("sex")
         
         if is_prod:
 
@@ -103,8 +104,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
             if len(name) < 2 or len(name) > 50:
                 return resp(400, "name_len_bad")
 
-            if not name.isalpha():
-                return resp(400, "name_alpha_bad")
+            # removed is alpha check, as someone may have a name with a '
 
             if len(password) < 8:
                 return resp(422, "password_len_bad")
