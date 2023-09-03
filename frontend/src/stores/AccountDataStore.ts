@@ -18,10 +18,10 @@ export const useUserAccountStore = defineStore('UserAccount', {
 
             loggedIn: false as boolean,
             accountData: {
-                name: "" as string,
                 public_id: "" as string,
-                images: [] as string[],
+                name: "" as string,
                 bio: "" as string,
+                images: [] as string[],
                 sex: "" as string,
                 fields_of_study: [] as string[],
                 target_sex: [] as string[],
