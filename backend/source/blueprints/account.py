@@ -12,7 +12,7 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from werkzeug.security import safe_join
 
-from backend.source.tools.response import resp
+from ..tools.response import resp
 
 from ..models import User
 from ..tools.files import secure_unique_filename_for_directory
@@ -105,7 +105,6 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
 
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
     def allowed_img_extension(filename: str):
-        print(Path(filename).suffix.lower())
         return Path(filename).suffix.lower().replace(".", "") in ALLOWED_EXTENSIONS
        
     return account_bp
