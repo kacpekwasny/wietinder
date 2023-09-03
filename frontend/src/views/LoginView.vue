@@ -42,7 +42,7 @@ export default defineComponent({
       });
 
       if (resp.status == 200) {
-        useUserAccountStore().refreshUserData(true)
+        await useUserAccountStore().refreshUserData(true)
         this.$router.push({ path: "/account" });
       }
       if (resp.status == 401) {

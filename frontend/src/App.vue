@@ -14,15 +14,16 @@ export default {
     Drawer,
   },
   data() {
-    return {};
+    return {
+      userAccountStore: useUserAccountStore(),
+    };
   },
 
   watch: {
     $route: async function (to, from) {
-      const store = useUserAccountStore();
-      await store.refreshUserData();
-      if (!store.loggedIn) {
-        if (this.$route.name.startsWith("/register")) {
+      await this.userAccountStore.refreshUserData();
+      if (!this.userAccountStore.loggedIn) {
+        if (!this.$route.name.startsWith("/register")) {
           return router.push("/login");
         }
       }
