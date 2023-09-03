@@ -9,17 +9,17 @@ import { mapState } from "pinia";
 
 export default {
   data() {
+    const userAccountStore = useUserAccountStore()
     return {
-      userAccountStore: useUserAccountStore(),
-
+      userAccountStore,
       imageView: null,
       selectedImages: [] as File[],
       imagePreviews: [] as { file: File; url: string }[],
       overlay: false,
       rules: [
         (files: File[]) => {
-          if (files.length > 9) {
-            return "Można dodać maksymalnie 9 zdjęć.";
+          if (files.length + userAccountStore.accountData.images.length > 9) {
+            return "Można mieć maksymalnie 9 zdjęć w sumie.";
           }
           let MB = 1_024_000;
           for (let f of files) {
@@ -29,6 +29,7 @@ export default {
               ).toFixed(2)} MB.`;
             }
           }
+          return;
         },
       ] as ValidationRule[],
       allPossibleFieldsOfStudyAGH: [] as string[],
@@ -117,6 +118,13 @@ export default {
         this.userAccountStore.$patch({accountData: v})
       }
     },
+    imagesToUploadValid() {
+      if (this.selectedImages.length == 0
+      ||  this.selectedImages.length + this.userAccountStore.accountData.images.length > 9) {
+        return false
+      }
+      return true
+    }
   },
 
   async created() {
@@ -180,7 +188,7 @@ export default {
           class="float-right mt-2"
           color="yellow"
           @click="uploadImages()"
-          :disabled="selectedImages.length == 0"
+          :disabled="!imagesToUploadValid"
           >Wyślij
           {{ selectedImages.length == 1 ? "zdjęcie" : "zdjęcia" }}</v-btn
         >
