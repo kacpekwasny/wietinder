@@ -235,8 +235,7 @@ export default {
           powyżej.
         </div>
       </div>
-    </v-card>
-    <v-card class="pa-3 mt-2 mb-2 elevation-3">
+      <v-divider class="mb-4 mt-4"></v-divider>
       <v-row dense>
         <v-col col="6">
           <v-card class="align-end" height="100%">
@@ -308,7 +307,7 @@ export default {
           </v-card>
         </v-col>
       </v-row>
-      <v-btn color="yellow" class="mt-2 float-right" @click="sendAccountData()"
+      <v-btn color="yellow" class="mt-5 float-right" @click="sendAccountData()"
         >Zapisz zmiany!</v-btn
       >
     </v-card>
