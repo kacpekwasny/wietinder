@@ -147,8 +147,6 @@ class User(db.Model, UserMixin):
         else:
             match_record.user2_choice = my_choice
 
-        db.session.commit()
-
 
 def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
     if isinstance(enum_, EnumType):

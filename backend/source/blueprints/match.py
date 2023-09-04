@@ -31,6 +31,8 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
         my_choice = j.get("my_choice")
         
         User.change_match_choice(current_user, MatchChoice(my_choice), other_user_public_id)
+        db.session.commit()
+        
         return resp(200, 'success')
 
     
