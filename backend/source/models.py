@@ -150,6 +150,16 @@ class PossibleMatch(db.Model):
     user1_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
     user2_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
 
+def change_user_choice(user1_public_id, user2_public_id, new_choice):
+    match_record = PossibleMatch.query.filter(
+        ((PossibleMatch.user1_public_id == user1_public_id) & (PossibleMatch.user2_public_id == user2_public_id)) |
+        ((PossibleMatch.user1_public_id == user2_public_id) & (PossibleMatch.user2_public_id == user1_public_id))
+    ).first()
+
+    match_record.user1_choice = new_choice
+
+    db.session.commit()
+
 
 # Stwórz trigger `make_pairs`.
 # Aktywuj trigger za każdym razem po INSERT w tabeli `users` - czyli po utworzeniu nowego usera

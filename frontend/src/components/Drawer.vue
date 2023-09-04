@@ -27,7 +27,10 @@ export default {
     },
     navigateToAccount(){
       this.$router.push({ path: "/profile/" + this.accountData.public_id})
-    }
+    },
+    navigateToSwipe(){
+      this.$router.push({ path: "/swipe"})
+    },
   },
   computed: {
     showSidePanel: {
@@ -66,6 +69,7 @@ export default {
           ></v-list-item>
           <v-divider></v-divider>
           <v-list-item 
+            @click="navigateToSwipe"
             prepend-icon="mdi-cards" 
             title="Chybił trafił" 
           ></v-list-item>
