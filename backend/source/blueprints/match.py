@@ -3,7 +3,7 @@ from flask.wrappers import Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_required
 from ..tools.response import resp
-from ..models import change_user_choice
+from ..models import MatchChoice
 
 def get_match_bp(db: SQLAlchemy) -> Blueprint:
     from ..models import User
@@ -27,11 +27,10 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
     @login_required
     def update_match_choice():
         j = request.json
-        user1 = current_user.public_id
-        user2 = j.get("user2_public_id")
-        choice = j.get("choice")
-        print(j)
-        change_user_choice(user1, user2, choice)
+        other_user_public_id = j.get("other_user_public_id")
+        my_choice = j.get("my_choice")
+        
+        User.change_match_choice(current_user, MatchChoice(my_choice), other_user_public_id)
         return resp(200, 'success')
 
     

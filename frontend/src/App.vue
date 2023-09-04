@@ -25,8 +25,7 @@ export default {
       await this.userAccountStore.refreshUserData();
       if (!this.userAccountStore.loggedIn) {
         if (!this.$route.name.startsWith("/register")) {
-          if (to.name.startsWith("/register")){
-            console.log("dupa")
+          if (to.name.startsWith("/register")) {
             return router.push("/login");
           }
         }

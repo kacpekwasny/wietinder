@@ -136,6 +136,20 @@ class User(db.Model, UserMixin):
         target_activity is not None and self.set_target_activity(target_activity)
         images          is not None and self.set_images(images)
 
+    def change_match_choice(self, my_choice: MatchChoice, other_public_id: str):
+        match_record: PossibleMatch = PossibleMatch.query.filter(
+            ((PossibleMatch.user1_public_id == self.public_id)  & (PossibleMatch.user2_public_id == other_public_id)) |
+            ((PossibleMatch.user1_public_id == other_public_id) & (PossibleMatch.user2_public_id == self.public_id))
+        ).first()
+        
+        if match_record.user1_public_id == self.public_id:
+            match_record.user1_choice = my_choice
+        else:
+            match_record.user2_choice = my_choice
+
+        db.session.commit()
+
+
 def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
     if isinstance(enum_, EnumType):
         return setattr(self, propname, json.dumps([v for v in values if enum_(v) in enum_]))
@@ -149,16 +163,6 @@ class PossibleMatch(db.Model):
     user2_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
     user1_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
     user2_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
-
-def change_user_choice(user1_public_id, user2_public_id, new_choice):
-    match_record = PossibleMatch.query.filter(
-        ((PossibleMatch.user1_public_id == user1_public_id) & (PossibleMatch.user2_public_id == user2_public_id)) |
-        ((PossibleMatch.user1_public_id == user2_public_id) & (PossibleMatch.user2_public_id == user1_public_id))
-    ).first()
-
-    match_record.user1_choice = new_choice
-
-    db.session.commit()
 
 
 # Stwórz trigger `make_pairs`.

@@ -11,8 +11,8 @@ export default {
             possibleMatches: [],
             profilesStore: useProfilesStore(),
             accountStore: useUserAccountStore(),
-            user2_public_id: "",
-            profilesChoiceMade: [],
+            other_user_public_id: "",
+            profilesChoiceMade: [] as string[],
 
             profileData: {
                 name: "",
@@ -30,7 +30,7 @@ export default {
         async loadData() {
             await this.getPossibleMatches();
             this.getRandomPossibleMatchID();
-            const p = await this.profilesStore.profile(this.user2_public_id);
+            const p = await this.profilesStore.profile(this.other_user_public_id);
             if (p === undefined) {
                 this.profileData.name = "404, profile not found";
                 this.profileData.bio = "profile with this ID was not found";
@@ -45,16 +45,18 @@ export default {
                 this.possibleMatches = json
             }
         },
+
         getRandomPossibleMatchID(){
-            this.user2_public_id = this.possibleMatches[Math.floor(Math.random()*this.possibleMatches.length)]
+            this.other_user_public_id = this.possibleMatches[Math.floor(Math.random()*this.possibleMatches.length)]
         },
-        async updateChoice(choice: String){
-            let response = await postJson("/update-match-choice", {
-                user2_public_id: this.user2_public_id,
-                choice: choice
+
+        async updateChoice(choice: string) {
+            postJson("/update-match-choice", {
+                other_user_public_id: this.other_user_public_id,
+                my_choice: choice
             })
-            this.profilesChoiceMade.push(this.user2_public_id) 
-            this.possibleMatches = this.possibleMatches.filter(item => item !== this.user2_public_id);
+            this.profilesChoiceMade.push(this.other_user_public_id) 
+            this.possibleMatches = this.possibleMatches.filter(item => item !== this.other_user_public_id);
             this.loadData();
         },
 
