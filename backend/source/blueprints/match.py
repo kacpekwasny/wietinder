@@ -33,9 +33,18 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
         User.change_match_choice(current_user, MatchChoice(my_choice), other_user_public_id)
         return resp(200, 'success')
 
-    
-    
+    @match.route('/get_who_likes_me', methods=['GET'])
+    @login_required
+    def get_who_likes_me():
+        likesMeID = []
+        for like in current_user.likes_me():
+            if current_user.public_id == like.user1_public_id:
+                likesMeID.append(like.user2_public_id)
+            else:
+                likesMeID.append(like.user1_public_id)
 
+        return jsonify(likesMeID)
+    
     return match
 
     
