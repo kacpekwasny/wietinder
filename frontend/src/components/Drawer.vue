@@ -31,6 +31,9 @@ export default {
     navigateToSwipe(){
       this.$router.push({ path: "/swipe"})
     },
+    navigateToLikes(){
+      this.$router.push({ path: "/likes"})
+    },
   },
   computed: {
     showSidePanel: {
@@ -74,6 +77,7 @@ export default {
             title="Chybił trafił" 
           ></v-list-item>
           <v-list-item 
+            @click="navigateToLikes"
             prepend-icon="mdi-heart" 
             title="Polubienia" 
           ></v-list-item>
