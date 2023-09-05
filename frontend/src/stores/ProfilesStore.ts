@@ -58,12 +58,20 @@ export const useProfilesStore = defineStore('Profiles', {
             for (let p of profilesArr.slice(0, -PROFILES_MAX_CACHE_SIZE)) {
                 this._profiles.delete(p.public_id)
             }
+        },
+
+        addProfilesToCache(profiles: Profile[]) {
+            for (let p of profiles) {
+                if (!this._profiles.has(p.public_id)) {
+                    this._profiles.set(p.public_id, p)
+                }
+            }
         }
     },
 })
 
 
-interface Profile {
+export interface Profile {
     // Timestamp of the last time the profile was fetched from server
     _last_fetched: number
 
