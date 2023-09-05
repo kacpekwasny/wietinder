@@ -3,7 +3,8 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import AccountView from '../views/AccountView.vue'
 import ProfileView from "@/views/ProfileView.vue";
-import SwipeView from "@/views/SwipeView.vue"
+import SwipeView from "@/views/SwipeView.vue";
+import LikesMeView from  "@/views/LikesMeView.vue";
 
 const router = createRouter ({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,6 +41,11 @@ const router = createRouter ({
             path: "/swipe",
             name: "swipe",
             component: SwipeView
+        },
+        {
+            path: "/likes",
+            name: "likes",
+            component: LikesMeView
         },
     ]
 })

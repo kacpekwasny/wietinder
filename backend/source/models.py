@@ -147,6 +147,15 @@ class User(db.Model, UserMixin):
         else:
             match_record.user2_choice = my_choice
 
+        db.session.commit()
+
+    def likes_me(self):
+        return PossibleMatch.query.filter(
+            ((PossibleMatch.user1_public_id == self.public_id) & (PossibleMatch.user2_choice == MatchChoice.like)) 
+            | ((PossibleMatch.user2_public_id == self.public_id) & (PossibleMatch.user1_choice == MatchChoice.like))
+        )
+
+
 
 def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
     if isinstance(enum_, EnumType):
