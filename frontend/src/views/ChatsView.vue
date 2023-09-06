@@ -23,7 +23,7 @@ export default {
     },
     methods: {
         async loadData() {
-            let resp = await getJson("/get-matches");
+            let resp = await getJson("/my-matches");
             let json = await resp.json();
             this.matchesID = json;
         },

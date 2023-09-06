@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import uuid
 import time
@@ -156,7 +158,7 @@ class User(db.Model, UserMixin):
             | ((PossibleMatch.user2_public_id == self.public_id) & (PossibleMatch.user1_choice == MatchChoice.like))
         )
     
-    def matches(self):
+    def matches(self) -> list[PossibleMatch]:
          return PossibleMatch.query.filter(
             ((PossibleMatch.user1_public_id == self.public_id) & ((PossibleMatch.user2_choice == MatchChoice.like) & (PossibleMatch.user1_choice == MatchChoice.like))) 
             | ((PossibleMatch.user2_public_id == self.public_id) & ((PossibleMatch.user2_choice == MatchChoice.like) & (PossibleMatch.user1_choice == MatchChoice.like)))
@@ -177,8 +179,22 @@ class PossibleMatch(db.Model):
     user2_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
     messages        = db.relationship('Message', backref='user')
 
+    def messages_slice(self, start: int, end: int) -> list[Message]:
+        return Message.query.filter(Message.possible_match == self.id).order_by(Message.id.desc()).slice(start, end).all()
 
-
+    def get_pairs_public_id(self, my_id: str) -> str:
+        if self.user1_public_id == my_id:
+            return self.user2_public_id
+        if self.user2_public_id == my_id:
+            return self.user1_public_id
+        raise RuntimeError("This is not your PossibleMatch. You are not user1, nor user2.")
+    
+    def get_match(self, my_pid: str, other_pid: str) -> PossibleMatch:
+        return PossibleMatch.query.filter(
+            ((PossibleMatch.user1_public_id == my_pid) & (PossibleMatch.user2_public_id == other_pid)
+            | (PossibleMatch.user2_public_id == my_pid) & (PossibleMatch.user1_public_id == other_pid))
+            & (PossibleMatch.user1_choice == MatchChoice.like & PossibleMatch.user2_choice == MatchChoice.like)
+        ).first()
 
 class Message(db.Model):
     __tablename__   = "messages"
