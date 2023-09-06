@@ -34,8 +34,8 @@ def make_dummy_messages(db):
         pm: PossibleMatch
         if len(pm.messages_slice(0, 3)) < 2:
             db.session.add_all([
-                Message(author=pm.user1_public_id, possible_match=pm.id, message=f"From user1: I have {pm.user1_public_id=}"),
-                Message(author=pm.user2_public_id, possible_match=pm.id, message=f"From user2: I have {pm.user2_public_id=}"),
+                Message(author=pm.user1_public_id, possible_match_id=pm.id, message=f"From user1: I have {pm.user1_public_id=}"),
+                Message(author=pm.user2_public_id, possible_match_id=pm.id, message=f"From user2: I have {pm.user2_public_id=}"),
             ])
             db.session.commit()
         

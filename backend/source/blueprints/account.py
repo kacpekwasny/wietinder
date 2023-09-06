@@ -26,7 +26,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @account_bp.route('/account-data', methods=['GET'])
     @login_required
     def get_account_data():
-        return jsonify(User.get_json(current_user))
+        return jsonify(User.json(current_user))
 
     @account_bp.route('/account-data', methods=['POST'])
     @login_required

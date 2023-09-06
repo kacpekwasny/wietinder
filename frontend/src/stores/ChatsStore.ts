@@ -13,7 +13,7 @@ export const useChatsStore = defineStore('ChatsStore', {
     },
     actions: {
         async loadChats() {
-            const resp = await getJson('/who-likes-me') // To chyba nie powinno dawać ID użytkowników tylko liste Chatów
+            const resp = await getJson('/chats') // To chyba nie powinno dawać ID użytkowników tylko liste Chatów
             const chats: Chat[] = await resp.json()
             chats.sort((ch1, ch2) => (ch1.messages[0].datetime + ch2.messages[0].datetime))
             chats.forEach(ch => {

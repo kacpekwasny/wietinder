@@ -107,7 +107,7 @@ class User(db.Model, UserMixin):
     def set_images(self, images: list[str]) -> list[str]:
         self.images = json.dumps(images)
 
-    def get_json(self) -> dict[str, str | list[str]]:
+    def json(self) -> dict[str, str | list[str]]:
         return {
             "name":      self.name,
             "public_id": self.public_id,
@@ -177,33 +177,49 @@ class PossibleMatch(db.Model):
     user2_public_id = db.Column(db.String(36),  db.ForeignKey('users.public_id'))
     user1_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
     user2_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
-    messages        = db.relationship('Message', backref='user')
+    messages        = db.relationship('Message', backref='possible_match')
+
+    @property
+    def user1(self) -> User:
+        return User.query.filter(User.public_id == self.user1_public_id).first()
+
+    @property
+    def user2(self) -> User:
+        return User.query.filter(User.public_id == self.user2_public_id).first()
+
+    def get_other_user(self, my_id: str) -> User:
+        if self.user1_public_id == my_id:
+            return self.user2
+        if self.user2_public_id == my_id:
+            return self.user1
+        raise RuntimeError("This is not your PossibleMatch. You are not user1, nor user2.")
 
     def messages_slice(self, start: int, end: int) -> list[Message]:
-        return Message.query.filter(Message.possible_match == self.id).order_by(Message.id.desc()).slice(start, end).all()
-
-    def get_pairs_public_id(self, my_id: str) -> str:
-        if self.user1_public_id == my_id:
-            return self.user2_public_id
-        if self.user2_public_id == my_id:
-            return self.user1_public_id
-        raise RuntimeError("This is not your PossibleMatch. You are not user1, nor user2.")
+        return Message.query.filter(Message.possible_match_id == self.id).order_by(Message.id.desc()).slice(start, end).all()
     
-    def get_match(self, my_pid: str, other_pid: str) -> PossibleMatch:
-        return PossibleMatch.query.filter(
+    @classmethod
+    def get_match(cls, my_pid: str, other_pid: str) -> PossibleMatch:
+        return cls.query.filter(
             ((PossibleMatch.user1_public_id == my_pid) & (PossibleMatch.user2_public_id == other_pid)
             | (PossibleMatch.user2_public_id == my_pid) & (PossibleMatch.user1_public_id == other_pid))
             & (PossibleMatch.user1_choice == MatchChoice.like & PossibleMatch.user2_choice == MatchChoice.like)
         ).first()
 
 class Message(db.Model):
-    __tablename__   = "messages"
-    id              = db.Column(db.Integer, primary_key=True)
-    possible_match  = db.Column(db.Integer,     db.ForeignKey('possible_matches.id'))
-    author          = db.Column(db.String,      db.ForeignKey('users.public_id'))
-    timemstamp      = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()) * 1000)
-    message         = db.Column(db.String(4000),    default="")
+    __tablename__       = "messages"
+    id                  = db.Column(db.Integer, primary_key=True)
+    possible_match_id   = db.Column(db.Integer,     db.ForeignKey('possible_matches.id'))
+    author              = db.Column(db.String,      db.ForeignKey('users.public_id'))
+    timemstamp          = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()) * 1000)
+    message             = db.Column(db.String(4000),    default="")
 
+    def json(self) -> dict[str, str|int]:
+        return {
+            "id":           self.id,
+            "author":       self.author,
+            "timestamp":    self.timemstamp,
+            "message":      self.message,
+        }
 
 
 # Stwórz trigger `make_pairs`.
