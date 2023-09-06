@@ -22,7 +22,7 @@ export default {
     methods: {
         async loadData(){
             this.profilesData = [];
-            let response = await getJson("/get_who_likes_me")
+            let response = await getJson("/who-likes-me")
             let json =  await response.json();
             this.usersWhoLikesMe = json
 

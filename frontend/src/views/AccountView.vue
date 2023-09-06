@@ -113,8 +113,6 @@ export default {
         return this.userAccountStore.accountData
       },
       set(v) {
-        console.log('set(AccountData)')
-        console.log(v)
         this.userAccountStore.$patch({accountData: v})
       }
     },

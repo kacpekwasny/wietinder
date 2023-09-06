@@ -33,10 +33,10 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
         
         User.change_match_choice(current_user, MatchChoice(my_choice), other_user_public_id)
         db.session.commit()
-        
-        return resp(200, 'success')
 
-    @match.route('/get_who_likes_me', methods=['GET'])
+        return resp(200, 'success')
+    
+    @match.route('/who-likes-me', methods=['GET'])
     @login_required
     def get_who_likes_me():
         likesMeID = []
@@ -62,6 +62,4 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
 
     return match
 
-    
-   
 
