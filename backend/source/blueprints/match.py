@@ -48,6 +48,18 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
 
         return jsonify(likesMeID)
     
+    @match.route('/get_matches', methods=['GET'])
+    @login_required
+    def get_matches():
+        matchesID = []
+        for match in current_user.matches():
+            if current_user.public_id == match.user1_public_id:
+               matchesID.append(match.user2_public_id)
+            else:
+               matchesID.append(match.user1_public_id)
+        
+        return jsonify(matchesID)
+
     return match
 
     

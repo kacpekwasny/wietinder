@@ -34,6 +34,9 @@ export default {
     navigateToLikes(){
       this.$router.push({ path: "/likes"})
     },
+    navigateToChats(){
+      this.$router.push({ path: "/chats"})
+    },
   },
   computed: {
     showSidePanel: {
@@ -80,6 +83,11 @@ export default {
             @click="navigateToLikes"
             prepend-icon="mdi-heart" 
             title="Polubienia" 
+          ></v-list-item>
+          <v-list-item 
+            @click="navigateToChats"
+            prepend-icon="mdi-chat" 
+            title="Chat" 
           ></v-list-item>
           <v-list-item 
             prepend-icon="mdi-account" 
