@@ -9,10 +9,11 @@ export const useChatsStore = defineStore('ChatsStore', {
     state() {
         return {
             _chats: new Map<string, Chat>(),
+            activeChat: null as Chat,
         }
     },
     actions: {
-        async loadChats() {
+        async fetchChats() {
             const resp = await getJson('/chats') // To chyba nie powinno dawać ID użytkowników tylko liste Chatów
             const chats: Chat[] = await resp.json()
             chats.sort((ch1, ch2) => (ch1.messages[0].datetime + ch2.messages[0].datetime))
@@ -35,6 +36,10 @@ export const useChatsStore = defineStore('ChatsStore', {
                 chats.push(ch)
             })
             return chats.reverse()
+        },
+
+        makeActive(publicId: string) {
+            this.activeChat = this._chats.get(publicId)
         }
 
     },

@@ -5,6 +5,7 @@ import { useUserAccountStore } from "@/stores/AccountDataStore";
 import { mapState } from "pinia";
 import { getBackendHostname, getJson, postJson} from "../common/requests";
 import router from "../router";
+import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 
 export default { 
   data() {
@@ -35,6 +36,7 @@ export default {
       this.$router.push({ path: "/likes"})
     },
     navigateToChats(){
+      useChatsListPanelStore().openChatsListPanel()
       this.$router.push({ path: "/chats"})
     },
   },

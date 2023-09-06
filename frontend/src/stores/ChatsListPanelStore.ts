@@ -9,6 +9,9 @@ export const useChatsListPanelStore = defineStore('ChatsListPanel', {
     actions: {
         toggleChatsListPanel(){
             this.showChatsListPanel = !this.showChatsListPanel;
+        },
+        openChatsListPanel(open=true) {
+            this.showChatsListPanel = open
         }
     }
 },

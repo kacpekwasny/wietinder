@@ -13,7 +13,7 @@ export default {
     },
 
     async created() {
-        await this.chatStore.loadChats()
+        await this.chatStore.fetchChats()
     },
 
     methods: {
@@ -21,8 +21,8 @@ export default {
              return `${getBackendHostname()}/uploads/${imageName}`;
         },
 
-        navigateToChat(publicId: str) {
-
+        navigateToChat(publicId: string) {
+            this.chatStore.makeActive(publicId)
         }
     },
     computed: {
@@ -55,7 +55,7 @@ export default {
             lines="two"
             :prepend-avatar="remoteURL(chat.profile.images[0])"
             :title="chat.profile.name"
-            subtitle="Last message"
+            :subtitle="chat.messages[0].message.slice(0, 30) + `...`"
           ></v-list-item>
         </v-list>
 
