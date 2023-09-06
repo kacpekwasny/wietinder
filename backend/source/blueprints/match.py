@@ -48,7 +48,7 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
 
         return jsonify(likesMeID)
     
-    @match.route('/get_matches', methods=['GET'])
+    @match.route('/get-matches', methods=['GET'])
     @login_required
     def get_matches():
         matchesID = []

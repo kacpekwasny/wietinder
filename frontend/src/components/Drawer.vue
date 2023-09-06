@@ -60,7 +60,8 @@ export default {
       v-model="showSidePanel"
       temporary
       :permanent="$vuetify.display.width > 1100"
-      class = "drawer h-100"
+      
+      class = "drawer h-100 elevation-10"
     >
       <div
         class="d-flex flex-column h-100 justify-space-between pb-12"
