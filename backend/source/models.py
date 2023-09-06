@@ -1,6 +1,8 @@
 import json
 import uuid
+import time
 
+from datetime import datetime
 from enum import Enum, EnumType
 from flask_login import UserMixin
 from sqlalchemy import event
@@ -41,7 +43,7 @@ class User(db.Model, UserMixin):
     password    = db.Column(db.String(250))
 
     ##### Public #####
-    name  = db.Column(db.String(NAME_LEN))
+    name        = db.Column(db.String(NAME_LEN))
     bio         = db.Column(db.String(BIO_LEN), default='')
     sex         = db.Column(db.Enum(Sex), default=Sex.male.value)
     """The sex of user. Enum 'Female'/'Male' """
@@ -55,7 +57,6 @@ class User(db.Model, UserMixin):
     target_activity = db.Column(db.String(150), default=json.dumps([t.value for t in TargetActivity]))
     """ The desired activity for the match. """
 
-    # images      = db.relationship('Image', back_populates='user')
     images = db.Column(db.Text(), default="[]")
     """List of filenames in JSON format."""
     
@@ -156,7 +157,6 @@ class User(db.Model, UserMixin):
         )
 
 
-
 def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
     if isinstance(enum_, EnumType):
         return setattr(self, propname, json.dumps([v for v in values if enum_(v) in enum_]))
@@ -166,10 +166,23 @@ def set_enum_valid(self: object, enum_: Enum|list, values: list, propname: str):
 class PossibleMatch(db.Model):
     __tablename__ = 'possible_matches'
     id              = db.Column(db.Integer, primary_key=True)
-    user1_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
-    user2_public_id = db.Column(db.String(36), db.ForeignKey('users.public_id'))
-    user1_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
-    user2_choice    = db.Column(db.Enum(MatchChoice), default=MatchChoice.none)
+    user1_public_id = db.Column(db.String(36),  db.ForeignKey('users.public_id'))
+    user2_public_id = db.Column(db.String(36),  db.ForeignKey('users.public_id'))
+    user1_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
+    user2_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
+    images          = db.relationship('Message', back_populates='user')
+
+
+
+
+class Message(db.Model):
+    __tablename__   = "messages"
+    id              = db.Column(db.Integer, primary_key=True)
+    possible_match  = db.Column(db.Integer,     db.ForeignKey('messages.id'))
+    author          = db.Column(db.String,      db.ForeignKey('users.public_id'))
+    timemstamp      = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()) * 1000)
+    message         = db.Column(db.String(4000),    default="")
+
 
 
 # Stwórz trigger `make_pairs`.
