@@ -3,43 +3,39 @@ import { defineStore } from 'pinia'
 import { Profile } from './ProfilesStore'
 
 
-// How long the cache is valid expressed in miliseconds
-const PROFILES_CACHE_TIMEOUT_MS = 1000 * 60 * 30 // Thirty minutes
-
-// How many profiles can be stored inside
-const PROFILES_MAX_CACHE_SIZE = 1000 // the profiles
-
 // Store for keeping data of other profiles that has been returned from API.
 // This store will implement an interface that will help with caching.
-export const useProfilesStore = defineStore('Profiles', {
+export const useChatsStore = defineStore('ChatsStore', {
     state() {
         return {
-            _chats: new Array<Chat>(),
+            _chats: new Map<string, Chat>(),
         }
     },
     actions: {
         async loadChats() {
             const resp = await getJson('/who-likes-me')
             const chats: Chat[] = await resp.json()
-            this._chats = new Array()
-            this._chats.push(...chats)
-            this._chats.sort((ch1, ch2) => (ch1.messages[0].datetime - ch2.messages[0].datetime))
+            chats.sort((ch1, ch2) => (ch1.messages[0].datetime + ch2.messages[0].datetime))
+            chats.forEach(ch => {
+                this._chats.set(ch.profile.public_id, ch)
+            })
         },
-        toTopOfChatOrder(selector: number|string) {
-            let idx = 0
-            if (typeof selector === "string") {
-                for (let [i, chat] of this._chats.entries()) {
-                    if (chat.profile.public_id == selector) {
-                        idx = i
-                        break
-                    }
-                }
-            } else {
-                idx = selector
+
+        toTopOfChatOrder(publicId: string) {
+            let chat = this._chats.get(publicId)
+            if (!this._chats.delete(publicId)) {
+                return
             }
-            let newTopChat = this._chats.splice(idx, 1)[0]
-            this._chats.unshift(newTopChat)
-        }        
+            this._chats.set(publicId, chat)
+        },
+
+        iterate(): Chat[] {
+            const chats = new Array<Chat>()
+            this._chats.forEach(ch => {
+                chats.push(ch)
+            })
+            return chats.reverse()
+        }
 
     },
 })

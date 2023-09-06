@@ -48,7 +48,7 @@ def create_app():
     app.register_blueprint(get_data_bp())
 
 
-    from .models import User, PossibleMatch
+    from .models import User, PossibleMatch, Message
 
     with app.app_context():
         db.create_all()
@@ -63,8 +63,18 @@ def create_app():
     
 
     admin = Admin(app, name='Admin Page', template_mode='bootstrap3')
-    admin.add_view(ModelView(User, db.session))
-    admin.add_view(ModelView(PossibleMatch, db.session))
+    
+    def make_view(model, hidden: list[str]=["password"]) -> ModelView:
+        from sqlalchemy.orm.attributes import InstrumentedAttribute
+        with app.app_context():
+            class MyView(ModelView):
+                    column_list = [col for col in dir(model) if (isinstance(getattr(model, col), InstrumentedAttribute) and (not col in hidden))]
+        
+            return MyView(model, db.session)
+
+    admin.add_view(make_view(User))
+    admin.add_view(make_view(PossibleMatch))
+    admin.add_view(make_view(Message))
 
     return app
 

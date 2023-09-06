@@ -175,7 +175,7 @@ class PossibleMatch(db.Model):
     user2_public_id = db.Column(db.String(36),  db.ForeignKey('users.public_id'))
     user1_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
     user2_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
-    images          = db.relationship('Message', back_populates='user')
+    messages        = db.relationship('Message', backref='user')
 
 
 
@@ -183,7 +183,7 @@ class PossibleMatch(db.Model):
 class Message(db.Model):
     __tablename__   = "messages"
     id              = db.Column(db.Integer, primary_key=True)
-    possible_match  = db.Column(db.Integer,     db.ForeignKey('messages.id'))
+    possible_match  = db.Column(db.Integer,     db.ForeignKey('possible_matches.id'))
     author          = db.Column(db.String,      db.ForeignKey('users.public_id'))
     timemstamp      = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()) * 1000)
     message         = db.Column(db.String(4000),    default="")
