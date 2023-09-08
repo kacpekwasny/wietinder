@@ -90,10 +90,16 @@ export default {
           ></v-list-item>
           
           <v-list-item 
-            @click="navigateToChats"
             prepend-icon="mdi-chat" 
-            title="Chat" 
           >
+          <v-expansion-panels>
+            <v-expansion-panel
+              title="Chaty"
+              text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima"
+            >
+            </v-expansion-panel>
+          </v-expansion-panels>
+
           </v-list-item>
           
         </v-list>
