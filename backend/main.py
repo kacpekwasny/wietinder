@@ -38,6 +38,17 @@ def make_dummy_messages(db):
                 Message(author=pm.user2_public_id, possible_match_id=pm.id, message=f"From user2: I have {pm.user2_public_id=}"),
             ])
             db.session.commit()
+
+def add_images(db):
+    from source.config import UPLOADS_DIR
+    from source.models import User
+    imgs = list(UPLOADS_DIR.iterdir())
+    for u in User.query.all():
+        u: User
+        if not u.get_images():
+            u.set_images([imgs.pop().name])
+    db.session.commit()
+    
         
 
 if __name__ == '__main__':
@@ -47,6 +58,7 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         add_users(db)
+        add_images(db)
         make_everyone_like_each_other(db)
         make_dummy_messages(db)
 
