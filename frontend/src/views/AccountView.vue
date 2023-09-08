@@ -142,10 +142,10 @@ export default {
 
 <template>
   <v-btn
-  class="v-btn--floating-action v-btn--fab v-btn--fixed ma-0 "
+  class="v-btn--floating-action v-btn--fab v-btn--fixed ml-2 "
   color="yellow"
   @click = "navigateToProfile"
-  style="position:fixed, relative; bottom: 10px; left: 5px; z-index: 999;"
+  style="position:fixed, relative; bottom: 10px; z-index: 999;"
   >
     <v-icon>mdi-account</v-icon>
   </v-btn>
