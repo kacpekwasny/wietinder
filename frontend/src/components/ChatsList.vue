@@ -22,6 +22,7 @@ export default {
     },
 
     navigateToChat(publicId: string) {
+      this.$router.push({path: '/chats'})
       this.chatStore.makeActive(publicId);
     },
     formatDate(unixTimeStamp: number): string {
