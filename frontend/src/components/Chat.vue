@@ -27,10 +27,8 @@ export default {
 
 <template>
   <v-card class="chat-card" v-if="chatsStore.activeChat != null" style="height: 100%; position: relative;">
-    <v-card-title class="pa-2 d-flex justify-between align-center">
-      <v-btn @click="toggleChatsListsPanel" icon class="ml-3 mr-5">
-        <v-icon>mdi-comment-outline</v-icon>
-      </v-btn>
+    <v-card-title class="ml-6 pa-2 d-flex justify-between align-center">
+     
       <div class="text-right">
         <v-avatar>
           <v-img
