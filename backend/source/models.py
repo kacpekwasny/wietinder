@@ -205,7 +205,7 @@ class PossibleMatch(db.Model):
         return cls.query.filter(
             ((PossibleMatch.user1_public_id == my_pid) & (PossibleMatch.user2_public_id == other_pid)
             | (PossibleMatch.user2_public_id == my_pid) & (PossibleMatch.user1_public_id == other_pid))
-            & (PossibleMatch.user1_choice == MatchChoice.like & PossibleMatch.user2_choice == MatchChoice.like)
+            & ((PossibleMatch.user1_choice == MatchChoice.like) & (PossibleMatch.user2_choice == MatchChoice.like))
         ).first()
 
 class Message(db.Model):

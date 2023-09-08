@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
-import { getBackendHostname } from "@/common/requests";
+import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 
 export default {
@@ -10,6 +10,7 @@ export default {
       chatsStore: useChatsStore(),
       accountStore: useUserAccountStore(),
       ChatsListPanelStore: useChatsListPanelStore(),
+      content: "",
     };
   },
 
@@ -21,6 +22,13 @@ export default {
     remoteURL(imageName: string) {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },
+    async sendMessage() {
+      let resp = await postJson(`/send-message`, {
+        recepient_public_id: this.chatsStore.activeChat.profile.public_id,
+        content: this.content,
+      })
+
+    }
   },
 };
 </script>
@@ -67,8 +75,10 @@ export default {
           max-rows="4"
           style="width: 100%;"
           auto-grow
+          v-model="content"
         ></v-textarea>
-      <v-btn icon class="ml-3 mr-5" color="yellow" float-right>
+      <v-btn icon class="ml-3 mr-5" color="yellow" float-right
+      @click="sendMessage()">
         <v-icon>mdi-send</v-icon>
       </v-btn>
 
