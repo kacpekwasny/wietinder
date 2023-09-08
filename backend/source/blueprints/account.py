@@ -78,7 +78,9 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     @login_required
     def get_image(filepath: str):
         directory_path = str(Path(__file__).parent.parent.parent / "uploads")
-        return send_from_directory(directory_path, filepath)
+        resp_img = send_from_directory(directory_path, filepath)
+        resp_img.headers['Cache-Control'] = 'max-age=86400'
+        return resp_img
     
     @account_bp.route('/delete-image', methods=['POST'])
     @login_required
