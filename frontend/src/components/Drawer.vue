@@ -26,9 +26,7 @@ export default {
       useUserAccountStore().setLoggedOut()
       router.push("/login");
     },
-    navigateToAccount(){
-      this.$router.push({ path: "/profile/" + this.accountData.public_id})
-    },
+   
     navigateToSwipe(){
       this.$router.push({ path: "/swipe"})
     },
@@ -38,6 +36,9 @@ export default {
     navigateToChats(){
       useChatsListPanelStore().openChatsListPanel()
       this.$router.push({ path: "/chats"})
+    },
+    navigateToAccountConfig(){
+      this.$router.push({ path: "/account"})
     },
   },
   computed: {
@@ -70,7 +71,7 @@ export default {
       >
         <v-list class="">
           <v-list-item 
-            @click="navigateToAccount"
+            @click="navigateToAccountConfig"
             lines="two"
             :prepend-avatar="remoteURL(accountData.images[0])"
             :title="accountData.name"
@@ -87,16 +88,14 @@ export default {
             prepend-icon="mdi-heart" 
             title="Polubienia" 
           ></v-list-item>
+          
           <v-list-item 
             @click="navigateToChats"
             prepend-icon="mdi-chat" 
             title="Chat" 
-          ></v-list-item>
-          <v-list-item 
-            prepend-icon="mdi-account" 
-            title="Profil" 
-            :to="{ name: 'account'}"
-          ></v-list-item>
+          >
+          </v-list-item>
+          
         </v-list>
   
         <v-list>

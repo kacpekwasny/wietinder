@@ -101,6 +101,9 @@ export default {
     localURL(file: File) {
       return URL.createObjectURL(file);
     },
+    navigateToProfile(){
+      this.$router.push({ path: "/profile/" + this.accountData.public_id})
+    },
   },
 
   components: {
@@ -138,13 +141,29 @@ export default {
 <!-- zrobic zeby zdjecia sie wyswietlaly, check box kogo szukam, piwo/etc, nie widac boxów :(()) -->
 
 <template>
+  <v-btn
+  class="v-btn--floating-action v-btn--fab v-btn--fixed ma-0 "
+  color="yellow"
+  @click = "navigateToProfile"
+  style="position:fixed, relative; bottom: 10px; left: 5px; z-index: 999;"
+  >
+    <v-icon>mdi-account</v-icon>
+  </v-btn>
+
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
-    <v-textarea
-      hide-details
-      class="elevation-3 rounded"
-      label="Opis profilu"
-      v-model="accountData.bio"
-    ></v-textarea>
+    <v-card>
+
+     
+       
+        <v-textarea
+          hide-details
+          class="elevation-3 rounded"
+          label="Opis profilu"
+          v-model="accountData.bio"
+        ></v-textarea>
+
+
+    </v-card>
     <v-card class="pa-3 mt-2 mb-2 elevation-3">
       <div>
         <div class="text-h5 mb-2">Dodaj zdjęcia</div>
@@ -311,3 +330,4 @@ export default {
     </v-card>
   </v-container>
 </template>
+

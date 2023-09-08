@@ -45,6 +45,7 @@ export default {
       :permanent="$vuetify.display.width > 1100"
       class = "drawer chats list"
     >
+    
     <div class="text-h5 mt-5 mb-5 ml-5" >Czaty</div>
      
         <v-list class="chats list">
@@ -58,6 +59,7 @@ export default {
             :subtitle="chat.messages[0].message.slice(0, 30) + `...`"
           ></v-list-item>
         </v-list>
+    
 
     </v-navigation-drawer>
 </template>
