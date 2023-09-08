@@ -42,9 +42,9 @@ export default {
 </script>
 
 <template>
-  <v-container fluid class="d-flex flex-column" style="max-width: 800px">
+  <v-container fluid class="d-flex flex-column" style="max-width: 800px; height: 100%;">
     <ChatsList></ChatsList>
-    <v-card class="pa-0">
+    <v-card class="pa-0" height="100%">
       <Chat></Chat>
     </v-card>
   </v-container>
