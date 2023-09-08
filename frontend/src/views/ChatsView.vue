@@ -1,7 +1,6 @@
 <script lang=ts>
 import { getJson } from "../common/requests";
 import { useProfilesStore } from "@/stores/ProfilesStore";
-import ChatsList from "@/components/ChatsList.vue";
 import Chat from "@/components/Chat.vue";
 
 
@@ -37,7 +36,7 @@ export default {
             this.profileData = p;
         },
     },
-    components: { ChatsList, Chat }
+    components: { Chat }
 }
 </script>
 

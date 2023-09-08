@@ -16,7 +16,7 @@ export const useChatsStore = defineStore('ChatsStore', {
         async fetchChats() {
             const resp = await getJson('/chats')
             const chats: Chat[] = await resp.json()
-            chats.sort((ch1, ch2) => (ch1.messages[0].datetime + ch2.messages[0].datetime))
+            chats.sort((ch1, ch2) => (ch1.messages[0].timestamp + ch2.messages[0].timestamp))
             chats.forEach(ch => {
                 this._chats.set(ch.profile.public_id, ch)
             })
@@ -57,7 +57,7 @@ export interface Message {
     id:         number
     
     // 
-    datetime:   number
+    timestamp:   number
 
     author:     string
     message:    string
