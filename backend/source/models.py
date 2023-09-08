@@ -152,7 +152,7 @@ class User(db.Model, UserMixin):
 
         db.session.commit()
 
-    def likes_me(self):
+    def likes_me(self) -> list[PossibleMatch]:
         return PossibleMatch.query.filter(
             ((PossibleMatch.user1_public_id == self.public_id) & (PossibleMatch.user2_choice == MatchChoice.like)) 
             | ((PossibleMatch.user2_public_id == self.public_id) & (PossibleMatch.user1_choice == MatchChoice.like))
