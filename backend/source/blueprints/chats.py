@@ -24,7 +24,7 @@ def get_chats_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
                 "messages": [msg.json() for msg in m.messages_slice(0, 50)],
             }
 
-            for m in User.matches(current_user)
+            for m in User.my_matches(current_user)
         ]
 
 
