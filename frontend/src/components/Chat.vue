@@ -38,6 +38,9 @@ export default {
     handleEmojiClick(emoji){
       this.content = this.content + emoji
     },
+    navigateToProfile(){
+      this.$router.push({ path: "/profile/" + this.chatsStore.activeChat.profile.public_id})
+    }
 
   },
 
@@ -60,18 +63,21 @@ export default {
           ></v-img>
         </v-avatar>
         {{ chatsStore.activeChat.profile.name }}
-     </div>
+      </div>
+      <v-btn icon class="ml-auto" @click="navigateToProfile">
+      <v-icon>mdi-information</v-icon>
+      </v-btn>
     </v-card-title>
     <v-divider></v-divider>
     <v-card-content class="chat-content" >
       <v-list>
         <v-list-item v-for="msg in chatsStore.activeChat.messages">
-          <v-card class="ma-3 pa-2 elevation-3 float-right" style ="max-width: 80%;"
+          <v-card class="message-card ma-3 pa-2 elevation-3 float-right" style ="max-width: 80%;"
           v-if=" msg.author ==  accountStore.accountData.public_id">
             <p>Ty:</p>
             <p>{{ msg.message }}</p>
           </v-card>
-          <v-card v-else class="ma-3 pa-2 elevation-3 " style ="max-width: 80%;"
+          <v-card v-else class="message-card ma-3 pa-2 elevation-3 " style ="max-width: 80%;"
           >
             <p>{{ chatsStore.activeChat.profile.name }}:</p>
             <p>{{ msg.message }}</p>
@@ -125,5 +131,13 @@ export default {
   background-color: white; /* You can adjust the background color as needed */
   z-index: 100;
   max-width: 40%;
+}
+.message-card {
+  background-color: #e0e0e0; /* Background color of the chat bubble */
+  padding: 10px;
+  margin: 10px; /* Add spacing between chat messages */
+  border-radius: 10px; /* Rounded corners for the chat bubble */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
+  word-wrap: break-word; /* Wrap long words to the next line */
 }
 </style>
