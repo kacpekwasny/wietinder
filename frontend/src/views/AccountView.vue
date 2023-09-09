@@ -28,10 +28,7 @@ export default {
   methods: {
     changeView(){
       this.showProfile = !this.showProfile
-      if(this.showProfile){
-        this.getProfileData()
-        console.log("dupa")
-      }
+      
     },
 
     async getProfileData() {
@@ -43,6 +40,10 @@ export default {
       }
       this.profileData = p
     }
+  },
+
+  created() {
+    this.getProfileData();
   },
 
   components: {
