@@ -73,7 +73,7 @@ export default {
     </v-card-title>
     <v-divider></v-divider>
     <v-card-content class="chat-content">
-      <v-list>
+      <v-list style="display: flex; flex-direction: column-reverse">
         <v-list-item v-for="msg in chatsStore.activeChat.messages">
           <v-card
             class="message-card ma-3 pa-2 elevation-3 float-right"
