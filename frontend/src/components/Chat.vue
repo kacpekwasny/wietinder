@@ -3,6 +3,8 @@ import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
+import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue"
+
 
 export default {
   data() {
@@ -10,6 +12,7 @@ export default {
       chatsStore: useChatsStore(),
       accountStore: useUserAccountStore(),
       ChatsListPanelStore: useChatsListPanelStore(),
+      showEmoji: false as boolean,
       content: "",
     };
   },
@@ -28,8 +31,21 @@ export default {
         content: this.content,
       })
 
-    }
+    },
+    toggleEmojiPicker(){
+      this.showEmoji = !this.showEmoji
+    },
+    handleEmojiClick(emoji){
+      this.content = this.content + emoji
+    },
+
   },
+
+
+
+  components: {
+    EmojiPicker
+  }
 };
 </script>
 
@@ -62,14 +78,19 @@ export default {
           </v-card>
         </v-list-item>
       </v-list>
-      
+      <div class ="emoji-picker-card">
+      <EmojiPicker v-if="showEmoji" @emoji_click="handleEmojiClick"></EmojiPicker>
+      </div>
     </v-card-content>
     <v-card class="textarea-card d-flex" >
-      
+        <v-btn icon class="ml-5 mr-3" color="yellow"
+        @click="toggleEmojiPicker">
+          <v-icon>mdi-emoticon-happy</v-icon>
+        </v-btn>
         
         <v-textarea
           prepend-inner-icon="mdi-chat"
-          class="mx-6 resize mt-4 "
+          class="mx-2 resize mt-4 "
           label="Napisz wiadomość"
           rows="1"
           max-rows="4"
@@ -77,10 +98,10 @@ export default {
           auto-grow
           v-model="content"
         ></v-textarea>
-      <v-btn icon class="ml-3 mr-5" color="yellow" float-right
-      @click="sendMessage()">
-        <v-icon>mdi-send</v-icon>
-      </v-btn>
+        <v-btn icon class="ml-3 mr-5" color="yellow" float-right
+        @click="sendMessage()">
+          <v-icon>mdi-send</v-icon>
+        </v-btn>
 
     </v-card>
   </v-card>
@@ -95,5 +116,14 @@ export default {
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); 
   align-items: center;
   z-index: 999;
+}
+.emoji-picker-card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white; /* You can adjust the background color as needed */
+  z-index: 100;
+  max-width: 40%;
 }
 </style>

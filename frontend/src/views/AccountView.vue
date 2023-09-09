@@ -57,6 +57,7 @@ export default {
 
 <template>
   <v-btn
+  icon
   class="v-btn--floating-action v-btn--fab v-btn--fixed ml-2 "
   color="yellow"
   @click = "changeView"
