@@ -1,5 +1,6 @@
 import os
 
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -12,11 +13,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 db = SQLAlchemy()
+socketio = SocketIO()
 
 IS_PROD = os.getenv("IS_PRODUCTION", "false").lower() == "true"
 
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__)
+    
     
     load_dotenv()
 
@@ -59,6 +62,7 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
+
     @login_manager.user_loader
     def load_user(id_: str):
         return User.query.get(int(id_))
@@ -78,6 +82,7 @@ def create_app():
     admin.add_view(make_view(PossibleMatch))
     admin.add_view(make_view(Message))
 
+    socketio.init_app(app, cors_allowed_origins="http://localhost:3000")
     return app
 
 def create_database(db_path: Path, app: Flask):

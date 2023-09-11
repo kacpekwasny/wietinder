@@ -1,11 +1,13 @@
-from flask_socketio import SocketIO, emit
+from flask_socketio import emit
 
-socketio = SocketIO()
+from . import socketio
 
-@socketio.on('new_message')
+
+@socketio.on('send_message')
 def handle_new_message(data):
     # Handle the new message, e.g., save it to the database
-    message = data['message']
+    message = data['content']
+    print(message)
     # ...
 
     # Emit the message to all connected clients

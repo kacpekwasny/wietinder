@@ -1,10 +1,8 @@
-from source import create_app, db
-from flask_socketio import SocketIO
+from source import create_app, db, socketio
 
 
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 def add_users(db):
     from source.models import User

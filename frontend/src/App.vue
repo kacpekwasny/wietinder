@@ -54,7 +54,7 @@ export default {
       <Header />
     </v-app-bar>
     <Drawer />
-    <v-main>
+    <v-main style="height: 100vh;">
       <router-view />
     </v-main>
   </v-app>
