@@ -16,7 +16,7 @@ export default {
   data() {
     return {
       userAccountStore: useUserAccountStore(),
-      dialog:true,
+      dialog:false,
     };
   },
 
