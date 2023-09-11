@@ -1,11 +1,13 @@
-from flask import Blueprint, request
-from flask.wrappers import Response
-from flask_cors import cross_origin
+import jwt as pyjwt
+
+from flask import Blueprint, jsonify, request
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 from ..models import Sex
+from ..config import CONFIG
 from ..tools.response import resp
 
 
@@ -83,7 +85,6 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
 
         """
 
-
     @auth.route('/register', methods=['POST'])
     def register():
         email = request.json.get('email')
@@ -123,7 +124,12 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         login_user(new_user, remember=True)
 
         return resp(200)
-    
+
+    @auth.route('/jwt')
+    @login_required
+    def get_jwt():
+        return jsonify({"jwt": User.refresh_jwt(current_user)})
+
     return auth
 
 

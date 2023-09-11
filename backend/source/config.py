@@ -16,6 +16,12 @@ class Config:
     SECRET_KEY: str
     """ """
 
+    JWT_SECRET: str
+    """ secret for JWT """
+
+    JWT_TIMEOUT: float = 1800
+    """ Time for which JWT is valid represented in seconds """
+
 
 class ConfigDev(Config):
     """Development config to be run on local machine."""
@@ -24,6 +30,8 @@ class ConfigDev(Config):
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
     
     SECRET_KEY = 'asdfjasdi'
+
+    JWT_SECRET = 'apud'
 
 
 class ConfigProd(Config):

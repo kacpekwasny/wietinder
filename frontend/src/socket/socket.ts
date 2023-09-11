@@ -1,7 +1,23 @@
-import { reactive } from "vue";
 import { io } from "socket.io-client";
+import { reactive } from "vue";
+import { defineStore } from 'pinia'
+import { getBackendHostname, getJson } from "@/common/requests";
 
-import {getBackendHostname} from "../common/requests";
+
+export const useSockerStore = defineStore('SocketStore', {
+    state() {
+        return {
+          jwt: "",
+
+        }
+    },
+    actions: {
+      requestJWT() {
+        
+        
+      }
+    },
+})
 
 export const state = reactive({
   connected: false,

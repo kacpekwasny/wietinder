@@ -1,17 +1,21 @@
 import functools
+from flask import g
 from flask_login import current_user
 from flask_socketio import emit, disconnect
 
 from . import socketio
-
+from .models import User
 
 def login_required_sock(f):
     @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        if not current_user.is_authenticated:
-            print('Not authenticated attempt to use websocket.')
+    def wrapped(data, *args, **kwargs):
+        user = User.get_user_by_jwt(data["__flas_auth_jwt"])
+        if user is None:
             return disconnect()
-        return f(*args, **kwargs)
+
+        emit('jwt_refresh', {"jwt", user.refresh_jwt()})
+        g._login_user = user
+        return f(data, *args, **kwargs)
     return wrapped
 
 

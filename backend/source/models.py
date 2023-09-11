@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+from typing import Any, Literal
 import uuid
 import time
+import jwt as pyjwt
 
 from datetime import datetime
 from enum import Enum, EnumType
@@ -11,7 +13,7 @@ from sqlalchemy import event
 from sqlalchemy.schema import DDL
 
 from .agh import AGH_FIELDS_OF_STUDY
-from .config import Config
+from .config import CONFIG
 
 
 from . import db
@@ -19,6 +21,10 @@ from . import db
 EMAIL_LEN: int = 150
 NAME_LEN:  int = 30
 BIO_LEN:   int = 300
+
+
+JWT = dict[Literal["public_id", "time"],
+           str | float | list | dict]
 
 class Sex(Enum):
     male = 'male'
@@ -61,7 +67,7 @@ class User(db.Model, UserMixin):
 
     images = db.Column(db.Text(), default="[]")
     """List of filenames in JSON format."""
-    
+
 
     def possible_matches_all(self):
         return PossibleMatch.query.filter(
@@ -106,6 +112,24 @@ class User(db.Model, UserMixin):
         return json.loads(self.images)
     def set_images(self, images: list[str]) -> list[str]:
         self.images = json.dumps(images)
+
+    def refresh_jwt(self) -> str:
+        return pyjwt.encode({"public_id": self.public_id,
+                                 "time": time.time()},
+                                CONFIG.JWT_SECRET)
+    @classmethod
+    def get_user_by_jwt(cls, jwt: str) -> User:
+        jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET)
+        user = cls.query.filter_by(public_id=jwt["public_id"]).first()
+        if user is None:
+            return None
+        
+        if time.time() - jwt["time"] > CONFIG.JWT_TIMEOUT:
+            return None
+        
+        return user
+    
+
 
     def json(self) -> dict[str, str | list[str]]:
         return {
