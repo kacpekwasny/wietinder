@@ -31,6 +31,7 @@ export default {
         content: this.content,
       });
     },
+
     toggleEmojiPicker() {
       this.showEmoji = !this.showEmoji;
     },
@@ -44,25 +45,28 @@ export default {
         path: "/profile/" + this.chatsStore.activeChat.profile.public_id,
       });
     },
+    clickOutsideEmojiPicker() {
+      if (this.showEmoji) {
+        this.showEmoji = false
+      }
+    }
   },
 
   components: {
     EmojiPicker,
   },
+
+  computed: {},
 };
 </script>
 
 <template>
-  <v-card
-    class="chat-card"
-    v-if="chatsStore.activeChat != null"
-    style="height: 100%; position: relative"
-  >
-    <v-card-title class="ml-6 pa-2 d-flex justify-between align-center">
-      <v-card
-        class="pa-1 pl-2 pr-2 v-btn--elevated pointer"
-        @click="navigateToProfile"
-      >
+  <div id="section" v-if="chatsStore.activeChat != null" class="chat">
+    <v-card-title
+      id="header"
+      class="contact bar ml-6 pa-2 d-flex justify-between align-center"
+    >
+      <v-card class="" @click="navigateToProfile" style="cursor: pointer">
         <v-avatar>
           <v-img
             :src="remoteURL(chatsStore.activeChat.profile.images[0])"
@@ -72,35 +76,45 @@ export default {
       </v-card>
     </v-card-title>
     <v-divider></v-divider>
-    <v-card-content class="chat-content">
-      <v-list style="display: flex; flex-direction: column-reverse">
-        <v-list-item v-for="msg in chatsStore.activeChat.messages">
-          <v-card
-            class="message-card ma-3 pa-2 elevation-3 float-right"
-            style="max-width: 80%"
-            v-if="msg.author == accountStore.accountData.public_id"
+    <v-list class="d-flex flex-column messages" style="flex-direction: column-reverse;">
+      <v-list-item v-for="msg in chatsStore.activeChat.messages">
+        <v-card
+          class="ma-3 pa-2 elevation-4 rounded-lg"
+          :class="{
+            'float-right': msg.author == accountStore.accountData.public_id,
+          }"
+          style="max-width: 80%; position: relative; overflow: visible"
+        >
+          <p
+            class="text-subtitle-2"
+            style="top: -0.8em; position: absolute; z-index: 9999 !important"
           >
-            <p>Ty:</p>
-            <p>{{ msg.message }}</p>
-          </v-card>
-          <v-card
-            v-else
-            class="message-card ma-3 pa-2 elevation-3"
-            style="max-width: 80%"
-          >
-            <p>{{ chatsStore.activeChat.profile.name }}:</p>
-            <p>{{ msg.message }}</p>
-          </v-card>
-        </v-list-item>
-      </v-list>
-      <div class="emoji-picker-card">
-        <EmojiPicker
-          v-if="showEmoji"
-          @emoji_click="handleEmojiClick"
-        ></EmojiPicker>
-      </div>
-    </v-card-content>
-    <v-card class="textarea-card d-flex">
+            {{
+              msg.author == accountStore.accountData.public_id
+                ? "Ty"
+                : chatsStore.activeChat.profile.name
+            }}:
+          </p>
+          <p class="text-caption">{{ msg.message }}</p>
+        </v-card>
+      </v-list-item>
+    </v-list>
+    <!-- Input area -->
+    <v-card
+      class="d-flex align-center elevation-4 ma-2 pa-0"
+      style="
+        flex-basis: 5rem;
+        flex-shrink: 0;
+        overflow: visible;
+        position: relative;
+      "
+    >
+      <EmojiPicker
+        v-if="showEmoji"
+        @emoji_click="handleEmojiClick"
+        v-click-outside="clickOutsideEmojiPicker"
+        style="position: absolute; bottom: 100%; left: 0"
+      ></EmojiPicker>
       <v-btn icon class="ml-5 mr-3" color="yellow" @click="toggleEmojiPicker">
         <v-icon>mdi-emoticon-happy</v-icon>
       </v-btn>
@@ -125,37 +139,35 @@ export default {
         <v-icon>mdi-send</v-icon>
       </v-btn>
     </v-card>
-  </v-card>
+  </div>
 </template>
 
-<style>
-.textarea-card {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  align-items: center;
-  z-index: 999;
-}
-.emoji-picker-card {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: white; /* You can adjust the background color as needed */
-  z-index: 100;
-  max-width: 40%;
-}
-.message-card {
-  background-color: #e0e0e0; /* Background color of the chat bubble */
-  padding: 10px;
-  margin: 10px; /* Add spacing between chat messages */
-  border-radius: 10px; /* Rounded corners for the chat bubble */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
-  word-wrap: break-word; /* Wrap long words to the next line */
-}
+<style lang="scss">
+.chat {
+  position: relative;
 
-.pointer {
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  height: 100%;
+  z-index: 2;
+
+  .contact.bar {
+    flex-basis: 3rem;
+    flex-shrink: 0;
+    margin: 1rem;
+    box-sizing: border-box;
+  }
+
+  .messages {
+    flex-grow: 2;
+    overflow-y: auto;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none; /* Firefox */
+  }
 }
 </style>
