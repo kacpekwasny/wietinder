@@ -47,9 +47,9 @@ export default {
     },
     clickOutsideEmojiPicker() {
       if (this.showEmoji) {
-        this.showEmoji = false
+        this.showEmoji = false;
       }
-    }
+    },
   },
 
   components: {
@@ -62,22 +62,26 @@ export default {
 
 <template>
   <div id="section" v-if="chatsStore.activeChat != null" class="chat">
-    <v-card-title
-      id="header"
-      class="contact bar ml-6 pa-2 d-flex justify-between align-center"
-    >
-      <v-card class="" @click="navigateToProfile" style="cursor: pointer">
-        <v-avatar>
+    <v-card-title id="header">
+      <div
+        class="contact bar ml-6 ma-1 pa-1 d-flex justify-between align-center elevation-5 rounded-sm"
+        @click="navigateToProfile"
+        style="cursor: pointer; width: fit-content"
+      >
+        <v-avatar class="mr-2">
           <v-img
             :src="remoteURL(chatsStore.activeChat.profile.images[0])"
           ></v-img>
         </v-avatar>
         {{ chatsStore.activeChat.profile.name }}
-      </v-card>
+      </div>
     </v-card-title>
     <v-divider></v-divider>
-    <v-list class="d-flex flex-column messages" style="flex-direction: column-reverse;">
-      <v-list-item v-for="msg in chatsStore.activeChat.messages">
+    <v-list class="d-flex scroll-nobar" style="flex-direction: column-reverse">
+      <v-list-item
+        v-for="msg in chatsStore.activeChat.messages"
+        style="overflow-anchor: none"
+      >
         <v-card
           class="ma-3 pa-2 elevation-4 rounded-lg"
           :class="{
@@ -87,7 +91,11 @@ export default {
         >
           <p
             class="text-subtitle-2"
-            style="top: -0.8em; position: absolute; z-index: 9999 !important"
+            style="
+              top: -0.8em;
+              left: 0.1rem;
+              position: absolute;
+            "
           >
             {{
               msg.author == accountStore.accountData.public_id
@@ -97,13 +105,14 @@ export default {
           </p>
           <p class="text-caption">{{ msg.message }}</p>
         </v-card>
+        <div style="overflow-anchor: auto; height: 1px"></div>
       </v-list-item>
     </v-list>
     <!-- Input area -->
     <v-card
       class="d-flex align-center elevation-4 ma-2 pa-0"
       style="
-        flex-basis: 5rem;
+        flex-basis: 4.3rem;
         flex-shrink: 0;
         overflow: visible;
         position: relative;
@@ -113,31 +122,34 @@ export default {
         v-if="showEmoji"
         @emoji_click="handleEmojiClick"
         v-click-outside="clickOutsideEmojiPicker"
-        style="position: absolute; bottom: 100%; left: 0"
+        style="position: absolute; bottom: 100%; right: 0"
       ></EmojiPicker>
-      <v-btn icon class="ml-5 mr-3" color="yellow" @click="toggleEmojiPicker">
-        <v-icon>mdi-emoticon-happy</v-icon>
-      </v-btn>
-
       <v-textarea
         prepend-inner-icon="mdi-chat"
-        class="mx-2 resize mt-4"
+        class="ma-2"
         label="Napisz wiadomość"
         rows="1"
-        max-rows="4"
-        style="width: 100%"
+        max-rows="8"
+        style="width: 40rem"
         auto-grow
         v-model="content"
+        hide-details
       ></v-textarea>
-      <v-btn
-        icon
-        class="ml-3 mr-5"
-        color="yellow"
-        float-right
-        @click="sendMessage()"
-      >
-        <v-icon>mdi-send</v-icon>
-      </v-btn>
+      <div class="d-sm-flex flex-row">
+        <v-btn
+          icon
+          class="ma-1 float-right"
+          color="yellow"
+          float-right
+          @click="sendMessage()"
+        >
+          <v-icon>mdi-send</v-icon>
+        </v-btn>
+        <v-btn icon class="ma-1 float-right" color="yellow" @click="toggleEmojiPicker">
+          <v-icon>mdi-emoticon-happy</v-icon>
+        </v-btn>
+
+      </div>
     </v-card>
   </div>
 </template>
@@ -160,7 +172,7 @@ export default {
     box-sizing: border-box;
   }
 
-  .messages {
+  .scroll-nobar {
     flex-grow: 2;
     overflow-y: auto;
     /* Hide scrollbar for Chrome, Safari and Opera */
