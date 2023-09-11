@@ -13,6 +13,7 @@ export default {
             accountStore: useUserAccountStore(),
             other_user_public_id: "",
             profilesChoiceMade: [] as string[],
+            noPossibleMatches: false as boolean,
 
             profileData: {
                 name: "",
@@ -43,6 +44,11 @@ export default {
                 let response = await getJson("/matches-undecided")
                 let json = await response.json();
                 this.possibleMatches = json
+                if (this.possibleMatches.length==0){
+                    this.noPossibleMatches = true
+                } else {
+                    this.noPossibleMatches = false
+                }
             }
         },
 
@@ -74,30 +80,42 @@ export default {
 </script>
 
 <template>
-    <Profile :profile-data="profileData"></Profile>
-    <v-bottom-navigation 
-        style="height: 60px;"
-        :elevation="15"
-        grow>
-        <v-btn 
-        value="dislike" 
-        class="mr-4"
-        @click = "updateChoice('dislike')"
+    <v-card-text class="text-h4 mt-3 text-center"> Swipe </v-card-text>
+    <v-card class="text-cetner" v-if="noPossibleMatches">
+        <v-alert
+        icon="mdi-information"
+        dense
+        outlined
         >
-        <v-icon>mdi-close-circle</v-icon>
+        Nie mamy więcej propozycji dla ciebie. Wróć po więcej później.
+        </v-alert>
+    </v-card>
+    <v-card v-else>
+        <Profile :profile-data="profileData"></Profile>
+        <v-bottom-navigation 
+            style="height: 60px;"
+            :elevation="15"
+            grow>
+            <v-btn 
+            value="dislike" 
+            class="mr-4"
+            @click = "updateChoice('dislike')"
+            >
+            <v-icon>mdi-close-circle</v-icon>
 
-        <span>Odrzuć</span>
-        </v-btn>
+            <span>Odrzuć</span>
+            </v-btn>
 
-        <v-btn 
-        value="like" 
-        class="mr-4"
-        @click = "updateChoice('like')"
-        >
-        <v-icon>mdi-heart-circle</v-icon>
+            <v-btn 
+            value="like" 
+            class="mr-4"
+            @click = "updateChoice('like')"
+            >
+            <v-icon>mdi-heart-circle</v-icon>
 
-        <span>Polub</span>
-        </v-btn>
-    </v-bottom-navigation>
+            <span>Polub</span>
+            </v-btn>
+        </v-bottom-navigation>
+    </v-card>
 </template>
   
