@@ -5,6 +5,7 @@ import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue"
 import { onMounted } from "vue";
+import {state, socket} from '../socket/socket'
 
 
 export default {
@@ -53,18 +54,13 @@ export default {
       }
     },
   },
+  mounted() {
+    socket.emit('send_message', { content: 'Hello from Vue component!' })
+    console.log('emited send messsage')
+
+  },
   setup() {
-    // Access the VueSocketIO instance via this.$socket
-    const socket = this.$socket
-
-    // Example: Emit a WebSocket event when the component is mounted
     onMounted(() => {
-      socket.emit('my_custom_event', { data: 'Hello from Vue component!' })
-    })
-
-    // Example: Listen for WebSocket events
-    socket.on('message_received', (data) => {
-      console.log('Received a WebSocket message:', data.message)
     })
   },
 
