@@ -3,6 +3,7 @@ import useValidate from "@vuelidate/core";
 import { email, required, minLength, helpers } from "@vuelidate/validators";
 import { postJson } from "../common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
+import AlredyLoggedInVue from "@/components/AlredyLoggedIn.vue";
 
 
 
@@ -16,6 +17,8 @@ export default {
       IS_PROD,
 
       v$: useValidate(),
+
+      userAccountStore: useUserAccountStore(),
 
       registerForm: {
         nameField: "",
@@ -146,11 +149,16 @@ export default {
       this.$router.push({ path: "/login" });
     },
   },
+
+  components: {
+    AlredyLoggedInVue
+  }
 };
 </script>
 
 <template>
-  <v-container fluid class="d-flex flex-column" style="width: fit-content">
+  <alredy-logged-in-vue v-if="this.userAccountStore.loggedIn"></alredy-logged-in-vue>
+  <v-container v-else fluid class="d-flex flex-column" style="width: fit-content">
     <v-card class="pa-4">
       <v-card-text class="text-h3 mb-8 text-center"> Rejestracja </v-card-text>
       <v-form v-on:keydown.enter="submitForm">

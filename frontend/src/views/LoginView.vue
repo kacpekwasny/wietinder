@@ -5,6 +5,7 @@ import { email, required } from "@vuelidate/validators";
 
 import { postJson } from "../common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
+import AlredyLoggedIn from "@/components/AlredyLoggedIn.vue";
 
 export default defineComponent({
   setup() {
@@ -14,6 +15,7 @@ export default defineComponent({
   },
   data() {
     return {
+      userAccountStore: useUserAccountStore(),
       showModal: false,
       emailField: "",
       passwordField: "",
@@ -59,11 +61,16 @@ export default defineComponent({
       this.passwordServerErrors = [];
     },
   },
+
+  components: {
+    AlredyLoggedIn
+  }
 });
 </script>
 
 <template>
-  <v-container fluid class="d-flex flex-column" style="width: fit-content">
+  <alredy-logged-in v-if="this.userAccountStore.loggedIn"></alredy-logged-in>
+  <v-container v-else fluid class="d-flex flex-column" style="width: fit-content">
     <v-card class="pa-4">
       <v-card-text class="text-h3 mb-8 text-center"> Logowanie </v-card-text>
       <v-form v-on:keydown.enter="submitForm">
