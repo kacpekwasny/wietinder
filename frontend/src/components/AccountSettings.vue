@@ -30,6 +30,8 @@ export default {
           return;
         },
       ] as ValidationRule[],
+      rulesBio:[v => v.length <= 500 || 'Musisz zmieścić swoje życie w 500 znakach'],
+
       allPossibleFieldsOfStudyAGH: [] as string[],
       css: {
         dispImgMaxHeight: "150px",
@@ -139,10 +141,11 @@ export default {
      
        
 <v-textarea
-  hide-details
+  counter
   class="elevation-3 rounded"
   label="Opis profilu"
   v-model="accountData.bio"
+  :rules="rulesBio"
 ></v-textarea>
 
 

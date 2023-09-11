@@ -51,24 +51,50 @@ export default {
       ];
       return items;
     },
+    shouldShowArrows(){
+      return this.profileData.images.length > 1 ? true : false;
+    },
+    
+   
+  },
+  methods:{
     backendHostname() {
       return getBackendHostname();
     },
-  },
+    remoteURL(imageName: string) {
+      return `${getBackendHostname()}/uploads/${imageName}`;
+    },
+   
+  }
 };
 </script>
 
 <template>
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
     <v-card class="pa-2 mb-4 elevation-6">
-      <v-img
-        :src="`http://localhost:5000/uploads/${profileData.images[0]}`"
-        max-height="480px"
-        class="align-end"
-      >
-        <div class="text-h4">{{ profileData.name }}</div>
-        <div class="text-caption">{{ profileData.bio }}</div>
-      </v-img>
+      <v-carousel hide-delimiters :show-arrows="shouldShowArrows">
+        <v-carousel-item
+        v-for="(image) in profileData.images"
+        :key="image"
+        :src="remoteURL(image)"
+        eager
+        >
+        <v-img
+          :src="remoteURL(image)"
+          max-height="480px"
+          class="align-end"
+          eager
+
+          > 
+          <div class="text-h4">{{ profileData.name }}</div>
+          <div class="text-caption">{{ profileData.bio }}</div>
+        </v-img>
+
+        </v-carousel-item>
+        
+      </v-carousel>
+      
+       
     </v-card>
     <v-expansion-panels>
       <v-expansion-panel>

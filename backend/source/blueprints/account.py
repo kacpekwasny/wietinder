@@ -33,6 +33,10 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     def post_account_data():
         j: dict = request.json
         j.pop("sex", None)
+        
+        if len(j.get("bio")) > 500:
+            return resp(400, 'bio_too_long')
+
         try:
             User.set_from_json(current_user, **j)
 
