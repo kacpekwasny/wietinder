@@ -3,7 +3,9 @@ import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
-import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue";
+import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue"
+import { onMounted } from "vue";
+
 
 export default {
   data() {
@@ -50,6 +52,20 @@ export default {
         this.showEmoji = false;
       }
     },
+  },
+  setup() {
+    // Access the VueSocketIO instance via this.$socket
+    const socket = this.$socket
+
+    // Example: Emit a WebSocket event when the component is mounted
+    onMounted(() => {
+      socket.emit('my_custom_event', { data: 'Hello from Vue component!' })
+    })
+
+    // Example: Listen for WebSocket events
+    socket.on('message_received', (data) => {
+      console.log('Received a WebSocket message:', data.message)
+    })
   },
 
   components: {

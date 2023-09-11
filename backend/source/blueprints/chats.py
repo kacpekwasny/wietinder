@@ -4,8 +4,9 @@ from flask_cors import cross_origin
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from ..socket_events import socketio
 from ..tools.response import resp
+
 
 MAX_MESSAGES_AT_ONCE = 50
 
