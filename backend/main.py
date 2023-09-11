@@ -1,6 +1,10 @@
 from source import create_app, db
+from flask_socketio import SocketIO
+
+
 
 app = create_app()
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 def add_users(db):
     from source.models import User
@@ -62,4 +66,4 @@ if __name__ == '__main__':
         make_everyone_like_each_other(db)
         make_dummy_messages(db)
 
-    app.run(debug=True, port=5000)
+    socketio.run(app, debug=True, port=5000)
