@@ -4,7 +4,6 @@ import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue"
-import { onMounted } from "vue";
 import {state, socket} from '../socket/socket'
 
 
@@ -55,13 +54,12 @@ export default {
     },
   },
   mounted() {
-    socket.emit('send_message', { content: 'Hello from Vue component!' })
-    console.log('emited send messsage')
+    socket.emit('get-chats-list', {})
+    console.log('emited get-chat-list')
 
   },
   setup() {
-    onMounted(() => {
-    })
+
   },
 
   components: {
@@ -99,7 +97,7 @@ export default {
           :class="{
             'float-right': msg.author == accountStore.accountData.public_id,
           }"
-          style="max-width: 80%; position: relative; overflow: visible"
+          style="width: fit-content; min-width: 2rem;; max-width: 80%; position: relative; overflow: visible"
         >
           <p
             class="text-subtitle-2"
@@ -122,7 +120,7 @@ export default {
     </v-list>
     <!-- Input area -->
     <v-card
-      class="d-flex align-center elevation-4 ma-2 pa-0"
+      class="d-flex align-center elevation-4 ma-2 pa-0 mt-0"
       style="
         flex-basis: 4.3rem;
         flex-shrink: 0;

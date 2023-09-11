@@ -14,7 +14,7 @@ export const useChatsStore = defineStore('ChatsStore', {
     },
     actions: {
         async fetchChats() {
-            const resp = await getJson('/chats')
+            const resp = await getJson('/chats-list')
             const chats: Chat[] = await resp.json()
             chats.sort((ch1, ch2) => (ch1.messages[0].timestamp + ch2.messages[0].timestamp))
             chats.forEach(ch => {

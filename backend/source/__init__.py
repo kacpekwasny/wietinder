@@ -82,7 +82,7 @@ def create_app() -> Flask:
     admin.add_view(make_view(PossibleMatch))
     admin.add_view(make_view(Message))
 
-    socketio.init_app(app, cors_allowed_origins="http://localhost:3000")
+    socketio.init_app(app, cors_allowed_origins="http://localhost:3000", manage_session=True)
     return app
 
 def create_database(db_path: Path, app: Flask):

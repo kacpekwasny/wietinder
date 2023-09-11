@@ -22,9 +22,10 @@ socket.on("disconnect", () => {
   console.log('disconnect')
 });
 
-socket.on("foo", (...args) => {
+socket.on("chats-list", (...args) => {
   state.fooEvents.push(args);
-  console.log('foo')
+  console.log('chats-list')
+  console.log(args)
 });
 
 socket.on("bar", (...args) => {

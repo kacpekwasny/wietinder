@@ -1,11 +1,15 @@
+import functools
 from flask import Blueprint, request
 from flask.wrappers import Response
 from flask_cors import cross_origin
 from flask_login import login_user, current_user, logout_user, login_required
+from flask_socketio import emit, disconnect
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from ..socket_events import socketio
 from ..tools.response import resp
+
 
 
 MAX_MESSAGES_AT_ONCE = 50
@@ -16,8 +20,7 @@ def get_chats_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
     chats = Blueprint('chats', __name__)
 
 
-    @chats.route('/chats', methods=['GET'])
-    @login_required
+    @chats.route('/chats-list', methods=['GET'])
     def get_chats():
         return [
             {
@@ -27,6 +30,11 @@ def get_chats_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
 
             for m in User.my_matches(current_user)
         ]
+
+    @socketio.on('get-chats-list')
+    def get_chats_sock():
+        print('get-chats-list')
+        emit('chats-list', 'adw')
 
 
     @chats.route('/more-messages/<public_id>/<int:index_start>/<int:index_end>', methods=['GET'])
