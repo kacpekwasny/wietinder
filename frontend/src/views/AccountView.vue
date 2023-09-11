@@ -8,7 +8,7 @@ export default {
   data() {
     return {
       showProfile: false as boolean,
-
+      dialog: false as boolean,
       profilesStore: useProfilesStore(),
       userAccountStore: useUserAccountStore(),
 
@@ -40,6 +40,13 @@ export default {
       }
       this.profileData = p;
     },
+
+    hasUserImages(){
+      if (this.profileData.images.length == 0) {
+        return this.dialog=true
+      }
+      return this.dialog=false
+    }
   },
 
   async created() {
@@ -68,6 +75,7 @@ export default {
   </v-btn>
 
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
+  
     <Profile :profile-data="profileData" v-if="showProfile"></Profile>
     <AccountSettings v-else></AccountSettings>
   </v-container>
