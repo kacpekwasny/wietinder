@@ -41,6 +41,10 @@ export const useChatsStore = defineStore('ChatsStore', {
 
         makeActive(publicId: string) {
             this.activeChat = this._chats.get(publicId)
+        },
+
+        getChat(publicId: string): Chat {
+            return this._chats.get(publicId)
         }
 
     },

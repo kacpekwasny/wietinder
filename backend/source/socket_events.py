@@ -1,40 +1,43 @@
 import functools
-from flask import g
-from flask_login import current_user
-from flask_socketio import emit, disconnect
+from typing import Literal
+from flask_socketio import emit, disconnect, join_room
 
 from . import socketio
 from .models import User
 
+AUTH_KEY_JWT_WS = "__flask_auth_jwt_ws"
+
 def login_required_sock(f):
     @functools.wraps(f)
-    def wrapped(data, *args, **kwargs):
-        user = User.get_user_by_jwt(data["__flas_auth_jwt"])
+    def wrapped(auth: dict[Literal["jwt"], str], *args, **kwargs):
+        print(999)
+        print(auth)
+        print(args)
+        print(kwargs)
+        print(888)
+        jwt = auth.get(AUTH_KEY_JWT_WS, None)
+        if jwt is None:
+            return disconnect()
+        user = User.get_user_by_jwt(jwt)
         if user is None:
+            print(f'jwt invalid {jwt=}')
             return disconnect()
 
-        emit('jwt_refresh', {"jwt", user.refresh_jwt()})
-        g._login_user = user
-        return f(data, *args, **kwargs)
+        emit('jwt_refresh', {"jwt": user.refresh_jwt()})
+        return f(user, *args, **kwargs)
     return wrapped
 
 
+@socketio.on('enter_my_room')
+@login_required_sock
+def enter_my_room_sock(user: User, *data: dict):
+    join_room(user.public_id)
+    return emit('enter_my_room', {'ok': True})
 
-
-@socketio.on('send_message')
-def handle_new_message(data):
-    # Handle the new message, e.g., save it to the database
-    message = data['content']
-    print(message)
-    # ...
-
-    # Emit the message to all connected clients
-    emit('message_received', {'message': message}, broadcast=True)
 
 @socketio.on('connect')
-@login_required_sock
 def handle_connect():
-    print(f'{current_user.name} connected')
+    print(f'A user connected')
     
 
 @socketio.on('disconnect')

@@ -50,7 +50,7 @@ def create_app() -> Flask:
     app.register_blueprint(get_account_bp(db, UPLOADS_DIR))
     app.register_blueprint(get_match_bp(db))
     app.register_blueprint(get_data_bp())
-    app.register_blueprint(get_chats_bp(db))
+    app.register_blueprint(get_chats_bp(db, socketio))
 
 
     from .models import User, PossibleMatch, Message

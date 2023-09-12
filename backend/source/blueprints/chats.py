@@ -1,20 +1,32 @@
 import functools
+import time
 from flask import Blueprint, request
-from flask.wrappers import Response
-from flask_cors import cross_origin
-from flask_login import login_user, current_user, logout_user, login_required
-from flask_socketio import emit, disconnect
+from flask_socketio import SocketIO, join_room, leave_room, emit, rooms
+from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 
-from ..socket_events import socketio
+from ..socket_events import login_required_sock
+
 from ..tools.response import resp
 
 
 
 MAX_MESSAGES_AT_ONCE = 50
 
-def get_chats_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
+def reply(data: dict={}, ok: bool=True, msg: str="") -> dict:
+    return data | {
+        "ok": ok,
+
+        # how to make something super simple, complicated
+        "msg": {
+            (True, ''):  'ok',
+            (False, ''): 'error',
+        }.get((ok, msg), msg),
+    }
+
+
+
+def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blueprint:
     from ..models import User, Message, PossibleMatch
 
     chats = Blueprint('chats', __name__)
@@ -69,10 +81,37 @@ def get_chats_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
 
         return resp(200)
 
-    
 
+    @socketio.on('server_message')
+    @login_required_sock
+    def send_message_sock(user: User, *data: dict):
+        data = data[0]
+        print(data)
+        recepient_id = data["recepient_public_id"]
+        author_id    = user.public_id
 
-            
+        print('send message:', data, user)
+
+        pm = PossibleMatch.get_match(author_id, recepient_id)
+        if pm is None:
+            print('Attempted to send message to a nonexistent match.')
+            return
+
+        msg: Message = Message(
+            possible_match_id=pm.id,
+            author=author_id,
+            timemstamp=time.time(),
+            message=data['content']
+        )
+        msg_json = msg.json() | {"recepient_id": recepient_id}
+
+        emit('client_message',
+            msg_json,
+            room=[recepient_id, author_id],
+        )
+        db.session.add(msg)
+        db.session.commit()
+
     return chats
 
 

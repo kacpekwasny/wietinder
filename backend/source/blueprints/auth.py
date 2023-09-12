@@ -125,7 +125,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
 
         return resp(200)
 
-    @auth.route('/jwt')
+    @auth.route('/refresh-jwt')
     @login_required
     def get_jwt():
         return jsonify({"jwt": User.refresh_jwt(current_user)})

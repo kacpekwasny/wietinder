@@ -6,6 +6,8 @@ import router from "./router";
 import { useUserAccountStore } from "./stores/AccountDataStore";
 import { usePanelStore } from "./stores/SidePanelStore";
 import { mapState } from "pinia";
+import { useSocketStore } from "./socket/socket";
+import { useChatsStore } from "./stores/ChatsStore";
 
 export default {
   name: "App",
@@ -13,13 +15,21 @@ export default {
     Header,
     Drawer,
   },
+  
   data() {
     return {
       userAccountStore: useUserAccountStore(),
-      dialog:false,
+      chatsStore:       useChatsStore(),
+      socketStore:      useSocketStore(),
+      dialog:           false,
     };
   },
 
+  async created() {
+    this.socketStore.refreshJWT()
+    this.socketStore.openConnectionToMyRoom()
+    this.socketStore.keepConnectionToMyRoom()
+  },
   watch: {
     $route: async function (to, from) {
       
