@@ -124,6 +124,12 @@ export default {
       }
       return true
     },
+    configurationToUploadValid(){
+      if(this.userAccountStore.accountData.images.length==0 || this.accountData.bio.length > 500){
+        return false
+      } 
+      return true
+    }
   },
 
   async created() {
@@ -311,7 +317,7 @@ draggable became a column of width 2/12 I think, and as such its children became
   </v-card>
 </v-col>
 </v-row>
-<v-btn color="yellow" class="mt-5 float-right" @click="sendAccountData()"
+<v-btn color="yellow" class="mt-5 float-right" @click="sendAccountData() " :disabled="!configurationToUploadValid"
 >Zapisz zmiany!</v-btn
 >
 </v-card>
