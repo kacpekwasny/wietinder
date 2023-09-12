@@ -10,7 +10,7 @@ import AlredyLoggedInVue from "@/components/AlredyLoggedIn.vue";
 
 export default {
   data() {
-    const IS_PROD = String(import.meta.env.VITE_IS_PRODUCTION).toLowerCase() === "true"
+    const IS_PROD = String(import.meta.env.VITE_IS_PROD).toLowerCase() === "true"
     console.info(`IS_PROD = ${IS_PROD}`);
 
     return {

@@ -34,12 +34,12 @@ class ConfigDev(Config):
     JWT_SECRET = 'apud'
 
 
-class ConfigProd(Config):
+class ConfigProd(ConfigDev):
     """Production config to be run on server."""
 
-    SQLALCHEMY_DATABASE_URI = f'mysql:///127.0.0.1 costam costam'
+    # SQLALCHEMY_DATABASE_URI = f'mysql:///127.0.0.1 costam costam'
     
-    SECRET_KEY = 'o87gouyvi65divuio6fb cu6f7'
+    # SECRET_KEY = 'o87gouyvi65divuio6fb cu6f7'
 
 
 
