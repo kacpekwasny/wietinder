@@ -35,11 +35,12 @@ export default {
     $route: async function (to, from) {
       
       await this.userAccountStore.refreshUserData();
+       
       if (!this.userAccountStore.loggedIn) {
-        if (!this.$route.name.startsWith("/register")) {
-          if (to.name.startsWith("/register")) {
-            return router.push("/login");
-          }
+        if (to.name === "register") {
+          return; 
+        } else {
+          return router.push("/login");
         }
       }
 
