@@ -15,10 +15,7 @@ const router = createRouter ({
             name: "login",
             component: LoginView
         },
-        {
-            path: "/:catchAll(.*)",
-            redirect: "/"
-        },
+       
         {
             path: "/home",
             redirect: "/"
@@ -56,6 +53,10 @@ const router = createRouter ({
             path: "/chats",
             name: "chats",
             component: ChatsView
+        },
+        {
+            path: "/:catchAll(.*)",
+            redirect: "/"
         },
     ]
 })

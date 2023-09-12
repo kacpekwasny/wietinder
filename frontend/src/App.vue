@@ -34,9 +34,10 @@ export default {
   watch: {
     $route: async function (to, from) {
       
-      await this.userAccountStore.refreshUserData();
+      await this.userAccountStore.refreshUserData(true);
        
       if (!this.userAccountStore.loggedIn) {
+        console.log(!this.userAccountStore.loggedIn)
         if (to.name === "register") {
           return; 
         } else {
