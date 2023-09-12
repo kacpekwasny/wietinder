@@ -115,9 +115,9 @@ class User(db.Model, UserMixin):
 
     def refresh_jwt(self) -> str:
         return pyjwt.encode({"public_id": self.public_id,
-                                 "time": time.time()},
-                                CONFIG.JWT_SECRET,
-                                algorithm="HS256")
+                             "time": time.time()},
+                              CONFIG.JWT_SECRET,
+                              algorithm="HS256")
     @classmethod
     def get_user_by_jwt(cls, jwt: str) -> User:
         jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET, algorithms=["HS256"])

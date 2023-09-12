@@ -1,6 +1,6 @@
 import functools
 from typing import Literal
-from flask_socketio import emit, disconnect
+from flask_socketio import emit, disconnect, join_room
 
 from . import socketio
 from .models import User
@@ -10,6 +10,11 @@ AUTH_KEY_JWT_WS = "__flask_auth_jwt_ws"
 def login_required_sock(f):
     @functools.wraps(f)
     def wrapped(auth: dict[Literal["jwt"], str], *args, **kwargs):
+        print(999)
+        print(auth)
+        print(args)
+        print(kwargs)
+        print(888)
         jwt = auth.get(AUTH_KEY_JWT_WS, None)
         if jwt is None:
             return disconnect()
@@ -21,6 +26,13 @@ def login_required_sock(f):
         emit('jwt_refresh', {"jwt": user.refresh_jwt()})
         return f(user, *args, **kwargs)
     return wrapped
+
+
+@socketio.on('enter_my_room')
+@login_required_sock
+def enter_my_room_sock(user: User, *data: dict):
+    join_room(user.public_id)
+    return emit('enter_my_room', {'ok': True})
 
 
 @socketio.on('connect')

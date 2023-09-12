@@ -1,13 +1,9 @@
 import functools
 import time
 from flask import Blueprint, request
-from flask.wrappers import Response
-from flask_socketio import SocketIO, join_room, leave_room
-from flask_cors import cross_origin
-from flask_login import login_user, current_user, logout_user, login_required
-from flask_socketio import emit, disconnect
+from flask_socketio import SocketIO, join_room, leave_room, emit, rooms
+from flask_login import login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 
 from ..socket_events import login_required_sock
 
@@ -28,9 +24,6 @@ def reply(data: dict={}, ok: bool=True, msg: str="") -> dict:
         }.get((ok, msg), msg),
     }
 
-def room_name(pid1: str, pid2: str) -> str:
-    print(pid1, pid2)
-    return ''.join(sorted([pid1, pid2]))
 
 
 def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blueprint:
@@ -88,45 +81,33 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
 
         return resp(200)
 
-    @socketio.on('join_room')
-    @login_required_sock
-    def join_room_sock(user: User, *data: dict):
-        data = data[0]
-        author_id    = user.public_id
-        recepient_id = data["recepient_public_id"]
-        pm = PossibleMatch.get_match(author_id, recepient_id)
-        if pm is None:
-            return emit('join_room', reply(ok=False, msg="not_a_pair"))
-        join_room(room_name(author_id, recepient_id))
-        return emit('join_room', reply(ok=True))
-
-    @socketio.on('leave_room')
-    @login_required_sock
-    def leave_room_sock(user: User, *data: dict):
-        data = data[0]
-        author_id    = user.public_id
-        recepient_id = data["recepient_public_id"]
-        leave_room(room_name(author_id, recepient_id))
-        return emit('leave_room', reply(ok=True))
-
 
     @socketio.on('server_message')
     @login_required_sock
     def send_message_sock(user: User, *data: dict):
         data = data[0]
+        print(data)
         recepient_id = data["recepient_public_id"]
         author_id    = user.public_id
+
         print('send message:', data, user)
+
         pm = PossibleMatch.get_match(author_id, recepient_id)
+        if pm is None:
+            print('Attempted to send message to a nonexistent match.')
+            return
+
         msg: Message = Message(
             possible_match_id=pm.id,
             author=author_id,
             timemstamp=time.time(),
             message=data['content']
         )
+        msg_json = msg.json() | {"recepient_id": recepient_id}
+
         emit('client_message',
-            msg.json() | {"recepient_id": recepient_id},
-            room=room_name(author_id, recepient_id),
+            msg_json,
+            room=[recepient_id, author_id],
         )
         db.session.add(msg)
         db.session.commit()

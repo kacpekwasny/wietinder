@@ -5,6 +5,7 @@ import { getBackendHostname, getJson } from "@/common/requests";
 import { throwStatement } from "@babel/types";
 import { Message, useChatsStore } from "@/stores/ChatsStore";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
+import { timer } from "@/common/timer";
 
 
 const AUTH_KEY_JWT_WS = '__flask_auth_jwt_ws'
@@ -15,7 +16,7 @@ export const useSocketStore = defineStore('SocketStore', {
           jwt: "",
           messages: [],
           socket: null as Socket,
-          connected: false,
+          tryConnected: false,
         }
     },
     actions: {
@@ -27,35 +28,43 @@ export const useSocketStore = defineStore('SocketStore', {
         this.jwt = (await resp.json())["jwt"]
       },
 
-      async openSocket() {
-        await this.refreshJWT()
-        if (this.connected) {
-          return
+      openConnectionToMyRoom() {
+        this.socket = io(getBackendHostname())
+        this._emit_with_jwt('enter_my_room')
+      },
+
+      async keepConnectionToMyRoom() {
+        this.tryConnected = true
+        
+        if (this.socket.connected) {
+          return await this.emit('enter_my_room')
         }
 
-        this.socket = io(getBackendHostname());
+        this.socket.on("connect", () => {
+          (async () => {
+            console.log('background job running!')
+            while (this.tryConnected) {
+              while (this.socket?.connected) {
+                await timer(15000);
+                this.emit('enter_my_room')
+              }
+              this.openConnectionToMyRoom()
+            }
+            console.log('background job exiting!', this.socket.connected)
+          })()
+        });
+        
+        this.socket.on("disconnect", async () => {
+          await this.refreshJWT()
+          console.log('disconnect')
+        });
 
         const chatsStore = useChatsStore()
         const userAccountStore = useUserAccountStore()
 
-        this.socket.on("connect", () => {
-          this.connected = true;
-          (async () => {
-            console.log('background job running!')
-            while (this.connected) {
-              await new Promise(r => setTimeout(r, 15_000));
-              this.emit('background_keep_alive')
-            }
-            console.log('background job exiting!', this.connected)
-          })()
-        });
-        
-        this.socket.on("disconnect", () => {
-          this.connected = false;
-          console.log('disconnect')
-        });
-        
         this.socket.on("client_message", (...args) => {
+          console.log("client message")
+          console.log(args)
           const msg: Message = args[0]
           let chat = undefined
           if (msg.author === userAccountStore.accountData.public_id) {
@@ -75,8 +84,8 @@ export const useSocketStore = defineStore('SocketStore', {
           this.jwt = jwt.jwt
         });
 
-        this.socket.on("join_room", (...args) => {
-          console.log("received join_room")
+        this.socket.on("enter_my_room", (...args) => {
+          console.log("Entered my room.")
           console.log(args)
         })
       },
@@ -86,9 +95,10 @@ export const useSocketStore = defineStore('SocketStore', {
           console.log('emit', key)
           console.log(data)
         }
-        if (!this.connected) {
-          await this.openSocket()
-        }
+        this._emit_with_jwt(key, ...data)
+      },
+
+      _emit_with_jwt(key: string, ...data: any[]) {
         this.socket.emit(key,
           {[AUTH_KEY_JWT_WS]: this.jwt},
           ...data)

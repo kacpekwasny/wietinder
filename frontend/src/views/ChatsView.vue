@@ -18,24 +18,6 @@ export default {
   async created() {
     await this.chatsStore.fetchChats();
     this.chatsStore.makeActive(this.chatsStore.toList()[0].profile.public_id);
-
-    await this.socketStore.openSocket();
-
-    this.chatsStore.$subscribe(async (mutation, state) => {
-      if (state.activeChat.profile.public_id === this.joinedRoom) {
-        return;
-      }
-      if (state.activeChat.profile.public_id !== "") {
-        await this.socketStore.emit("leave_room", {
-          recepient_public_id: this.joinedRoom,
-        });
-      }
-
-      await this.socketStore.emit("join_room", {
-        recepient_public_id: this.chatsStore.activeChat.profile.public_id,
-      });
-      this.joinedRoom = this.chatsStore.activeChat.profile.public_id;
-    });
   },
   components: { Chat },
 };
