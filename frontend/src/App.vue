@@ -21,6 +21,7 @@ export default {
       userAccountStore: useUserAccountStore(),
       chatsStore:       useChatsStore(),
       socketStore:      useSocketStore(),
+      dialog:           false,
     };
   },
 
@@ -40,6 +41,11 @@ export default {
           }
         }
       }
+
+      if (this.userAccountStore.accountData.images.length == 0 && this.userAccountStore.loggedIn){
+        this.dialog = true
+        return router.push("/account")
+      }
     },
   },
   methods: {
@@ -56,6 +62,19 @@ export default {
 
 <template>
   <v-app>
+    <v-dialog
+      v-model="dialog"
+      width="auto"
+    >
+      <v-card>
+        <v-card-text>
+          Musisz dodać przynajmniej jedno zdjęcie!
+        </v-card-text>
+        <v-card-actions>
+          <v-btn block @click="dialog = false">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-app-bar app density="compact">
       <v-app-bar-nav-icon
         v-if="loggedIn"

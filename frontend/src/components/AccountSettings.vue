@@ -122,7 +122,7 @@ export default {
         return false
       }
       return true
-    }
+    },
   },
 
   async created() {
@@ -234,7 +234,7 @@ draggable became a column of width 2/12 I think, and as such its children became
   </template>
 </draggable>
 <div v-else class="ma-1 text-subtitle-1">
-  Nie masz jeszcze obrazów do wyświetlania. Dodaj używając opcji
+  Musisz mieć conajmniej jedno zdjęcie! Dodaj używając opcji
   powyżej.
 </div>
 </div>
