@@ -120,13 +120,16 @@ class User(db.Model, UserMixin):
                               algorithm="HS256")
     @classmethod
     def get_user_by_jwt(cls, jwt: str) -> User:
-        jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET, algorithms=["HS256"])
+        try:
+            jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET, algorithms=["HS256"])
+        except pyjwt.exceptions.DecodeError:
+            return None
+        
         user = cls.query.filter_by(public_id=jwt["public_id"]).first()
         if user is None:
             return None
         
         if time.time() - jwt["time"] > CONFIG.JWT_TIMEOUT:
-            print("jwt time", jwt["time"])
             return None
         
         return user

@@ -139,6 +139,7 @@ export default {
         auto-grow
         v-model="content"
         hide-details
+        @keydown.enter.exact.prevent="sendMessage()"
       ></v-textarea>
       <div class="d-sm-flex flex-row">
         <v-btn

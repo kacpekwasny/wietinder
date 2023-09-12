@@ -22,11 +22,12 @@ export default {
       chatsStore:       useChatsStore(),
       socketStore:      useSocketStore(),
       dialog:           false,
+      
     };
   },
 
   async created() {
-    this.socketStore.refreshJWT()
+    await this.socketStore.refreshJWT()
     this.socketStore.openConnectionToMyRoom()
     this.socketStore.keepConnectionToMyRoom()
   },
