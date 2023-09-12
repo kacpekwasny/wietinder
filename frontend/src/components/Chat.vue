@@ -1,5 +1,4 @@
 <script lang="ts">
-import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";

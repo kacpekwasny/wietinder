@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname } from "@/common/requests";
+import ChatsView from "@/views/ChatsView.vue";
 
 export default {
   data() {
@@ -34,6 +35,7 @@ export default {
       return `${p(date, 2)}/${p(month, 2)}/${year} ${p(hour, 2)}:${p(min, 2)}`
     }
   },
+
   
 };
 </script>
