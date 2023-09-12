@@ -43,11 +43,6 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
             for m in User.my_matches(current_user)
         ]
 
-    @socketio.on('get-chats-list')
-    def get_chats_sock():
-        print('get-chats-list')
-        emit('chats-list', 'adw')
-
 
     @chats.route('/more-messages/<public_id>/<int:index_start>/<int:index_end>', methods=['GET'])
     @login_required
@@ -89,6 +84,11 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
         recepient_id = data["recepient_public_id"]
         author_id    = user.public_id
 
+        content: str = data['content']
+
+        if len(content.strip(" ").replace("\n", "")) == 0:
+            return
+
         pm = PossibleMatch.get_match(author_id, recepient_id)
         if pm is None:
             print('Attempted to send message to a nonexistent match.')
@@ -98,7 +98,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
             possible_match_id=pm.id,
             author=author_id,
             timemstamp=time.time(),
-            message=data['content']
+            message=content
         )
         msg_json = msg.json() | {"recepient_id": recepient_id}
 

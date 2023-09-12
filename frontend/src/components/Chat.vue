@@ -29,6 +29,9 @@ export default {
     },
 
     async sendMessage() {
+      if (this.content.replace(" ", "").replace("\n", "") === "") {
+        return
+      }
       this.socketStore.emit('server_message', {
         recepient_public_id: this.chatsStore.activeChat.profile.public_id,
         content: this.content,
