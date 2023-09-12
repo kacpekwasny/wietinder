@@ -15,7 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 socketio = SocketIO()
 
-IS_PROD = os.getenv("IS_PRODUCTION", "false").lower() == "true"
+IS_PROD = os.getenv("IS_PROD", "false").lower() == "true"
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -30,7 +30,7 @@ def create_app() -> Flask:
     conf = ConfigDev
     if IS_PROD:
         # ustaw config pod produkcje, jeżewli zmienna środowiskowa 
-        # IS_PRODUCTION==True
+        # IS_PROD==True
         conf = ConfigProd
 
     app.config.from_object(conf)
@@ -82,7 +82,10 @@ def create_app() -> Flask:
     admin.add_view(make_view(PossibleMatch))
     admin.add_view(make_view(Message))
 
-    socketio.init_app(app, cors_allowed_origins="http://localhost:3000", manage_session=True)
+    socketio.init_app(app,
+                      cors_allowed_origins=None if IS_PROD else ["http://localhost:3000", "http://localhost:5000"],
+                      manage_session=True)
+    print(f"{IS_PROD=}")
     return app
 
 def create_database(db_path: Path, app: Flask):
