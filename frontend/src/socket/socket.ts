@@ -30,6 +30,10 @@ export const useSocketStore = defineStore('SocketStore', {
 
       openConnectionToMyRoom() {
         this.socket = io(getBackendHostname())
+        this.enter_my_room()
+      },
+
+      enter_my_room() {
         this._emit_with_jwt('enter_my_room')
       },
 
@@ -37,7 +41,7 @@ export const useSocketStore = defineStore('SocketStore', {
         this.tryConnected = true
         
         if (this.socket.connected) {
-          return await this.emit('enter_my_room')
+          return this.enter_my_room()
         }
 
         this.socket.on("connect", () => {
@@ -46,10 +50,11 @@ export const useSocketStore = defineStore('SocketStore', {
             while (this.tryConnected) {
               while (this.socket?.connected) {
                 await timer(15000);
-                this.emit('enter_my_room')
+                this.enter_my_room()
               }
               this.openConnectionToMyRoom()
             }
+            this.socket.close()
             console.log('background job exiting!', this.socket.connected)
           })()
         });
@@ -63,8 +68,6 @@ export const useSocketStore = defineStore('SocketStore', {
         const userAccountStore = useUserAccountStore()
 
         this.socket.on("client_message", (...args) => {
-          console.log("client message")
-          console.log(args)
           const msg: Message = args[0]
           let chat = undefined
           if (msg.author === userAccountStore.accountData.public_id) {
@@ -72,16 +75,15 @@ export const useSocketStore = defineStore('SocketStore', {
           } else {
             chat = chatsStore.getChat(msg.author)
           }
-          console.log('recieved message', msg)
+
           chat.messages.unshift(msg)
         });
 
         this.socket.on("jwt_refresh", (...args) => {
           let jwt = args[0]
-          if (jwt.jwt === undefined) {
-            return
+          if ((typeof jwt.jwt) === "string") {
+            this.jwt = jwt.jwt
           }
-          this.jwt = jwt.jwt
         });
 
         this.socket.on("enter_my_room", (...args) => {

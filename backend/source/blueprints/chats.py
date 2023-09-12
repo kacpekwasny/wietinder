@@ -86,11 +86,8 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
     @login_required_sock
     def send_message_sock(user: User, *data: dict):
         data = data[0]
-        print(data)
         recepient_id = data["recepient_public_id"]
         author_id    = user.public_id
-
-        print('send message:', data, user)
 
         pm = PossibleMatch.get_match(author_id, recepient_id)
         if pm is None:

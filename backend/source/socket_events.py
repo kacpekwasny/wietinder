@@ -10,18 +10,13 @@ AUTH_KEY_JWT_WS = "__flask_auth_jwt_ws"
 def login_required_sock(f):
     @functools.wraps(f)
     def wrapped(auth: dict[Literal["jwt"], str], *args, **kwargs):
-        print(999)
-        print(auth)
-        print(args)
-        print(kwargs)
-        print(888)
         jwt = auth.get(AUTH_KEY_JWT_WS, None)
         if jwt is None:
-            return disconnect()
+            return
         user = User.get_user_by_jwt(jwt)
         if user is None:
             print(f'jwt invalid {jwt=}')
-            return disconnect()
+            return
 
         emit('jwt_refresh', {"jwt": user.refresh_jwt()})
         return f(user, *args, **kwargs)
