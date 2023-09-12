@@ -4,7 +4,7 @@ import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 import EmojiPicker from "@/components/EmojiPicker/EmojiPicker.vue"
-import {state, socket} from '../socket/socket'
+import { useSocketStore } from '../socket/socket'
 
 
 export default {
@@ -13,6 +13,7 @@ export default {
       chatsStore: useChatsStore(),
       accountStore: useUserAccountStore(),
       ChatsListPanelStore: useChatsListPanelStore(),
+      socketStore: useSocketStore(),
       showEmoji: false as boolean,
       content: "",
     };
@@ -53,9 +54,12 @@ export default {
       }
     },
   },
-  mounted() {
-    socket.emit('get-chats-list', {})
+  async mounted() {
+    // socket.emit('get-chats-list', {})
     console.log('emited get-chat-list')
+    await this.socketStore.openSocket()
+    console.log('socket open')
+    this.socketStore.emit('send_message', {content: "waaaa content!"})
 
   },
   setup() {

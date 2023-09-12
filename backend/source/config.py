@@ -19,7 +19,7 @@ class Config:
     JWT_SECRET: str
     """ secret for JWT """
 
-    JWT_TIMEOUT: float = 1800
+    JWT_TIMEOUT: float = 30
     """ Time for which JWT is valid represented in seconds """
 
 

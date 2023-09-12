@@ -116,10 +116,11 @@ class User(db.Model, UserMixin):
     def refresh_jwt(self) -> str:
         return pyjwt.encode({"public_id": self.public_id,
                                  "time": time.time()},
-                                CONFIG.JWT_SECRET)
+                                CONFIG.JWT_SECRET,
+                                algorithm="HS256")
     @classmethod
     def get_user_by_jwt(cls, jwt: str) -> User:
-        jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET)
+        jwt: JWT = pyjwt.decode(jwt, CONFIG.JWT_SECRET, algorithms=["HS256"])
         user = cls.query.filter_by(public_id=jwt["public_id"]).first()
         if user is None:
             return None
