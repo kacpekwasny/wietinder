@@ -51,6 +51,7 @@ export default {
       let json = await resp.json();
       if (json.ok === undefined) {
         this.accountData = json
+        this.userAccountStore.refreshUserData(true)
       }
     },
 

@@ -106,24 +106,19 @@ export default {
     </v-expansion-panels>
     <v-card>
       <v-card-title>Zdjęcia</v-card-title>
-      <v-row class="pa-1">
+      <v-row class="pa-2">
         <v-col
           v-for="(image, index) in profileData.images"
           cols="6"
           sm="4"
-          class="pa-1"
+          class="pa-2"
         >
         <v-card @click="openImageDialog(image)" class="cursor-pointer">
             <v-img :src="remoteURL(image)" max-height="150px"></v-img>
         </v-card>
-        <v-dialog v-model="imageDialog" max-width="600">
-          <template v-slot:activator="{ on }">
-            <!-- Clickable thumbnail image -->
-            
-          </template>
+        <v-dialog v-model="imageDialog" max-width="600px" max-height="600px">
           <v-card>
-            <!-- Image displayed in the dialog -->
-            <v-img :src="remoteURL(imageToShow)" max-height="600px"></v-img>
+            <v-img :src="remoteURL(imageToShow)" max-height="600px" max-width="600px"></v-img>
           </v-card>
         </v-dialog>
         </v-col>
