@@ -6,6 +6,7 @@ import { email, required } from "@vuelidate/validators";
 import { postJson } from "../common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
 import AlredyLoggedIn from "@/components/AlredyLoggedIn.vue";
+import { useSocketStore } from "@/socket/socket";
 
 export default defineComponent({
   setup() {
@@ -44,8 +45,12 @@ export default defineComponent({
       });
 
       if (resp.status == 200) {
-        await useUserAccountStore().refreshUserData(true)
         this.$router.push({ path: "/account" });
+        useUserAccountStore().refreshUserData(true).then(async () => {
+          const socketStore = useSocketStore()
+          await socketStore.refreshJWT()
+          socketStore.enter_my_room()
+        })
       }
       if (resp.status == 401) {
         this.passwordServerErrors = ["Błędne hasło!"];
