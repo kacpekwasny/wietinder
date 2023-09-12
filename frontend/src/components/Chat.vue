@@ -29,10 +29,11 @@ export default {
     },
 
     async sendMessage() {
-      let resp = await postJson(`/send-message`, {
+      this.socketStore.emit('server_message', {
         recepient_public_id: this.chatsStore.activeChat.profile.public_id,
         content: this.content,
       });
+      this.content = "";
     },
 
     toggleEmojiPicker() {
@@ -48,22 +49,12 @@ export default {
         path: "/profile/" + this.chatsStore.activeChat.profile.public_id,
       });
     },
+
     clickOutsideEmojiPicker() {
       if (this.showEmoji) {
         this.showEmoji = false;
       }
     },
-  },
-  async mounted() {
-    // socket.emit('get-chats-list', {})
-    console.log('emited get-chat-list')
-    await this.socketStore.openSocket()
-    console.log('socket open')
-    this.socketStore.emit('send_message', {content: "waaaa content!"})
-
-  },
-  setup() {
-
   },
 
   components: {

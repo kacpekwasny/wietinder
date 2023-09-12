@@ -126,6 +126,7 @@ class User(db.Model, UserMixin):
             return None
         
         if time.time() - jwt["time"] > CONFIG.JWT_TIMEOUT:
+            print("jwt time", jwt["time"])
             return None
         
         return user
