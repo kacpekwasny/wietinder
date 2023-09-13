@@ -1,7 +1,6 @@
 <script lang="ts">
 import Header from "./components/Header.vue";
 import Drawer from "./components/Drawer.vue";
-import { getJson } from "./common/requests";
 import router from "./router";
 import { useUserAccountStore } from "./stores/AccountDataStore";
 import { usePanelStore } from "./stores/SidePanelStore";
@@ -21,8 +20,6 @@ export default {
       userAccountStore: useUserAccountStore(),
       chatsStore:       useChatsStore(),
       socketStore:      useSocketStore(),
-      dialog:           false,
-      
     };
   },
 
@@ -38,7 +35,6 @@ export default {
       await this.userAccountStore.refreshUserData(true);
        
       if (!this.userAccountStore.loggedIn) {
-        console.log(!this.userAccountStore.loggedIn)
         if (to.name === "register") {
           return; 
         } else {
@@ -47,7 +43,6 @@ export default {
       }
 
       if (this.userAccountStore.accountData.images.length == 0 && this.userAccountStore.loggedIn) {
-        this.dialog = true
         return router.push("/account")
       }
     },
@@ -66,19 +61,6 @@ export default {
 
 <template>
   <v-app>
-    <v-dialog
-      v-model="dialog"
-      width="auto"
-    >
-      <v-card>
-        <v-card-text>
-          Musisz dodać przynajmniej jedno zdjęcie!
-        </v-card-text>
-        <v-card-actions>
-          <v-btn block @click="dialog = false">OK</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-app-bar app density="compact">
       <v-app-bar-nav-icon
         v-if="loggedIn"
