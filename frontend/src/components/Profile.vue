@@ -77,7 +77,7 @@ export default {
 
 <template>
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
-    <v-card class="pa-2 mb-4 elevation-6" style="position: relative">
+    <v-card class="pa-2 mb-4 elevation-6" style="position: relative" min-height="100px">
       
       <v-img :src="remoteURL(profileData.images[0])" max-height="500px" eager></v-img>
       <div class="pa-2" style="position: absolute; bottom: 0; left: 0">
@@ -104,7 +104,7 @@ export default {
         </v-table>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-card>
+    <v-card min-height="100px">
       <v-card-title>Zdjęcia</v-card-title>
       <v-row class="pa-2">
         <v-col
