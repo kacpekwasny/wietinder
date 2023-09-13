@@ -30,6 +30,9 @@ export default {
         async loadData() {
             await this.getPossibleMatches();
             this.getRandomPossibleMatchID();
+            if(this.noPossibleMatches){
+                return
+            }
             const p = await this.profilesStore.profile(this.other_user_public_id);
             if (p === undefined) {
                 this.profileData.name = "404, profile not found";
@@ -43,7 +46,7 @@ export default {
                 let response = await getJson("/matches-undecided")
                 let json = await response.json();
                 this.possibleMatches = json
-                if (this.possibleMatches.length==0){
+                if (this.possibleMatches.length<=1){   // Was getting json from server again hotfix befor deadline
                     this.noPossibleMatches = true
                 } else {
                     this.noPossibleMatches = false
