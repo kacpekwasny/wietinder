@@ -94,7 +94,8 @@ export default {
     <v-card v-else>
         <Profile :profile-data="profileData"></Profile>
         <v-bottom-navigation 
-            style="height: 60px;"
+        
+            style="height: 60px; position: fixed;"
             :elevation="15"
             grow>
             <v-btn 

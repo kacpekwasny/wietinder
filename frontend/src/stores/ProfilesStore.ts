@@ -34,7 +34,7 @@ export const useProfilesStore = defineStore('Profiles', {
         },
 
         async fetchProfile(publicId: string): Promise<Profile | undefined> {
-            const resp = await getJson(`/profile/${publicId}`)
+            const resp = await getJson(`/api/profile/${publicId}`)
             if (resp.status != 200) {
                 return undefined
             }
