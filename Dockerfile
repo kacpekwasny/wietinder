@@ -1,6 +1,31 @@
-FROM python:3.11-slim-bullseye
+# Container for build frontend
+FROM node:16-slim as nodeBuilder
 
-WORKDIR /usr/src/app
+WORKDIR /app
+RUN mkdir frontend
+COPY frontend/package.json ./frontend
+
+ARG NODE_ENV
+WORKDIR /app/frontend
+RUN npm install
+
+# RUN if [ "$NODE_ENV" = "development" ]; \
+#         then npm install; \
+#     else npm install --only=production; \
+# fi
+
+COPY ./frontend .
+
+WORKDIR /app
+COPY ./.env.production ./
+
+WORKDIR /app/frontend
+RUN npx vite build
+
+
+# Conda Run Container
+FROM continuumio/anaconda3
+
 
 # Prevents Python from writing pyc files to disc
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -8,30 +33,42 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # ARG DEBIAN_FRONTEND=noninteractive
-
 ENV TZ="Europe/Warsaw"
 
 RUN apt-get update
-RUN apt-get upgrade -y
+RUN apt-get install tree
+RUN tree /app
 
-RUN apt-get install -y tzdata locales
+# RUN apt-get install -y tzdata locales
+# RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+# RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen
+# RUN locale-gen
 
-RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+# RUN apt-get install nano git procps cron -y
+# RUN apt-get install libpq-dev python-dev gcc -y
 
-RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen
+WORKDIR /app
 
-RUN locale-gen
+RUN pwd
+RUN ls -la
+COPY ./condaenv_ubuntu.yml .
+RUN conda env create -f condaenv_ubuntu.yml
 
-RUN apt-get install nano git procps cron -y
-RUN apt-get install libpq-dev python-dev gcc -y
+# Fron now on all commands will be run from `wietinder` environment
+SHELL ["conda", "run", "-n", "wietinder", "/bin/bash", "-c"]
 
-COPY ./requirements.txt ./requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r ./requirements.txt
+RUN mkdir frontend/
+COPY --from=nodeBuilder /app/frontend/dist  ./frontend/dist
 
-COPY ./start.sh ./start.sh
-RUN chmod +x start.sh
+COPY ./backend  ./backend
 
-RUN echo "from app.app import create_app" > wsgi.py
-RUN echo "application = create_app()" >> wsgi.py
+ENV IS_PROD=true
+WORKDIR /app/backend
+
+
+RUN mkdir -p backend/uploads
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "wietinder",  "gunicorn", "main", "--bind", "0.0.0.0:8081", "--worker-class", "eventlet", "-w", "1", "--log-level", "debug" ]
+
+
+# conda run --no-capture-output -n wietinder  gunicorn main --bind 0.0.0.0:8082 --worker-class eventlet -w 1 --log-level debug
 

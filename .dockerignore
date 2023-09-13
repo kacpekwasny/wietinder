@@ -1,0 +1,16 @@
+.vscode
+.gitignore
+.dockerignore
+docker-compose*
+Dockerfile
+README.md
+
+frontend/node_modules/
+
+backend/*__pycache__*
+backend/database_dev.db
+backend/flask.code-workspace
+backend/uploads
+
+
+
