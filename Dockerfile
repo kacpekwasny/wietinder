@@ -13,22 +13,14 @@ RUN npm install
 #         then npm install; \
 #     else npm install --only=production; \
 # fi
-RUN apt-get update
-RUN apt-get install tree
 
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
-RUN tree /app -a -I 'node_modules|dist'
 COPY ./frontend .
 
 WORKDIR /app
 COPY ./.env.production ./
 
-RUN tree /app -a -I 'node_modules|dist'
-
 WORKDIR /app/frontend
 RUN npx vite build
-
-
 
 
 # Conda Run Container
@@ -42,6 +34,10 @@ ENV PYTHONUNBUFFERED 1
 
 # ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/Warsaw"
+
+RUN apt-get update
+RUN apt-get install tree
+RUN tree /app
 
 # RUN apt-get install -y tzdata locales
 # RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
@@ -61,7 +57,6 @@ RUN conda env create -f condaenv_ubuntu.yml
 # Fron now on all commands will be run from `wietinder` environment
 SHELL ["conda", "run", "-n", "wietinder", "/bin/bash", "-c"]
 
-
 RUN mkdir frontend/
 COPY --from=nodeBuilder /app/frontend/dist  ./frontend/dist
 
@@ -70,10 +65,8 @@ COPY ./backend  ./backend
 ENV IS_PROD=true
 WORKDIR /app/backend
 
-RUN apt-get update
-RUN apt-get install tree
-RUN tree /app
 
+RUN mkdir -p backend/uploads
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "wietinder",  "gunicorn", "main", "--bind", "0.0.0.0:8081", "--worker-class", "eventlet", "-w", "1", "--log-level", "debug" ]
 
 

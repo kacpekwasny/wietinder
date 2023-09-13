@@ -1,9 +1,11 @@
+import os
+
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 REPO_DIR = BACKEND_DIR.parent
 UPLOADS_DIR = BACKEND_DIR / "uploads"
-
+os.makedirs(str(UPLOADS_DIR), exist_ok=True)
 
 class Config:
     """
