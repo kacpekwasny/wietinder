@@ -25,13 +25,14 @@ export default {
   },
 
   methods: {
-    changeView() {
+    async changeView() {
       this.showProfile = !this.showProfile;
+      await this.getProfileData();
     },
 
     async getProfileData() {
       const p = await this.profilesStore.profile(
-        this.userAccountStore.accountData.public_id
+        this.userAccountStore.accountData.public_id, true
       );
       if (p === undefined) {
         this.profileData.name = "404, profile not found";

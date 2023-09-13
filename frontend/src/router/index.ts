@@ -15,6 +15,7 @@ const router = createRouter ({
             name: "login",
             component: LoginView
         },
+       
         {
             path: "/home",
             redirect: "/"
@@ -54,10 +55,10 @@ const router = createRouter ({
             component: ChatsView
         },
         {
-            path: "/:pathMatch(.*)*",
-            redirect: '/'
+            path: "/:catchAll(.*)",
+            redirect: "/"
         },
-    ],
+    ]
 })
 
 export default router

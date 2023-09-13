@@ -1,5 +1,4 @@
 <script lang="ts">
-import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
 import { getBackendHostname, postJson } from "@/common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
@@ -12,7 +11,6 @@ export default {
     return {
       chatsStore: useChatsStore(),
       accountStore: useUserAccountStore(),
-      ChatsListPanelStore: useChatsListPanelStore(),
       socketStore: useSocketStore(),
       showEmoji: false as boolean,
       content: "",
@@ -20,10 +18,7 @@ export default {
   },
 
   methods: {
-    toggleChatsListsPanel() {
-      this.ChatsListPanelStore.toggleChatsListPanel();
-    },
-
+ 
     remoteURL(imageName: string) {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },

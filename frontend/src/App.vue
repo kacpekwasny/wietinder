@@ -36,12 +36,14 @@ export default {
   watch: {
     $route: async function (to, from) {
       
-      await this.userAccountStore.refreshUserData();
+      await this.userAccountStore.refreshUserData(true);
+       
       if (!this.userAccountStore.loggedIn) {
-        if (!this.$route.name.startsWith("/register")) {
-          if (to.name.startsWith("/register")) {
-            return router.push("/login");
-          }
+        console.log(!this.userAccountStore.loggedIn)
+        if (to.name === "register") {
+          return; 
+        } else {
+          return router.push("/login");
         }
       }
 

@@ -1,14 +1,12 @@
 <script lang="ts">
 import { useChatsStore } from "@/stores/ChatsStore";
-import { Chat } from "@/stores/ChatsStore";
 import { getBackendHostname } from "@/common/requests";
-import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
+import ChatsView from "@/views/ChatsView.vue";
 
 export default {
   data() {
     return {
       chatStore: useChatsStore(),
-      chatListPanelStore: useChatsListPanelStore(),
     };
   },
 
@@ -37,16 +35,8 @@ export default {
       return `${p(date, 2)}/${p(month, 2)}/${year} ${p(hour, 2)}:${p(min, 2)}`
     }
   },
-  computed: {
-    showChatsListPanel: {
-      get() {
-        return this.chatListPanelStore.showChatsListPanel;
-      },
-      set(newValue: boolean) {
-        this.chatListPanelStore.$patch({ showChatsListPanel: newValue });
-      },
-    },
-  },
+
+  
 };
 </script>
 

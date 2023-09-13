@@ -3,7 +3,6 @@ import Profile from "../components/Profile.vue"
 import { useProfilesStore } from "@/stores/ProfilesStore";
 import { getJson, postJson} from "../common/requests";
 import { useUserAccountStore } from "@/stores/AccountDataStore";
-import { createDecipheriv } from "crypto";
 
 export default {
     data() {
@@ -86,6 +85,8 @@ export default {
         icon="mdi-information"
         dense
         outlined
+        class="d-flex align-center justify-center"
+       
         >
         Nie mamy więcej propozycji dla ciebie. Wróć po więcej później.
         </v-alert>

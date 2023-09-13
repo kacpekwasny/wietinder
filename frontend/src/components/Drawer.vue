@@ -4,7 +4,6 @@ import { useUserAccountStore } from "@/stores/AccountDataStore";
 import { mapState } from "pinia";
 import { getBackendHostname, getJson, postJson } from "../common/requests";
 import router from "../router";
-import { useChatsListPanelStore } from "@/stores/ChatsListPanelStore";
 import { useChatsStore } from "@/stores/ChatsStore";
 import ChatsList from "@/components/ChatsList.vue";
 import Chat from "@/components/Chat.vue";
@@ -36,10 +35,7 @@ export default {
     navigateToLikes() {
       this.$router.push({ path: "/likes" });
     },
-    navigateToChats() {
-      useChatsListPanelStore().openChatsListPanel();
-      this.$router.push({ path: "/chats" });
-    },
+  
     navigateToAccountConfig() {
       this.$router.push({ path: "/account" });
     },

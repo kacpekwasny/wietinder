@@ -242,7 +242,7 @@ class Message(db.Model):
     id                  = db.Column(db.Integer, primary_key=True)
     possible_match_id   = db.Column(db.Integer,     db.ForeignKey('possible_matches.id'))
     author              = db.Column(db.String,      db.ForeignKey('users.public_id'))
-    timemstamp          = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()) * 1000)
+    timemstamp          = db.Column(db.Integer,         default=lambda: time.mktime(datetime.now().timetuple()))
     message             = db.Column(db.String(4000),    default="")
 
     def json(self) -> dict[str, str|int]:

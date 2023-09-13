@@ -97,8 +97,8 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
         msg: Message = Message(
             possible_match_id=pm.id,
             author=author_id,
-            timemstamp=time.time(),
-            message=content
+            timemstamp=time.time()*1000,
+            message=data['content']
         )
         msg_json = msg.json() | {"recepient_id": recepient_id}
 
