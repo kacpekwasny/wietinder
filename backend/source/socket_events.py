@@ -16,9 +16,9 @@ def login_required_sock(f):
         user = User.get_user_by_jwt(jwt)
         if user is None:
             print(f'jwt invalid {jwt=}')
-            return
+            return emit("refresh_jwt_manualy")
 
-        emit('jwt_refresh', {"jwt": user.refresh_jwt()})
+        emit('new_jwt', {"jwt": user.refresh_jwt()})
         return f(user, *args, **kwargs)
     return wrapped
 

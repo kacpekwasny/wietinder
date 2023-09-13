@@ -2,7 +2,7 @@ from source import create_app, db, socketio
 
 
 
-app = create_app()
+application = create_app()
 
 def add_users(db):
     from source.models import User
@@ -55,13 +55,13 @@ def add_images(db):
 
 if __name__ == '__main__':
     from flask_cors import CORS
-    cors = CORS(app, supports_credentials=True)
+    cors = CORS(application, supports_credentials=True)
 
-    with app.app_context():
+    with application.app_context():
         db.create_all()
         add_users(db)
         add_images(db)
         make_everyone_like_each_other(db)
         make_dummy_messages(db)
 
-    socketio.run(app, debug=True, port=5000)
+    socketio.run(application, debug=True, port=5000)

@@ -26,11 +26,13 @@ export default {
     };
   },
 
-  async created() {
+  async mounted() {
     await this.socketStore.refreshJWT()
     this.socketStore.openConnectionToMyRoom()
+    this.socketStore.setupEventListeners()
     this.socketStore.keepConnectionToMyRoom()
   },
+
   watch: {
     $route: async function (to, from) {
       
@@ -43,7 +45,7 @@ export default {
         }
       }
 
-      if (this.userAccountStore.accountData.images.length == 0 && this.userAccountStore.loggedIn){
+      if (this.userAccountStore.accountData.images.length == 0 && this.userAccountStore.loggedIn) {
         this.dialog = true
         return router.push("/account")
       }
