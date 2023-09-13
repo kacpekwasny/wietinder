@@ -53,7 +53,11 @@ const router = createRouter ({
             name: "chats",
             component: ChatsView
         },
-    ]
+        {
+            path: "/:pathMatch(.*)*",
+            redirect: '/'
+        },
+    ],
 })
 
 export default router
