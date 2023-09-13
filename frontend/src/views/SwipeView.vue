@@ -43,7 +43,6 @@ export default {
                 let response = await getJson("/matches-undecided")
                 let json = await response.json();
                 this.possibleMatches = json
-                console.log(this.possibleMatches)
                 if (this.possibleMatches.length==0){
                     this.noPossibleMatches = true
                 } else {
