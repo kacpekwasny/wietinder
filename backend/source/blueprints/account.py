@@ -46,7 +46,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         db.session.commit()
         return get_account_data()
     
-    @account_bp.route('/profile/<profile_id>')
+    @account_bp.route('/api/profile/<profile_id>')
     @login_required
     def get_profile(profile_id: str):
         return jsonify(User.query.filter_by(public_id=profile_id)
