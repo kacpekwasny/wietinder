@@ -49,7 +49,7 @@ export default defineComponent({
         useUserAccountStore().refreshUserData(true).then(async () => {
           const socketStore = useSocketStore()
           await socketStore.refreshJWT()
-          socketStore.enter_my_room()
+          socketStore.enterMyRoom()
         })
       }
       if (resp.status == 401) {

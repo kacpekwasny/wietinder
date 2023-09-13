@@ -27,16 +27,7 @@ export const useSocketStore = defineStore('SocketStore', {
       this.jwt = (await resp.json())["jwt"]
     },
 
-    openConnectionToMyRoom() {
-      console.trace()
-      if (!this.socket?.connected) {
-        // this.socket = io(getBackendHostname())
-        // this.setupEventListeners()
-        this.enter_my_room()
-      }
-    },
-
-    enter_my_room() {
+    enterMyRoom() {
       this._emit_with_jwt('enter_my_room')
     },
 
@@ -45,14 +36,14 @@ export const useSocketStore = defineStore('SocketStore', {
         console.log('background job running!')
         while (true) {
           await timer(15000);
-          this.enter_my_room()
+          this.enterMyRoom()
         }
       })()
     },
 
-    async setupEventListeners() {
+    setupEventListeners() {
       if (this.socket.connected) {
-        return this.enter_my_room()
+        return this.enterMyRoom()
       }
 
       this.socket.on("connect", () => {

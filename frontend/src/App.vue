@@ -28,7 +28,6 @@ export default {
 
   async mounted() {
     await this.socketStore.refreshJWT()
-    this.socketStore.openConnectionToMyRoom()
     this.socketStore.setupEventListeners()
     this.socketStore.keepConnectionToMyRoom()
   },
