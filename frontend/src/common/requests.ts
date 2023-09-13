@@ -20,7 +20,7 @@ export function postJson(url: string, object: object, redirect: RequestRedirect 
 }
 
 export function getJson(url: string, redirect: RequestRedirect = 'manual'): Promise<Response> {
-    return fetch(import.meta.env.VITE_API_URL + url, {
+    return fetch((import.meta.env.VITE_API_URL || "") + url, {
         credentials: "include",
         redirect: redirect,
     })
