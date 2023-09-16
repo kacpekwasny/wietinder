@@ -26,6 +26,11 @@ BIO_LEN:   int = 300
 JWT = dict[Literal["public_id", "time"],
            str | float | list | dict]
 
+def unix_timestamp() -> float:
+    # time.time returns seconds since 1/1/1970
+    # JS Date.now uses miliseconds since that date.
+    return time.time() * 1000
+
 class Sex(Enum):
     male = 'male'
     female = 'female'
@@ -115,7 +120,7 @@ class User(db.Model, UserMixin):
 
     def refresh_jwt(self) -> str:
         return pyjwt.encode({"public_id": self.public_id,
-                             "time": time.time()},
+                             "time": unix_timestamp()},
                               CONFIG.JWT_SECRET,
                               algorithm="HS256")
     @classmethod
@@ -129,13 +134,11 @@ class User(db.Model, UserMixin):
         if user is None:
             return None
         
-        if time.time() - jwt["time"] > CONFIG.JWT_TIMEOUT:
+        if unix_timestamp() - jwt["time"] > CONFIG.JWT_TIMEOUT:
             return None
         
         return user
     
-
-
     def json(self) -> dict[str, str | list[str]]:
         return {
             "name":      self.name,
@@ -169,15 +172,23 @@ class User(db.Model, UserMixin):
         images          is not None and self.set_images(images)
 
     def change_match_choice(self, my_choice: MatchChoice, other_public_id: str):
-        match_record: PossibleMatch = PossibleMatch.query.filter(
+        match: PossibleMatch = PossibleMatch.query.filter(
             ((PossibleMatch.user1_public_id == self.public_id)  & (PossibleMatch.user2_public_id == other_public_id)) |
             ((PossibleMatch.user1_public_id == other_public_id) & (PossibleMatch.user2_public_id == self.public_id))
         ).first()
+
+        was_like = False
+        if match.user1_choice == MatchChoice.like and match.user2_choice == MatchChoice.like:
+            was_like = True
+
         
-        if match_record.user1_public_id == self.public_id:
-            match_record.user1_choice = my_choice
+        if match.user1_public_id == self.public_id:
+            match.user1_choice = my_choice
         else:
-            match_record.user2_choice = my_choice
+            match.user2_choice = my_choice
+
+        if my_choice == MatchChoice.like and not was_like:
+            match.matched_timestamp = unix_timestamp()
 
         db.session.commit()
 
@@ -210,6 +221,7 @@ class PossibleMatch(db.Model):
     user1_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
     user2_choice    = db.Column(db.Enum(MatchChoice),   default=MatchChoice.none)
     messages        = db.relationship('Message', backref='possible_match')
+    matched_timestamp = db.Column(db.Integer,           default=0)
 
     @property
     def user1(self) -> User:

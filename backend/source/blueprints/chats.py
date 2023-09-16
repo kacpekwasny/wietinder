@@ -38,6 +38,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
             {
                 "profile":  m.get_other_user(current_user.public_id).json(),
                 "messages": [msg.json() for msg in m.messages_slice(0, 50)],
+                "timestamp": m.matched_timestamp,
             }
 
             for m in User.my_matches(current_user)

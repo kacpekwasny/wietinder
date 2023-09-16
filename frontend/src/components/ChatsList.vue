@@ -1,5 +1,5 @@
 <script lang="ts">
-import { useChatsStore } from "@/stores/ChatsStore";
+import { useChatsStore, lastChatInteraction } from "@/stores/ChatsStore";
 import { getBackendHostname } from "@/common/requests";
 import ChatsView from "@/views/ChatsView.vue";
 
@@ -50,7 +50,7 @@ export default {
       lines="two"
       :prepend-avatar="remoteURL(chat.profile.images[0])"
       :title="chat.profile.name"
-      :subtitle="formatDate(chat.messages[0].timestamp)"
+      :subtitle="formatDate(lastChatInteraction(chat))"
     >
   
   </v-list-item>

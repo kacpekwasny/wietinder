@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getBackendHostname, getJson } from "@/common/requests";
+import { getBackendHostname, getJson, postJson } from "@/common/requests";
 
 export default {
   props: {
@@ -63,27 +63,66 @@ export default {
     backendHostname() {
       return getBackendHostname();
     },
-    
+
     remoteURL(imageName: string) {
       return `${getBackendHostname()}/uploads/${imageName}`;
     },
     openImageDialog(image) {
       this.imageToShow = image;
       this.imageDialog = true;
-    }
-  }
+    },
+
+    async updateChoice(choice: string) {
+      postJson("/update-match-choice", {
+        other_user_public_id: this.profileData.public_id,
+        my_choice: choice,
+      });
+      // this.profilesChoiceMade.push(this.other_user_public_id);
+      // this.possibleMatches = this.possibleMatches.filter(
+      //   (item) => item !== this.other_user_public_id
+      // );
+      // this.loadData();
+    },
+  },
 };
 </script>
 
 <template>
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
-    <v-card class="pa-2 mb-4 elevation-6" style="position: relative" min-height="100px">
-      
-      <v-img :src="remoteURL(profileData.images[0])" max-height="500px"></v-img>
-      <div class="pa-2" style="position: absolute; bottom: 0; left: 0">
-        <div class="text-h4">{{ profileData.name }}</div>
-        <div class="text-caption">{{ profileData.bio }}</div>
-      </div>
+    <v-card class="pa-2 mb-4 elevation-6" min-height="100px">
+      <v-card-item style="position: relative">
+        <v-img
+          :src="remoteURL(profileData.images[0])"
+          max-height="500px"
+        ></v-img>
+        <div class="pa-2" style="position: absolute; bottom: 0; left: 0">
+          <div class="text-h4">{{ profileData.name }}</div>
+          <div class="text-caption">{{ profileData.bio }}</div>
+        </div>
+      </v-card-item>
+      <v-card-actions class="d-flex flex-row justify-center">
+        <v-btn
+          value="dislike"
+          variant="outlined"
+          class="mr-4"
+          @click="updateChoice('dislike')"
+        >
+          <v-icon class="ma-1">mdi-close-circle</v-icon>
+
+          <span>Odrzuć</span>
+        </v-btn>
+
+        <v-btn
+          value="like"
+          variant="elevated"
+          color="pink"
+          @click="updateChoice('like')"
+        >
+          <v-icon class="ma-1">mdi-heart-circle</v-icon>
+
+          <span>Polub</span>
+        </v-btn>
+      </v-card-actions>
     </v-card>
     <v-expansion-panels>
       <v-expansion-panel>
@@ -113,14 +152,18 @@ export default {
           sm="4"
           class="pa-2"
         >
-        <v-card @click="openImageDialog(image)" class="cursor-pointer">
+          <v-card @click="openImageDialog(image)" class="cursor-pointer">
             <v-img :src="remoteURL(image)" max-height="150px"></v-img>
-        </v-card>
-        <v-dialog v-model="imageDialog" max-width="600px" max-height="600px">
-          <v-card>
-            <v-img :src="remoteURL(imageToShow)" max-height="600px" max-width="600px"></v-img>
           </v-card>
-        </v-dialog>
+          <v-dialog v-model="imageDialog" max-width="600px" max-height="600px">
+            <v-card>
+              <v-img
+                :src="remoteURL(imageToShow)"
+                max-height="600px"
+                max-width="600px"
+              ></v-img>
+            </v-card>
+          </v-dialog>
         </v-col>
       </v-row>
     </v-card>
