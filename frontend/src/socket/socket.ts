@@ -58,7 +58,7 @@ export const useSocketStore = defineStore('SocketStore', {
       const chatsStore = useChatsStore()
       const userAccountStore = useUserAccountStore()
 
-      this.socket.on("client_message", (...args) => {
+      this.socket.on("server_broadcast_message", (...args) => {
         const msg: Message = args[0]
         let chat = undefined
         if (msg.author === userAccountStore.accountData.public_id) {

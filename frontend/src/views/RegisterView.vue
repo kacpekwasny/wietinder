@@ -71,7 +71,7 @@ export default {
         }
       }
 
-      postJson("/register", {
+      postJson("/api/register", {
         name: this.registerForm.nameField,
         email: this.registerForm.emailField,
         password: this.registerForm.passwordField,
@@ -146,7 +146,7 @@ export default {
     },
 
     navigateToLogin() {
-      this.$router.push({ path: "/login" });
+      this.$router.push({ path: "/api/login" });
     },
   },
 

@@ -48,7 +48,7 @@ def create_app() -> Flask:
     app.register_blueprint(get_serve_frontend_bp())
     app.register_blueprint(get_auth_bp(db, is_prod=IS_PROD))
     app.register_blueprint(get_account_bp(db, UPLOADS_DIR))
-    app.register_blueprint(get_match_bp(db))
+    app.register_blueprint(get_match_bp(db, socketio))
     app.register_blueprint(get_data_bp())
     app.register_blueprint(get_chats_bp(db, socketio))
 

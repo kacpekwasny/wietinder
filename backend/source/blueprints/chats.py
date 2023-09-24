@@ -32,7 +32,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
     chats = Blueprint('chats', __name__)
 
 
-    @chats.route('/chats-list', methods=['GET'])
+    @chats.route('/api/chats-list', methods=['GET'])
     def get_chats():
         return [
             {
@@ -45,7 +45,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
         ]
 
 
-    @chats.route('/more-messages/<public_id>/<int:index_start>/<int:index_end>', methods=['GET'])
+    @chats.route('/api/more-messages/<public_id>/<int:index_start>/<int:index_end>', methods=['GET'])
     @login_required
     def more_messages(other_pid: str, index_start: int, index_end: int):
         if index_end - index_start > MAX_MESSAGES_AT_ONCE:
@@ -56,29 +56,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
         return m.messages_slice(index_start, index_end)
 
 
-
-    @chats.route('/send-message', methods=['POST'])
-    @login_required
-    def send_message():
-        j: dict = request.json
-        recepient_pid = j.get("recepient_public_id")
-        content       = j.get("content")
-        current_user
-        match = PossibleMatch.get_match(current_user.public_id, recepient_pid)
-        if match is None:
-            return resp(404, "you dont have such a match")
-        msg = Message(
-            possible_match=match,
-            author=current_user.public_id,
-            message=content,
-        )
-        db.session.add(msg)
-        db.session.commit()
-
-        return resp(200)
-
-
-    @socketio.on('server_message')
+    @socketio.on('client_sends_msg')
     @login_required_sock
     def send_message_sock(user: User, *data: dict):
         data = data[0]
@@ -103,7 +81,7 @@ def get_chats_bp(db: SQLAlchemy, socketio: SocketIO, is_prod: bool=True) -> Blue
         )
         msg_json = msg.json() | {"recepient_id": recepient_id}
 
-        emit('client_message',
+        emit('server_broadcast_message',
             msg_json,
             room=[recepient_id, author_id],
         )

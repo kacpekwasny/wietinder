@@ -23,12 +23,12 @@ from ..config import UPLOADS_DIR
 def get_account_bp(db: SQLAlchemy, upload_dir: Path):
     account_bp = Blueprint('views', __name__)
 
-    @account_bp.route('/account-data', methods=['GET'])
+    @account_bp.route('/api/account-data', methods=['GET'])
     @login_required
     def get_account_data():
         return jsonify(User.json(current_user))
 
-    @account_bp.route('/account-data', methods=['POST'])
+    @account_bp.route('/api/account-data', methods=['POST'])
     @login_required
     def post_account_data():
         j: dict = request.json
@@ -52,7 +52,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         return jsonify(User.query.filter_by(public_id=profile_id)
                        .first_or_404().json())
     
-    @account_bp.route('/upload-images', methods=['POST'])
+    @account_bp.route('/api/upload-images', methods=['POST'])
     @login_required
     def upload_images():
         files = request.files.getlist('images')
@@ -78,7 +78,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         return resp(200)
 
 
-    @account_bp.route('/uploads/<path:filepath>')
+    @account_bp.route('/api/uploads/<path:filepath>')
     @login_required
     def get_image(filepath: str):
         directory_path = str(Path(__file__).parent.parent.parent / "uploads")
@@ -86,7 +86,7 @@ def get_account_bp(db: SQLAlchemy, upload_dir: Path):
         resp_img.headers['Cache-Control'] = 'max-age=86400'
         return resp_img
     
-    @account_bp.route('/delete-image', methods=['POST'])
+    @account_bp.route('/api/delete-image', methods=['POST'])
     @login_required
     def delete_image():
         removed_img_name = request.json["removed_image_name"]

@@ -47,7 +47,7 @@ export default {
     },
 
     async sendAccountData() {
-      let resp = await postJson("/account-data", this.accountData);
+      let resp = await postJson("/api/account-data", this.accountData);
       let json = await resp.json();
       if (json.ok === undefined) {
         this.accountData = json
@@ -61,7 +61,7 @@ export default {
         formData.append("images", this.selectedImages[i]);
       }
       const resp = await axios.post(
-        `${getBackendHostname()}/upload-images`,
+        `${getBackendHostname()}/api/upload-images`,
         formData,
         {
           headers: {
@@ -82,7 +82,7 @@ export default {
       const removedImageName = this.accountData.images[index];
       this.accountData.images.splice(index, 1);
 
-      const resp = await postJson("/delete-image", {
+      const resp = await postJson("/api/delete-image", {
         removed_image_name: removedImageName,
       });
       const data = await resp.json();
@@ -96,7 +96,7 @@ export default {
     },
 
     remoteURL(imageName: string) {
-      return `${getBackendHostname()}/uploads/${imageName}`;
+      return `${getBackendHostname()}/api/uploads/${imageName}`;
     },
 
     localURL(file: File) {

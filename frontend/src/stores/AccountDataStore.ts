@@ -9,7 +9,7 @@ export const useUserAccountStore = defineStore('UserAccount', {
     state() {
         return {
 
-            // `_lastChecked` - keeps the date of when was the last `GET /account-data` sent.
+            // `_lastChecked` - keeps the date of when was the last `GET /api/account-data` sent.
             // It is a number representing the Unix timestamp, so ms since the date 01.01.1970
             // 0 - zero means we have never before checked for the state.
             // Date.now() will be set when we send a request.
@@ -46,7 +46,7 @@ export const useUserAccountStore = defineStore('UserAccount', {
 
             // We are either forcing or previous request was long time ago
             // so the data may have changed.
-            const r = await getJson('/account-data')
+            const r = await getJson('/api/account-data')
             if (r.status != 200) {
                 this.$patch({loggedIn: false})
                 return

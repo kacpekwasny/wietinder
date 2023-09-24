@@ -21,10 +21,10 @@ export default {
       this.panelStore.toggleSidePanel();
     },
     remoteURL(imageName: string) {
-      return `${getBackendHostname()}/uploads/${imageName}`;
+      return `${getBackendHostname()}/api/uploads/${imageName}`;
     },
     async logout() {
-      await getJson("/logout");
+      await getJson("/api/logout");
       useUserAccountStore().setLoggedOut();
       router.push("/login");
     },

@@ -11,7 +11,7 @@ export default {
     },
     methods: {
         async fetchWhoLikesMe(){
-            let response = await getJson("/who-likes-me")
+            let response = await getJson("/api/who-likes-me")
             let profilesThatLikeMe: Profile[] =  await response.json();
             this.profilesData = profilesThatLikeMe
             this.profilesStore.addProfilesToCache(profilesThatLikeMe)
@@ -44,7 +44,7 @@ export default {
             >
             <v-card
             @click = "navigateToAccount(profile.public_id)">
-            <v-img :src="`http://localhost:5000/uploads/${profile.images[0]}`" max-height="150px"> 
+            <v-img :src="`http://localhost:5000/api/uploads/${profile.images[0]}`" max-height="150px"> 
             </v-img>
             <div class="text-caption ma-1">
             {{ profile.name }}

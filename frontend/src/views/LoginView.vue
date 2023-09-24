@@ -39,7 +39,7 @@ export default defineComponent({
       if (this.v$.$error) {
         return;
       }
-      const resp = await postJson("/login", {
+      const resp = await postJson("/api/login", {
         email: this.emailField,
         password: this.passwordField,
       });

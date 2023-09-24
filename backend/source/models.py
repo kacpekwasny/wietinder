@@ -79,7 +79,7 @@ class User(db.Model, UserMixin):
             (PossibleMatch.user1_public_id == self.public_id) | (PossibleMatch.user2_public_id == self.public_id)
         )
     
-    def possible_matches_undecided(self):
+    def possible_matches_undecided(self) -> list[PossibleMatch]:
         return PossibleMatch.query.filter(
             ((PossibleMatch.user1_public_id == self.public_id) & (PossibleMatch.user1_choice == MatchChoice.none)) \
           | ((PossibleMatch.user2_public_id == self.public_id) & (PossibleMatch.user2_choice == MatchChoice.none)) \

@@ -2,29 +2,31 @@ from flask import Blueprint, request, jsonify
 from flask.wrappers import Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_required
-from ..tools.response import resp
-from ..models import MatchChoice
+from flask_socketio import SocketIO
 
-def get_match_bp(db: SQLAlchemy) -> Blueprint:
+from ..socket_events import login_required_sock
+from ..tools.response import resp
+from ..models import MatchChoice, PossibleMatch
+
+def get_match_bp(db: SQLAlchemy, socketio: SocketIO) -> Blueprint:
     from ..models import User
 
     match = Blueprint('match', __name__)
 
-    @match.route('/matches-undecided', methods=['GET'])
+    @match.route('/api/matches-undecided', methods=['GET'])
     @login_required
     def matches_undecided():
         # TODO - filtrowanie po preferencjach
-        possibleMatchesID = []
-        print(current_user.possible_matches_undecided())
-        for match in current_user.possible_matches_undecided():
-            if current_user.public_id == match.user1_public_id:
-                possibleMatchesID.append(match.user2_public_id)
-            else:
-                possibleMatchesID.append(match.user1_public_id)
+        possible_matches_pid = []
+        current_user: User
+        for match in User.possible_matches_undecided(current_user):
+            other_user = PossibleMatch.get_other_user(match, current_user.public_id)
+            if current_user.sex.value in other_user.get_target_sex():
+                possible_matches_pid.append(other_user.public_id)
 
-        return jsonify(possibleMatchesID)
+        return jsonify(possible_matches_pid)
 
-    @match.route('/update-match-choice', methods=['POST'])
+    @match.route('/api/update-match-choice', methods=['POST'])
     @login_required
     def update_match_choice():
         j = request.json
@@ -36,24 +38,28 @@ def get_match_bp(db: SQLAlchemy) -> Blueprint:
 
         return resp(200, 'success')
     
-    @match.route('/who-likes-me', methods=['GET'])
+    @socketio.on('update-match-choice')
+    @login_required_sock
+    def update_match_choice_sock(*args, **kwargs):
+        j: dict = args[0]
+        other_user_public_id = j.get("other_user_public_id")
+        my_choice = j.get("my_choice")
+        
+        User.change_match_choice(current_user, MatchChoice(my_choice), other_user_public_id)
+        db.session.commit()
+
+        return resp(200, 'success')
+        
+
+
+    @match.route('/api/who-likes-me', methods=['GET'])
     @login_required
     def get_who_likes_me():
         return jsonify([
             match.get_other_user(current_user.public_id).json()
             for match in User.likes_me(current_user)
         ])
-            
     
-    @match.route('/my-matches', methods=['GET'])
-    @login_required
-    def get_matches():
-        matchesID = []
-        for match in User.my_matches(current_user):
-            matchesID.append(match.get_other_user(current_user.public_id).public_id)
-        
-        return jsonify(matchesID)
-
     return match
-
+            
 

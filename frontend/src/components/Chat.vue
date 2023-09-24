@@ -20,14 +20,14 @@ export default {
   methods: {
  
     remoteURL(imageName: string) {
-      return `${getBackendHostname()}/uploads/${imageName}`;
+      return `${getBackendHostname()}/api/uploads/${imageName}`;
     },
 
     async sendMessage() {
       if (this.content.replace(" ", "").replace("\n", "") === "") {
         return
       }
-      this.socketStore.emit('server_message', {
+      this.socketStore.emit('client_sends_msg', {
         recepient_public_id: this.chatsStore.activeChat.profile.public_id,
         content: this.content,
       });

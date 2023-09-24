@@ -44,7 +44,7 @@ export default {
 
     async getPossibleMatches() {
       if (this.possibleMatches.length == 0) {
-        let response = await getJson("/matches-undecided");
+        let response = await getJson("/api/matches-undecided");
         let json = await response.json();
         this.possibleMatches = json;
         if (this.possibleMatches.length <= 1) {

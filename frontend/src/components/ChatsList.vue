@@ -16,7 +16,7 @@ export default {
 
   methods: {
     remoteURL(imageName: string) {
-      return `${getBackendHostname()}/uploads/${imageName}`;
+      return `${getBackendHostname()}/api/uploads/${imageName}`;
     },
 
     navigateToChat(publicId: string) {

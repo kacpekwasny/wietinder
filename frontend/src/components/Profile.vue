@@ -65,7 +65,7 @@ export default {
     },
 
     remoteURL(imageName: string) {
-      return `${getBackendHostname()}/uploads/${imageName}`;
+      return `${getBackendHostname()}/api/uploads/${imageName}`;
     },
     openImageDialog(image) {
       this.imageToShow = image;
@@ -73,7 +73,7 @@ export default {
     },
 
     async updateChoice(choice: string) {
-      postJson("/update-match-choice", {
+      postJson("/api/update-match-choice", {
         other_user_public_id: this.profileData.public_id,
         my_choice: choice,
       });

@@ -21,20 +21,13 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         user = User.query.filter_by(email=email).first()
         return user is not None
     
-    @auth.route('/is-user-logged-in', methods = ['GET'])
-    def is_user_logged_in():
-        if current_user.is_authenticated:
-            return resp(200, "user_logged_in")
-        else:
-            return resp(401, "user_not_logged_in")
-        
-    @auth.route('/logout')
+    @auth.route('/api/logout')
     @login_required
     def logout():
         logout_user()
         return resp(200, "git")
 
-    @auth.route('/login', methods=['POST'])
+    @auth.route('/api/login', methods=['POST'])
     def login():
         email = request.json.get('email')
         password = request.json.get('password')
@@ -52,40 +45,7 @@ def get_auth_bp(db: SQLAlchemy, is_prod: bool=True) -> Blueprint:
         else:
             return resp(404, "email_not_registered")
 
-    @auth.route('/login')
-    def get_login():
-        # To jest taki zapasowy
-        return """
-
-        <input id="e">
-        <input id="p">
-        <button onclick="postLogin()">post login</button>
-        
-        <script>
-        e = document.getElementById("e");
-        p = document.getElementById("p");
-        
-        function postLogin() {
-            object = {
-                "email": e.value,
-                "password": p.value,
-            }
-
-            fetch("/login", {
-                method: "POST", headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(object),
-                credentials: "same-origin",
-        }).then(console.log)
-        }
-
-
-        </script>
-
-        """
-
-    @auth.route('/register', methods=['POST'])
+    @auth.route('/api/register', methods=['POST'])
     def register():
         email = request.json.get('email')
         password = request.json.get('password')

@@ -15,7 +15,7 @@ export const useChatsStore = defineStore('ChatsStore', {
     },
     actions: {
         async fetchChats() {
-            const resp = await getJson('/chats-list')
+            const resp = await getJson('/api/chats-list')
             const chats: Chat[] = await resp.json()
             chats.sort((ch1, ch2) => {
                 return  lastChatInteraction(ch1) - lastChatInteraction(ch2)
