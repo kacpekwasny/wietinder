@@ -47,12 +47,6 @@ export default {
         let response = await getJson("/api/matches-undecided");
         let json = await response.json();
         this.possibleMatches = json;
-        if (this.possibleMatches.length <= 1) {
-          // Was getting json from server again hotfix befor deadline
-          this.noPossibleMatches = true;
-        } else {
-          this.noPossibleMatches = false;
-        }
       }
     },
 
@@ -76,8 +70,7 @@ export default {
 </script>
 
 <template>
-  <v-card-text class="text-h4 mt-3 text-center"> Swipe </v-card-text>
-  <v-card class="text-cetner" v-if="noPossibleMatches">
+  <v-card class="text-cetner pa-4" v-if="possibleMatches.length === 0">
     <v-alert
       icon="mdi-information"
       dense
@@ -88,6 +81,6 @@ export default {
     </v-alert>
   </v-card>
   <v-card v-else>
-    <Profile :profile-data="profileData"></Profile>
+    <Profile :profile-data="profileData" :likeable="true"></Profile>
   </v-card>
 </template>

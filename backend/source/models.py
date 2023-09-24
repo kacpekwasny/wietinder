@@ -81,8 +81,8 @@ class User(db.Model, UserMixin):
     
     def possible_matches_undecided(self) -> list[PossibleMatch]:
         return PossibleMatch.query.filter(
-            ((PossibleMatch.user1_public_id == self.public_id) & (PossibleMatch.user1_choice == MatchChoice.none)) \
-          | ((PossibleMatch.user2_public_id == self.public_id) & (PossibleMatch.user2_choice == MatchChoice.none)) \
+            ((PossibleMatch.user1_public_id == self.public_id) & PossibleMatch.user1_choice.in_([MatchChoice.none, MatchChoice.dislike])) \
+          | ((PossibleMatch.user2_public_id == self.public_id) & PossibleMatch.user2_choice.in_([MatchChoice.none, MatchChoice.dislike])) \
         )
     
     def set_name(self, name: str):
@@ -237,6 +237,17 @@ class PossibleMatch(db.Model):
         if self.user2_public_id == my_id:
             return self.user1
         raise RuntimeError("This is not your PossibleMatch. You are not user1, nor user2.")
+
+    def get_other_and_choices(self, my_id: str) -> tuple[User, MatchChoice, MatchChoice]:
+        """
+        return other_user, other_choice, my_choice
+        """
+        if self.user1_public_id == my_id:
+            return self.user2, self.user2_choice, self.user1_choice
+        if self.user2_public_id == my_id:
+            return self.user1, self.user1_choice, self.user2_choice
+        raise RuntimeError("This is not your PossibleMatch. You are not user1, nor user2.")
+
 
     def messages_slice(self, start: int, end: int) -> list[Message]:
         return Message.query.filter(Message.possible_match_id == self.id).order_by(Message.id.desc()).slice(start, end).all()

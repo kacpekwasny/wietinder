@@ -1,7 +1,6 @@
 import { getJson } from '@/common/requests'
 import { defineStore } from 'pinia'
 import { Profile } from './ProfilesStore'
-import { timeStamp } from 'console'
 
 
 // Store for keeping data of other profiles that has been returned from API.
@@ -18,7 +17,7 @@ export const useChatsStore = defineStore('ChatsStore', {
             const resp = await getJson('/api/chats-list')
             const chats: Chat[] = await resp.json()
             chats.sort((ch1, ch2) => {
-                return  lastChatInteraction(ch1) - lastChatInteraction(ch2)
+                return  this.lastChatInteraction(ch1) - this.lastChatInteraction(ch2)
             });
             chats.forEach(ch => {
                 this._chats.set(ch.profile.public_id, ch)
@@ -49,6 +48,10 @@ export const useChatsStore = defineStore('ChatsStore', {
         getChat(publicId: string): Chat {
             return this._chats.get(publicId)
         },
+
+        lastChatInteraction(ch: Chat): number {
+            return ch.messages[0]?.timestamp || ch.timestamp
+        }
         
     },
     getters: {
@@ -61,10 +64,6 @@ export interface Chat {
     profile:    Profile
     messages:   Message[]
     timestamp:  number
-}
-
-export function lastChatInteraction(ch: Chat): number {
-    return ch.messages[0]?.timestamp || ch.timestamp
 }
 
 export interface Message {

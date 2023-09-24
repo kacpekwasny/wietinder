@@ -16,15 +16,23 @@ def get_match_bp(db: SQLAlchemy, socketio: SocketIO) -> Blueprint:
     @match.route('/api/matches-undecided', methods=['GET'])
     @login_required
     def matches_undecided():
-        # TODO - filtrowanie po preferencjach
-        possible_matches_pid = []
-        current_user: User
-        for match in User.possible_matches_undecided(current_user):
-            other_user = PossibleMatch.get_other_user(match, current_user.public_id)
-            if current_user.sex.value in other_user.get_target_sex():
-                possible_matches_pid.append(other_user.public_id)
+        # Fix for: unboundlocalerror: cannot access local variable "current_user" where it is not associated with a value
+        global current_user
 
-        return jsonify(possible_matches_pid)
+        possible_matches: list[User] = []
+        for match in User.possible_matches_undecided(current_user):
+            other_user, _, me_choice = PossibleMatch.get_other_and_choices(match, current_user.public_id)
+            if current_user.sex.value not in other_user.get_target_sex():
+                continue
+            
+            print(me_choice)
+            if me_choice == MatchChoice.dislike:
+                possible_matches.append(other_user.public_id)
+            elif me_choice == MatchChoice.none:
+                possible_matches.insert(0, other_user.public_id)
+            print(possible_matches)
+
+        return jsonify(possible_matches)
 
     @match.route('/api/update-match-choice', methods=['POST'])
     @login_required

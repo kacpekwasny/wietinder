@@ -1,22 +1,24 @@
 <script lang="ts">
-import { useProfilesStore } from "@/stores/ProfilesStore";
+import { useProfilesStore, Profile as ProfileInterface } from "@/stores/ProfilesStore";
+import { useUserAccountStore } from "@/stores/AccountDataStore";
 import { getJson } from "../common/requests";
 import Profile from "../components/Profile.vue";
-
 
 export default {
   data() {
     return {
       profilesStore: useProfilesStore(),
+      accountDataStore: useUserAccountStore(),
       profileData: {
         name: "",
-        images: [],
+        public_id: "",
+        images: [] as string[],
         bio: "",
         sex: "",
-        fields_of_study: [],
-        target_sex: [],
-        target_activity: [],
-      },
+        fields_of_study: [] as string[],
+        target_sex: [] as string[],
+        target_activity: [] as string[],
+      } as ProfileInterface,
     };
   },
 
@@ -41,5 +43,5 @@ export default {
 </script>
 
 <template>
-  <Profile :profile-data="profileData"></Profile>
+  <Profile :profile-data="profileData" :likeable="profileData.public_id !== accountDataStore.accountData.public_id"></Profile>
 </template>

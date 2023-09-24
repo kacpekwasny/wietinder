@@ -15,6 +15,10 @@ export default {
         target_activity: [],
       },
     },
+    likeable: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -100,7 +104,7 @@ export default {
           <div class="text-caption">{{ profileData.bio }}</div>
         </div>
       </v-card-item>
-      <v-card-actions class="d-flex flex-row justify-center">
+      <v-card-actions v-if="likeable" class="d-flex flex-row justify-center">
         <v-btn
           value="dislike"
           variant="outlined"

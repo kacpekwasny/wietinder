@@ -77,7 +77,7 @@ export default {
 
   <v-container fluid class="d-flex flex-column" style="max-width: 800px">
   
-    <Profile :profile-data="profileData" v-if="showProfile"></Profile>
+    <Profile :profile-data="profileData" :likeable="false" v-if="showProfile"></Profile>
     <AccountSettings v-else></AccountSettings>
   </v-container>
 </template>
